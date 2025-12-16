@@ -1,14 +1,9 @@
-export class QuestionPanel {
+export class QuestionDisplay {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.onSubmitCallback = null;
     }
 
-    /**
-     * Renders the question UI.
-     * @param {Object} questionData - { text, type } from engine
-     * @param {Function} onSubmit - Callback when user submits answer
-     */
     render(questionData, onSubmit) {
         this.onSubmitCallback = onSubmit;
         this.container.innerHTML = '';
@@ -16,12 +11,10 @@ export class QuestionPanel {
         const wrapper = document.createElement('div');
         wrapper.className = 'question-box reveal-anim';
 
-        // Question Text
         const text = document.createElement('h3');
         text.textContent = questionData.text;
         wrapper.appendChild(text);
 
-        // Input Area
         const inputGroup = document.createElement('div');
         inputGroup.className = 'input-group';
         inputGroup.style.marginTop = '15px';
@@ -40,7 +33,6 @@ export class QuestionPanel {
         btn.className = 'primary-btn';
         btn.onclick = () => this.handleSubmit(input.value);
 
-        // Allow Enter key
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleSubmit(input.value);
         });
@@ -48,7 +40,7 @@ export class QuestionPanel {
         inputGroup.appendChild(input);
         inputGroup.appendChild(btn);
         wrapper.appendChild(inputGroup);
-        
+
         this.container.appendChild(wrapper);
     }
 
@@ -60,7 +52,6 @@ export class QuestionPanel {
     }
 
     showFeedback(isCorrect, correctAnswer) {
-        // Simple visual feedback
         const input = this.container.querySelector('input');
         if (isCorrect) {
             input.style.borderColor = '#1dd1a1';
