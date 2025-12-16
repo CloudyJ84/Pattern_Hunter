@@ -1,20 +1,25 @@
 export class QuestionDisplay {
-    constructor(containerId) {
+    constructor(containerId, onSubmitCallback) {
         this.container = document.getElementById(containerId);
-        this.onSubmitCallback = null;
+        this.onSubmitCallback = onSubmitCallback;
     }
 
-    render(questionData, onSubmit) {
-        this.onSubmitCallback = onSubmit;
+    /**
+     * Renders the question UI.
+     * @param {Object} questionData - { text, type, answer }
+     */
+    render(questionData) {
         this.container.innerHTML = '';
 
         const wrapper = document.createElement('div');
         wrapper.className = 'question-box reveal-anim';
 
+        // Question Text
         const text = document.createElement('h3');
         text.textContent = questionData.text;
         wrapper.appendChild(text);
 
+        // Input Area
         const inputGroup = document.createElement('div');
         inputGroup.className = 'input-group';
         inputGroup.style.marginTop = '15px';
@@ -33,6 +38,7 @@ export class QuestionDisplay {
         btn.className = 'primary-btn';
         btn.onclick = () => this.handleSubmit(input.value);
 
+        // Allow Enter key
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.handleSubmit(input.value);
         });
@@ -48,19 +54,6 @@ export class QuestionDisplay {
         if (!value) return;
         if (this.onSubmitCallback) {
             this.onSubmitCallback(value);
-        }
-    }
-
-    showFeedback(isCorrect, correctAnswer) {
-        const input = this.container.querySelector('input');
-        if (isCorrect) {
-            input.style.borderColor = '#1dd1a1';
-            input.style.backgroundColor = 'rgba(29, 209, 161, 0.1)';
-        } else {
-            input.style.borderColor = '#ee5253';
-            input.style.backgroundColor = 'rgba(238, 82, 83, 0.1)';
-            input.value = '';
-            input.placeholder = 'Try again...';
         }
     }
 }
