@@ -1,4 +1,4 @@
-import { generateLevel } from './src/engine/levelEngine.js';
+import { initLevelEngine, generateLevel } from './src/engine/levelEngine.js';
 
 async function loadJSON(path) {
   const response = await fetch(path);
@@ -13,16 +13,15 @@ async function init() {
   const uiComponents = await loadJSON('./data/uiComponents.json');
   const uiStateFlow = await loadJSON('./data/uiStateFlow.json');
 
-  // Store globally or pass into engine modules as needed
-  window.gameConfig = {
+  // Initialize the engine with the loaded data
+  initLevelEngine({
     datasetRules,
     patternEngine,
     questionGenerator,
-    levelProgression,
-    uiComponents,
-    uiStateFlow
-  };
+    levelProgression
+  });
 
+  // Now it's safe to generate a level
   const test = generateLevel(1);
   console.log(test);
 
