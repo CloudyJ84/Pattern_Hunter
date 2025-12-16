@@ -1,11 +1,14 @@
 console.log("main.js loaded");
 
-// Import all engine initializers and generators
+// Import engine initializers
 import { initDatasetGenerator } from './src/engine/datasetGenerator.js';
 import { initPatternEngine } from './src/engine/patternEngine.js';
 import { initQuestionEngine } from './src/engine/questionEngine.js';
 import { initFormattingEngine } from './src/engine/formattingEngine.js';
-import { initLevelEngine, generateLevel } from './src/engine/levelEngine.js';
+import { initLevelEngine } from './src/engine/levelEngine.js';
+
+// Import UI
+import { UIManager } from './src/ui/UIManager.js';
 
 // Helper to load JSON files
 async function loadJSON(path) {
@@ -21,8 +24,6 @@ async function init() {
   const patternEngine = await loadJSON('./data/patternEngine.json');
   const questionGenerator = await loadJSON('./data/questionGenerator.json');
   const levelProgression = await loadJSON('./data/levelProgression.json');
-  const uiComponents = await loadJSON('./data/uiComponents.json');
-  const uiStateFlow = await loadJSON('./data/uiStateFlow.json');
 
   // Initialize all engine modules
   initDatasetGenerator(datasetRules);
@@ -33,14 +34,10 @@ async function init() {
 
   console.log("All engines initialized");
 
-  // Test the engine
-  const test = generateLevel(1);
-  console.log("Generated Level 1:", test);
+  // Boot the UI
+  new UIManager();
 
-  // Display a simple message on the page
-  document.getElementById('app').innerText =
-    'Engine test complete. Check console for output.';
-
+  console.log("UI initialized");
   console.log("init() finished");
 }
 
