@@ -1,114 +1,115 @@
 {
-  "patternEngine": {
-    "dates": {
-      "weekendHighlight": {
-        "injectPattern": "ensure at least one weekend date",
-        "formattingRule": "highlightWeekends",
-        "highlightLogic": "cells where date.getDay() is 0 or 6",
-        "questionTypes": ["whichDateIsHighlighted", "countWeekendDates", "rowWithEarliestDate", "mostFrequentWeekday"]
-      },
-      "weekdayCluster": {
-        "injectPattern": "inject 2–4 dates with same weekday",
-        "formattingRule": "highlightSpecificWeekday",
-        "highlightLogic": "cells matching chosen weekday",
-        "questionTypes": ["whichWeekdayIsMostFrequent", "howManyOfWeekday"]
-      },
-      "earliestOrLatest": {
-        "injectPattern": "inject a min or max date",
-        "formattingRule": "highlightEarliestOrLatest",
-        "highlightLogic": "min or max date in dataset",
-        "questionTypes": ["whichDateIsEarliest", "whichDateIsLatest"]
-      },
-      "dateRange": {
-        "injectPattern": "inject dates within a 7-day window",
-        "formattingRule": "highlightDateRange",
-        "highlightLogic": "dates between start and end",
-        "questionTypes": ["howManyInRange", "whichDatesInRange"]
-      }
+  "numbers": {
+    "aboveThreshold": {
+      "injectPattern": "inject at least one value > threshold",
+      "formattingRule": "highlightAboveThreshold",
+      "highlightLogic": "value > threshold",
+      "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold"]
     },
-    "numbers": {
-      "aboveThreshold": {
-        "injectPattern": "inject at least one value > threshold",
-        "formattingRule": "highlightAboveThreshold",
-        "highlightLogic": "value > threshold",
-        "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold"]
-      },
-      "belowThreshold": {
-        "injectPattern": "inject at least one value < threshold",
-        "formattingRule": "highlightBelowThreshold",
-        "highlightLogic": "value < threshold",
-        "questionTypes": ["whichValueIsHighlighted", "countBelowThreshold"]
-      },
-      "outlier": {
-        "injectPattern": "inject a value 2–3× larger or smaller",
-        "formattingRule": "highlightOutlier",
-        "highlightLogic": "value is > mean+2sd or < mean-2sd",
-        "questionTypes": ["whichValueIsOutlier", "rowWithOutlier"]
-      },
-      "cluster": {
-        "injectPattern": "inject 3–5 values within narrow band",
-        "formattingRule": "highlightCluster",
-        "highlightLogic": "values within cluster range",
-        "questionTypes": ["whichClusterIsLargest", "howManyInCluster"]
-      },
-      "maxOrMin": {
-        "injectPattern": "inject unique max or min",
-        "formattingRule": "highlightMaxOrMin",
-        "highlightLogic": "value === max or value === min",
-        "questionTypes": ["whichValueIsHighest", "whichValueIsLowest"]
-      }
+    "belowThreshold": {
+      "injectPattern": "inject at least one value < threshold",
+      "formattingRule": "highlightBelowThreshold",
+      "highlightLogic": "value < threshold",
+      "questionTypes": ["whichValueIsHighlighted", "countBelowThreshold"]
     },
-    "categories": {
-      "mostFrequent": {
-        "injectPattern": "inject category X 3–6 times",
-        "formattingRule": "highlightMostFrequent",
-        "highlightLogic": "cells matching most frequent category",
-        "questionTypes": ["whichCategoryIsMostFrequent", "howManyTimesCategoryAppears"]
-      },
-      "leastFrequent": {
-        "injectPattern": "inject category X exactly once",
-        "formattingRule": "highlightUnique",
-        "highlightLogic": "cells with category count === 1",
-        "questionTypes": ["whichCategoryIsUnique", "rowWithUniqueCategory"]
-      },
-      "uniqueCategory": {
-        "injectPattern": "inject category not used elsewhere",
-        "formattingRule": "highlightUnique",
-        "highlightLogic": "cells with category count === 1",
-        "questionTypes": ["whichCategoryIsUnique", "howManyUniqueCategories"]
-      },
-      "rowOrColumnPattern": {
-        "injectPattern": "fill one row or column with same category",
-        "formattingRule": "highlightRowOrColumnPattern",
-        "highlightLogic": "cells in the patterned row/column",
-        "questionTypes": ["whichRowHasPattern", "whichColumnHasPattern"]
-      }
+    "outlier": {
+      "injectPattern": "inject a value 2–3× larger or smaller",
+      "formattingRule": "highlightOutlier",
+      "highlightLogic": "value is > mean+2sd or < mean-2sd",
+      "questionTypes": ["whichValueIsOutlier", "rowWithOutlier"]
     },
-    "times": {
-      "earlyLate": {
-        "injectPattern": "inject times <10:00 or >16:00",
-        "formattingRule": "highlightEarlyLate",
-        "highlightLogic": "time < threshold or time > threshold",
-        "questionTypes": ["whichTimeIsHighlighted", "countEarlyOrLate"]
-      },
-      "amPm": {
-        "injectPattern": "inject at least one PM time",
-        "formattingRule": "highlightAmPm",
-        "highlightLogic": "time.getHours() >= 12",
-        "questionTypes": ["howManyPmTimes", "whichTimeIsPm"]
-      },
-      "earliestLatest": {
-        "injectPattern": "inject min or max time",
-        "formattingRule": "highlightEarliestOrLatest",
-        "highlightLogic": "time === min or time === max",
-        "questionTypes": ["whichTimeIsEarliest", "whichTimeIsLatest"]
-      },
-      "timeRange": {
-        "injectPattern": "inject times between 12:00–14:00",
-        "formattingRule": "highlightTimeRange",
-        "highlightLogic": "time between start and end",
-        "questionTypes": ["howManyInTimeRange", "whichTimesInRange"]
-      }
+    "cluster": {
+      "injectPattern": "inject 3–5 values within narrow band",
+      "formattingRule": "highlightCluster",
+      "highlightLogic": "values within cluster range",
+      "questionTypes": ["whichClusterIsLargest", "howManyInCluster"]
+    },
+    "maxOrMin": {
+      "injectPattern": "inject unique max or min",
+      "formattingRule": "highlightMaxOrMin",
+      "highlightLogic": "value === max or value === min",
+      "questionTypes": ["whichValueIsHighest", "whichValueIsLowest"]
+    }
+  },
+
+  "dates": {
+    "weekendHighlight": {
+      "injectPattern": "ensure at least one weekend date",
+      "formattingRule": "highlightWeekends",
+      "highlightLogic": "cells where date.getDay() is 0 or 6",
+      "questionTypes": ["whichDateIsHighlighted", "countWeekendDates", "rowWithEarliestDate", "mostFrequentWeekday"]
+    },
+    "weekdayCluster": {
+      "injectPattern": "inject 2–4 dates with same weekday",
+      "formattingRule": "highlightSpecificWeekday",
+      "highlightLogic": "cells matching chosen weekday",
+      "questionTypes": ["whichWeekdayIsMostFrequent", "howManyOfWeekday"]
+    },
+    "earliestOrLatest": {
+      "injectPattern": "inject a min or max date",
+      "formattingRule": "highlightEarliestOrLatest",
+      "highlightLogic": "min or max date in dataset",
+      "questionTypes": ["whichDateIsEarliest", "whichDateIsLatest"]
+    },
+    "dateRange": {
+      "injectPattern": "inject dates within a 7-day window",
+      "formattingRule": "highlightDateRange",
+      "highlightLogic": "dates between start and end",
+      "questionTypes": ["howManyInRange", "whichDatesInRange"]
+    }
+  },
+
+  "times": {
+    "earlyLate": {
+      "injectPattern": "inject times <10:00 or >16:00",
+      "formattingRule": "highlightEarlyLate",
+      "highlightLogic": "time < threshold or time > threshold",
+      "questionTypes": ["whichTimeIsHighlighted", "countEarlyOrLate"]
+    },
+    "amPm": {
+      "injectPattern": "inject at least one PM time",
+      "formattingRule": "highlightAmPm",
+      "highlightLogic": "time.getHours() >= 12",
+      "questionTypes": ["howManyPmTimes", "whichTimeIsPm"]
+    },
+    "earliestLatest": {
+      "injectPattern": "inject min or max time",
+      "formattingRule": "highlightEarliestOrLatest",
+      "highlightLogic": "time === min or time === max",
+      "questionTypes": ["whichTimeIsEarliest", "whichTimeIsLatest"]
+    },
+    "timeRange": {
+      "injectPattern": "inject times between 12:00–14:00",
+      "formattingRule": "highlightTimeRange",
+      "highlightLogic": "time between start and end",
+      "questionTypes": ["howManyInTimeRange", "whichTimesInRange"]
+    }
+  },
+
+  "categories": {
+    "mostFrequent": {
+      "injectPattern": "inject category X 3–6 times",
+      "formattingRule": "highlightMostFrequent",
+      "highlightLogic": "cells matching most frequent category",
+      "questionTypes": ["whichCategoryIsMostFrequent", "howManyTimesCategoryAppears"]
+    },
+    "leastFrequent": {
+      "injectPattern": "inject category X exactly once",
+      "formattingRule": "highlightUnique",
+      "highlightLogic": "cells with category count === 1",
+      "questionTypes": ["whichCategoryIsUnique", "rowWithUniqueCategory"]
+    },
+    "uniqueCategory": {
+      "injectPattern": "inject category not used elsewhere",
+      "formattingRule": "highlightUnique",
+      "highlightLogic": "cells with category count === 1",
+      "questionTypes": ["whichCategoryIsUnique", "howManyUniqueCategories"]
+    },
+    "rowOrColumnPattern": {
+      "injectPattern": "fill one row or column with same category",
+      "formattingRule": "highlightRowOrColumnPattern",
+      "highlightLogic": "cells in the patterned row/column",
+      "questionTypes": ["whichRowHasPattern", "whichColumnHasPattern"]
     }
   }
 }
