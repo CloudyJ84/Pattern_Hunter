@@ -1,6 +1,7 @@
 import { generateLevel, initLevelEngine } from '../src/engine/levelEngine.js';
 import { initDatasetGenerator } from '../src/engine/datasetGenerator.js';
 import { initPatternEngine } from '../src/engine/patternEngine.js';
+import { initFormattingEngine } from '../src/engine/formattingEngine.js';
 import { GridRenderer } from '../src/ui/GridRenderer.js';
 import { QuestionDisplay } from '../src/ui/QuestionDisplay.js';
 
@@ -25,6 +26,7 @@ Promise.all([
   // Initialize engines in dependency order
   initDatasetGenerator(datasetRules);
   initPatternEngine(patternRules);
+  initFormattingEngine(patternRules);   // ⭐ NEW LINE
   initLevelEngine(levelProgression);
 
   console.log("All engines initialized");
