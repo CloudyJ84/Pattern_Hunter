@@ -3,32 +3,50 @@
     "levels": [1, 2, 3],
     "datasetSize": { "rows": 3, "cols": 3 },
     "datasetTypes": ["numbers"],
-    "patternTypes": ["aboveThreshold", "belowThreshold"],
-    "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold", "countBelowThreshold"],
-    "notes": "Intro band. Single highlighted cell. Very obvious numeric patterns."
+    "patternTypes": ["aboveThreshold"],
+    "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold"],
+    "notes": "Intro band. Simple numeric patterns only. Guaranteed compatibility."
   },
   {
     "levels": [4, 5, 6],
     "datasetSize": { "rows": 4, "cols": 4 },
     "datasetTypes": ["numbers", "dates", "times"],
-    "patternTypes": ["aboveThreshold", "belowThreshold", "earliestOrLatest", "earlyLate", "amPm"],
-    "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold", "countBelowThreshold", "whichTimeIsEarliest", "whichTimeIsLatest", "howManyPmTimes", "countEarlyOrLate"],
-    "notes": "Introduce time logic and slightly more complex numeric patterns."
+    "patternTypes": {
+      "numbers": ["aboveThreshold"],
+      "dates": ["earliestOrLatest", "weekendHighlight"],
+      "times": ["earlyLate", "amPm"]
+    },
+    "questionTypes": {
+      "numbers": ["whichValueIsHighlighted", "countAboveThreshold"],
+      "dates": ["whichDateIsEarliest", "whichDateIsLatest", "whichDateIsHighlighted"],
+      "times": ["whichTimeIsEarliest", "whichTimeIsLatest", "howManyPmTimes", "countEarlyOrLate"]
+    },
+    "notes": "Introduces dates and times with dataset-specific pattern pools."
   },
   {
     "levels": [7, 8, 9, 10],
     "datasetSize": { "rows": 5, "cols": 5 },
     "datasetTypes": ["numbers", "dates", "times", "categories"],
-    "patternTypes": ["cluster", "maxOrMin", "weekdayCluster", "dateRange", "timeRange", "mostFrequent", "leastFrequent", "uniqueCategory"],
-    "questionTypes": ["whichClusterIsLargest", "howManyInCluster", "whichValueIsHighest", "whichValueIsLowest", "mostFrequentWeekday", "howManyInRange", "whichDatesInRange", "whichCategoryIsMostFrequent", "whichCategoryIsUnique", "howManyUniqueCategories"],
-    "notes": "Full pattern variety. Multi‑cell highlights. Frequency logic introduced."
+    "patternTypes": {
+      "numbers": ["aboveThreshold", "maxOrMin", "cluster"],
+      "dates": ["earliestOrLatest", "weekdayCluster", "dateRange"],
+      "times": ["earlyLate", "amPm", "timeRange"],
+      "categories": ["mostFrequent", "leastFrequent", "uniqueCategory"]
+    },
+    "questionTypes": {
+      "numbers": ["whichValueIsHighest", "whichValueIsLowest", "howManyInCluster"],
+      "dates": ["whichDateIsEarliest", "whichDateIsLatest", "whichDatesInRange", "mostFrequentWeekday"],
+      "times": ["whichTimeIsEarliest", "whichTimeIsLatest", "howManyInRange"],
+      "categories": ["whichCategoryIsMostFrequent", "whichCategoryIsUnique", "howManyUniqueCategories"]
+    },
+    "notes": "Full pattern variety. Dataset-specific logic prevents mismatches."
   },
   {
     "levels": "11+",
     "datasetSize": { "rows": 6, "cols": 6 },
     "datasetTypes": ["numbers", "dates", "times", "categories"],
-    "patternTypes": "ALL",
-    "questionTypes": "ALL",
-    "notes": "Endless mode. Randomized dataset type, pattern type, and question type. Difficulty scales by increasing dataset size and pattern subtlety."
+    "patternTypes": "ALL_SAFE",
+    "questionTypes": "ALL_SAFE",
+    "notes": "Endless mode. Engine filters patterns by dataset type to avoid mismatches."
   }
 ]
