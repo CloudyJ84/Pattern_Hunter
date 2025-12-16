@@ -1,15 +1,31 @@
-import levelProgression from '../data/levelProgression.json' assert { type: 'json' };
 import { generateLevel, initLevelEngine } from '../src/engine/levelEngine.js';
 import { GridRenderer } from '../src/ui/GridRenderer.js';
 import { QuestionDisplay } from '../src/ui/QuestionDisplay.js';
 
-// Initialize engine with progression rules
-console.log("Initializing LevelEngine with progression rules:", levelProgression);
-initLevelEngine(levelProgression);
-
 const challengeContainer = document.getElementById('challenge');
 const jsonOutput = document.getElementById('jsonOutput');
 const logPanel = document.getElementById('log');
+
+// Disable buttons until engine is ready
+document.querySelectorAll('#controls button').forEach(btn => btn.disabled = true);
+
+// Load progression JSON manually (GitHub Pages compatible)
+fetch('../data/levelProgression.json')
+  .then(res => res.json())
+  .then(levelProgression => {
+    console.log("Loaded progression rules:", levelProgression);
+
+    // Initialize engine with loaded config
+    initLevelEngine(levelProgression);
+
+    // Re-enable buttons
+    document.querySelectorAll('#controls button').forEach(btn => btn.disabled = false);
+
+    console.log("LevelEngine initialized");
+  })
+  .catch(err => {
+    console.error("Failed to load levelProgression.json:", err);
+  });
 
 function renderChallenge(challenge) {
   challengeContainer.innerHTML = '';
@@ -22,7 +38,6 @@ function renderChallenge(challenge) {
   const grid = new GridRenderer(gridWrapper);
   grid.render(challenge.grid);
 
-  // Apply formatting (if any)
   if (challenge.formatting && challenge.formatting.highlightedCells) {
     grid.applyFormatting(
       challenge.formatting.highlightedCells,
