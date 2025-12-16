@@ -1,4 +1,5 @@
 import { generateLevel, initLevelEngine } from '../src/engine/levelEngine.js';
+import { initDatasetGenerator } from '../src/engine/datasetGenerator.js';
 import { GridRenderer } from '../src/ui/GridRenderer.js';
 import { QuestionDisplay } from '../src/ui/QuestionDisplay.js';
 
@@ -6,26 +7,32 @@ const challengeContainer = document.getElementById('challenge');
 const jsonOutput = document.getElementById('jsonOutput');
 const logPanel = document.getElementById('log');
 
-// Disable buttons until engine is ready
+// Disable buttons until everything is initialized
 document.querySelectorAll('#controls button').forEach(btn => btn.disabled = true);
 
-// Load progression JSON manually (GitHub Pages compatible)
-fetch('../data/levelProgression.json')
-  .then(res => res.json())
-  .then(levelProgression => {
-    console.log("Loaded progression rules:", levelProgression);
+// Load BOTH configs before enabling the harness
+Promise.all([
+  fetch('../data/datasetRules.json').then(res => res.json()),
+  fetch('../data/levelProgression.json').then(res => res.json())
+])
+.then(([datasetRules, levelProgression]) => {
+  console.log("Loaded dataset rules:", datasetRules);
+  console.log("Loaded progression rules:", levelProgression);
 
-    // Initialize engine with loaded config
-    initLevelEngine(levelProgression);
+  // Initialize DatasetGenerator FIRST
+  initDatasetGenerator(datasetRules);
 
-    // Re-enable buttons
-    document.querySelectorAll('#controls button').forEach(btn => btn.disabled = false);
+  // Initialize LevelEngine SECOND
+  initLevelEngine(levelProgression);
 
-    console.log("LevelEngine initialized");
-  })
-  .catch(err => {
-    console.error("Failed to load levelProgression.json:", err);
-  });
+  console.log("All engines initialized");
+
+  // Re-enable buttons
+  document.querySelectorAll('#controls button').forEach(btn => btn.disabled = false);
+})
+.catch(err => {
+  console.error("Initialization failed:", err);
+});
 
 function renderChallenge(challenge) {
   challengeContainer.innerHTML = '';
