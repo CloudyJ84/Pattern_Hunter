@@ -1,9 +1,11 @@
+import levelProgression from '../data/levelProgression.json' assert { type: 'json' };
 import { generateLevel, initLevelEngine } from '../src/engine/levelEngine.js';
 import { GridRenderer } from '../src/ui/GridRenderer.js';
 import { QuestionDisplay } from '../src/ui/QuestionDisplay.js';
 
-// Initialize engine before generating any levels
-initLevelEngine();
+// Initialize engine with progression rules
+console.log("Initializing LevelEngine with progression rules:", levelProgression);
+initLevelEngine(levelProgression);
 
 const challengeContainer = document.getElementById('challenge');
 const jsonOutput = document.getElementById('jsonOutput');
