@@ -2,10 +2,10 @@
   {
     "levels": [1, 2, 3],
     "datasetSize": { "rows": 3, "cols": 3 },
-    "datasetTypes": ["numbers", "dates"],
-    "patternTypes": ["aboveThreshold", "belowThreshold", "weekendHighlight", "earliestOrLatest"],
-    "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold", "countBelowThreshold", "whichDateIsHighlighted", "whichDateIsEarliest", "whichDateIsLatest"],
-    "notes": "Intro band. Single highlighted cell. Very obvious patterns."
+    "datasetTypes": ["numbers"],
+    "patternTypes": ["aboveThreshold", "belowThreshold"],
+    "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold", "countBelowThreshold"],
+    "notes": "Intro band. Single highlighted cell. Very obvious numeric patterns."
   },
   {
     "levels": [4, 5, 6],
