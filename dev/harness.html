@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Pattern Hunter – Dev Harness</title>
+  <link rel="stylesheet" href="../src/ui/styles.css">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #controls button { margin-right: 10px; }
+    #log { margin-top: 20px; padding: 10px; background: #f3f3f3; border-radius: 6px; }
+    #jsonView { margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h1>Pattern Hunter – Developer Harness</h1>
+
+  <div id="controls">
+    <button data-level="1">Generate Level 1</button>
+    <button data-level="2">Generate Level 2</button>
+    <button id="random">Generate Random Level</button>
+  </div>
+
+  <div id="challenge"></div>
+
+  <div id="jsonView">
+    <details>
+      <summary>Show Raw Challenge JSON</summary>
+      <pre id="jsonOutput"></pre>
+    </details>
+  </div>
+
+  <div id="log"></div>
+
+  <script type="module" src="./harness.js"></script>
+</body>
+</html>
