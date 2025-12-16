@@ -2,6 +2,7 @@ import { generateLevel, initLevelEngine } from '../src/engine/levelEngine.js';
 import { initDatasetGenerator } from '../src/engine/datasetGenerator.js';
 import { initPatternEngine } from '../src/engine/patternEngine.js';
 import { initFormattingEngine } from '../src/engine/formattingEngine.js';
+import { initQuestionEngine } from '../src/engine/questionEngine.js';
 import { GridRenderer } from '../src/ui/GridRenderer.js';
 import { QuestionDisplay } from '../src/ui/QuestionDisplay.js';
 
@@ -12,21 +13,24 @@ const logPanel = document.getElementById('log');
 // Disable buttons until everything is initialized
 document.querySelectorAll('#controls button').forEach(btn => btn.disabled = true);
 
-// Load ALL THREE configs before enabling the harness
+// Load ALL FOUR configs before enabling the harness
 Promise.all([
   fetch('../data/datasetRules.json').then(res => res.json()),
   fetch('../data/levelProgression.json').then(res => res.json()),
-  fetch('../data/patternEngine.json').then(res => res.json())
+  fetch('../data/patternEngine.json').then(res => res.json()),
+  fetch('../data/questionGenerator.json').then(res => res.json())
 ])
-.then(([datasetRules, levelProgression, patternRules]) => {
+.then(([datasetRules, levelProgression, patternRules, questionRules]) => {
   console.log("Loaded dataset rules:", datasetRules);
   console.log("Loaded progression rules:", levelProgression);
   console.log("Loaded pattern rules:", patternRules);
+  console.log("Loaded question rules:", questionRules);
 
   // Initialize engines in dependency order
   initDatasetGenerator(datasetRules);
   initPatternEngine(patternRules);
-  initFormattingEngine(patternRules);   // ⭐ NEW LINE
+  initFormattingEngine(patternRules);   // formatting uses pattern rules
+  initQuestionEngine(questionRules);    // question engine uses questionGenerator.json
   initLevelEngine(levelProgression);
 
   console.log("All engines initialized");
