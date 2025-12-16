@@ -1,5 +1,6 @@
 import { generateLevel, initLevelEngine } from '../src/engine/levelEngine.js';
 import { initDatasetGenerator } from '../src/engine/datasetGenerator.js';
+import { initPatternEngine } from '../src/engine/patternEngine.js';
 import { GridRenderer } from '../src/ui/GridRenderer.js';
 import { QuestionDisplay } from '../src/ui/QuestionDisplay.js';
 
@@ -10,19 +11,20 @@ const logPanel = document.getElementById('log');
 // Disable buttons until everything is initialized
 document.querySelectorAll('#controls button').forEach(btn => btn.disabled = true);
 
-// Load BOTH configs before enabling the harness
+// Load ALL THREE configs before enabling the harness
 Promise.all([
   fetch('../data/datasetRules.json').then(res => res.json()),
-  fetch('../data/levelProgression.json').then(res => res.json())
+  fetch('../data/levelProgression.json').then(res => res.json()),
+  fetch('../data/patternEngine.json').then(res => res.json())
 ])
-.then(([datasetRules, levelProgression]) => {
+.then(([datasetRules, levelProgression, patternRules]) => {
   console.log("Loaded dataset rules:", datasetRules);
   console.log("Loaded progression rules:", levelProgression);
+  console.log("Loaded pattern rules:", patternRules);
 
-  // Initialize DatasetGenerator FIRST
+  // Initialize engines in dependency order
   initDatasetGenerator(datasetRules);
-
-  // Initialize LevelEngine SECOND
+  initPatternEngine(patternRules);
   initLevelEngine(levelProgression);
 
   console.log("All engines initialized");
