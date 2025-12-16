@@ -1,15 +1,11 @@
 import { Cell } from './Cell.js';
 
-export class Grid {
+export class GridRenderer {
     constructor(containerElement) {
         this.container = containerElement;
-        this.cells = []; // Array of Cell instances
+        this.cells = [];
     }
 
-    /**
-     * Renders the grid based on the provided 2D dataset.
-     * @param {Array<Array<Object>>} gridData - 2D array from engine
-     */
     render(gridData) {
         this.container.innerHTML = '';
         this.cells = [];
@@ -17,11 +13,9 @@ export class Grid {
         const rows = gridData.length;
         const cols = gridData[0].length;
 
-        // Apply CSS Grid layout dynamic properties
         this.container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
         this.container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-        
-        // Flatten loop to render cells
+
         gridData.forEach(row => {
             row.forEach(cellData => {
                 const cellComponent = new Cell(cellData);
@@ -31,13 +25,7 @@ export class Grid {
         });
     }
 
-    /**
-     * Applies highlighting to specific cells.
-     * @param {Array<Object>} cellsToHighlight - Array of {row, col} objects
-     * @param {string} cssClass - The CSS class to apply
-     */
     applyFormatting(cellsToHighlight, cssClass) {
-        // Create a lookup set for O(1) access
         const highlightSet = new Set(
             cellsToHighlight.map(c => `${c.row},${c.col}`)
         );
