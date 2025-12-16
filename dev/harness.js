@@ -15,7 +15,18 @@ function renderChallenge(challenge) {
 
   // Render question
   const question = new QuestionDisplay(challenge.question);
-  challengeContainer.appendChild(question.render());
+  const questionEl = question.render();
+
+  // Add answer checking
+  const checkBtn = document.createElement('button');
+  checkBtn.textContent = 'Check Answer';
+  checkBtn.addEventListener('click', () => {
+    const userAnswer = question.getAnswer();
+    evaluateAnswer(userAnswer, challenge);
+  });
+
+  challengeContainer.appendChild(questionEl);
+  challengeContainer.appendChild(checkBtn);
 
   // JSON output
   jsonOutput.textContent = JSON.stringify(challenge, null, 2);
@@ -27,6 +38,18 @@ function renderChallenge(challenge) {
     <strong>formattingRule:</strong> ${challenge.formatting.formattingRule}<br>
     <strong>highlightedCells:</strong> ${JSON.stringify(challenge.formatting.highlightedCells)}<br>
   `;
+}
+
+function evaluateAnswer(userAnswer, challenge) {
+  const correct = userAnswer == challenge.question.answer;
+
+  const result = document.createElement('div');
+  result.className = 'answer-result';
+  result.textContent = correct
+    ? 'Correct!'
+    : `Incorrect — correct answer is ${challenge.question.answer}`;
+
+  challengeContainer.appendChild(result);
 }
 
 function generate(level) {
