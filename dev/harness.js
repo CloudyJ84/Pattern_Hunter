@@ -1,6 +1,9 @@
-import { generateLevel } from '../src/engine/levelEngine.js';
+import { generateLevel, initLevelEngine } from '../src/engine/levelEngine.js';
 import { GridRenderer } from '../src/ui/GridRenderer.js';
 import { QuestionDisplay } from '../src/ui/QuestionDisplay.js';
+
+// Initialize engine before generating any levels
+initLevelEngine();
 
 const challengeContainer = document.getElementById('challenge');
 const jsonOutput = document.getElementById('jsonOutput');
@@ -9,29 +12,36 @@ const logPanel = document.getElementById('log');
 function renderChallenge(challenge) {
   challengeContainer.innerHTML = '';
 
-  // Render grid
-  const grid = new GridRenderer(challenge.grid, challenge.formatting);
-  challengeContainer.appendChild(grid.render());
+  // --- GRID RENDERING ---
+  const gridWrapper = document.createElement('div');
+  gridWrapper.className = 'grid-container';
+  challengeContainer.appendChild(gridWrapper);
 
-  // Render question
-  const question = new QuestionDisplay(challenge.question);
-  const questionEl = question.render();
+  const grid = new GridRenderer(gridWrapper);
+  grid.render(challenge.grid);
 
-  // Add answer checking
-  const checkBtn = document.createElement('button');
-  checkBtn.textContent = 'Check Answer';
-  checkBtn.addEventListener('click', () => {
-    const userAnswer = question.getAnswer();
-    evaluateAnswer(userAnswer, challenge);
+  // Apply formatting (if any)
+  if (challenge.formatting && challenge.formatting.highlightedCells) {
+    grid.applyFormatting(
+      challenge.formatting.highlightedCells,
+      challenge.formatting.formattingRule
+    );
+  }
+
+  // --- QUESTION RENDERING ---
+  const questionWrapper = document.createElement('div');
+  questionWrapper.id = 'question-area';
+  challengeContainer.appendChild(questionWrapper);
+
+  const question = new QuestionDisplay('question-area');
+  question.render(challenge.question, (userAnswer) => {
+    evaluateAnswer(userAnswer, challenge, question);
   });
 
-  challengeContainer.appendChild(questionEl);
-  challengeContainer.appendChild(checkBtn);
-
-  // JSON output
+  // --- JSON OUTPUT ---
   jsonOutput.textContent = JSON.stringify(challenge, null, 2);
 
-  // Log panel
+  // --- LOG PANEL ---
   logPanel.innerHTML = `
     <strong>datasetType:</strong> ${challenge.datasetType}<br>
     <strong>patternType:</strong> ${challenge.patternType}<br>
@@ -40,11 +50,14 @@ function renderChallenge(challenge) {
   `;
 }
 
-function evaluateAnswer(userAnswer, challenge) {
+function evaluateAnswer(userAnswer, challenge, questionComponent) {
   const correct = userAnswer == challenge.question.answer;
+
+  questionComponent.showFeedback(correct, challenge.question.answer);
 
   const result = document.createElement('div');
   result.className = 'answer-result';
+  result.style.marginTop = '10px';
   result.textContent = correct
     ? 'Correct!'
     : `Incorrect — correct answer is ${challenge.question.answer}`;
@@ -53,10 +66,12 @@ function evaluateAnswer(userAnswer, challenge) {
 }
 
 function generate(level) {
+  console.log("Generating level:", level);
   const challenge = generateLevel(level);
   renderChallenge(challenge);
 }
 
+// --- BUTTON HOOKS ---
 document.querySelectorAll('#controls button[data-level]').forEach(btn => {
   btn.addEventListener('click', () => generate(Number(btn.dataset.level)));
 });
