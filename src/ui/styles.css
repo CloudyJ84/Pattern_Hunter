@@ -1,0 +1,82 @@
+/* Reset & Base */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e24;
+    color: #f0f0f0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    max-height: 900px;
+    position: relative;
+    background-color: #2b2b36;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+#ui-layer {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Utility Classes */
+.screen {
+    padding: 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hidden {
+    display: none !important;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #357abd;
+}
+
+/* Formatting Engine Classes (Placeholders) */
+.fmt-weekend { border: 2px solid #ff6b6b; }
+.fmt-weekday { background-color: rgba(255, 255, 255, 0.1); }
+.fmt-extreme { font-weight: bold; color: #ffd93d; }
+.fmt-range { background-color: rgba(74, 144, 226, 0.2); }
+.fmt-above { color: #6bff6b; }
+.fmt-below { color: #ff6b6b; }
+.fmt-outlier { border: 2px dashed red; }
+.fmt-cluster { background-color: rgba(255, 217, 61, 0.2); }
+.fmt-frequency { font-weight: bold; text-decoration: underline; }
+.fmt-unique { border: 2px solid #a8e6cf; }
+.fmt-rowcol { background-color: rgba(255, 255, 255, 0.05); }
+.fmt-earlylate { color: #ffadad; }
+.fmt-ampm { font-style: italic; }
+.fmt-timerange { border-bottom: 2px solid #4a90e2; }
+.fmt-default { }
