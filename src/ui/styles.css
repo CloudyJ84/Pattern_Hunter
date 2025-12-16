@@ -1,82 +1,159 @@
-/* Reset & Base */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+:root {
+    --cell-size: 80px;
+    --grid-gap: 8px;
+    --bg-color: #2b2b36;
+    --cell-bg: #3a3a45;
+    --cell-hover: #454552;
+    --text-primary: #f0f0f0;
+    --accent-color: #4a90e2;
+    --highlight-anim: 0.3s ease-in-out;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1e1e24;
-    color: #f0f0f0;
-    height: 100vh;
-    display: flex;
+/* --- Grid System --- */
+.dataset-grid {
+    display: grid;
+    gap: var(--grid-gap);
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    max-width: 100%;
+    overflow: auto;
     justify-content: center;
+}
+
+/* --- Cell Component --- */
+.grid-cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: var(--cell-bg);
+    color: var(--text-primary);
+    display: flex;
     align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: all 0.2s ease, transform var(--highlight-anim);
+    cursor: default;
+    user-select: none;
+    border: 2px solid transparent;
 }
 
-#game-container {
+.grid-cell:hover {
+    background-color: var(--cell-hover);
+}
+
+/* --- Formatting Engine Classes (Mapped from formattingEngine.js) --- */
+
+/* Dates: Weekends */
+.fmt-weekend {
+    border-color: #ff6b6b;
+    background-color: rgba(255, 107, 107, 0.1);
+    animation: pulse 2s infinite;
+}
+
+/* Dates: Specific Weekday */
+.fmt-weekday {
+    border-color: #feca57;
+    background-color: rgba(254, 202, 87, 0.1);
+}
+
+/* Dates/Numbers: Extreme (Min/Max/Earliest/Latest) */
+.fmt-extreme {
+    background-color: #5f27cd;
+    color: white;
+    font-weight: bold;
+    transform: scale(1.05);
+}
+
+/* Ranges (Date/Time) */
+.fmt-range, .fmt-timerange {
+    background-color: rgba(72, 219, 251, 0.15);
+    border-left: 4px solid #48dbfb;
+    border-right: 4px solid #48dbfb;
+}
+
+/* Numbers: Thresholds */
+.fmt-above { color: #1dd1a1; border: 2px solid #1dd1a1; }
+.fmt-below { color: #ff9f43; border: 2px solid #ff9f43; }
+
+/* Numbers: Outlier */
+.fmt-outlier {
+    background-color: #ee5253;
+    color: white;
+    box-shadow: 0 0 10px #ee5253;
+    transform: scale(1.1);
+}
+
+/* Numbers: Cluster */
+.fmt-cluster {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px dashed #c8d6e5;
+}
+
+/* Frequency */
+.fmt-frequency, .fmt-unique {
+    border-bottom: 3px solid #f368e0;
+    font-weight: bold;
+}
+
+/* Row/Column Patterns */
+.fmt-rowcol {
+    background-color: rgba(84, 160, 255, 0.2);
+}
+
+/* Time Specific */
+.fmt-earlylate { color: #ff9ff3; font-style: italic; }
+.fmt-ampm { border: 1px solid #00d2d3; color: #00d2d3; }
+
+/* --- Animations --- */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 107, 107, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+}
+
+.reveal-anim {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Panel Layouts --- */
+.challenge-container {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    max-width: 800px;
+    max-width: 900px;
     height: 100%;
-    max-height: 900px;
-    position: relative;
-    background-color: #2b2b36;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-#ui-layer {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-/* Utility Classes */
-.screen {
-    padding: 2rem;
-    height: 100%;
+.game-area {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    overflow-y: auto;
 }
 
-.hidden {
-    display: none !important;
+.controls-area {
+    padding: 20px;
+    background: #222;
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-button {
-    padding: 10px 20px;
-    margin: 10px;
-    font-size: 1rem;
-    cursor: pointer;
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 4px;
+.question-box {
+    background: #333;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: left;
 }
-
-button:hover {
-    background-color: #357abd;
-}
-
-/* Formatting Engine Classes (Placeholders) */
-.fmt-weekend { border: 2px solid #ff6b6b; }
-.fmt-weekday { background-color: rgba(255, 255, 255, 0.1); }
-.fmt-extreme { font-weight: bold; color: #ffd93d; }
-.fmt-range { background-color: rgba(74, 144, 226, 0.2); }
-.fmt-above { color: #6bff6b; }
-.fmt-below { color: #ff6b6b; }
-.fmt-outlier { border: 2px dashed red; }
-.fmt-cluster { background-color: rgba(255, 217, 61, 0.2); }
-.fmt-frequency { font-weight: bold; text-decoration: underline; }
-.fmt-unique { border: 2px solid #a8e6cf; }
-.fmt-rowcol { background-color: rgba(255, 255, 255, 0.05); }
-.fmt-earlylate { color: #ffadad; }
-.fmt-ampm { font-style: italic; }
-.fmt-timerange { border-bottom: 2px solid #4a90e2; }
-.fmt-default { }
