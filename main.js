@@ -14,12 +14,7 @@ async function init() {
   const uiStateFlow = await loadJSON('./data/uiStateFlow.json');
 
   // Initialize the engine with the loaded data
-  initLevelEngine({
-    datasetRules,
-    patternEngine,
-    questionGenerator,
-    levelProgression
-  });
+initLevelEngine(levelProgression);
 
   // Now it's safe to generate a level
   const test = generateLevel(1);
@@ -30,3 +25,4 @@ async function init() {
 }
 
 init();
+
