@@ -7,6 +7,7 @@ import { FeedbackDisplay } from '../components/FeedbackDisplay.js';
 
 /**
  * Configuration for the Mythic Vows (Tiers)
+ * Maps internal IDs to display names and multipliers.
  */
 const TIER_CONFIG = {
     0: { name: 'SCOUT', mult: '1.0', rune: '👁️', flavor: 'The path is lit.' },
@@ -16,29 +17,33 @@ const TIER_CONFIG = {
 };
 
 /**
- * Glyph Definitions for the Bottom Bar
- * Maps mythic names to the CSS formatting classes defined in main.css
+ * Glyph Definitions for the Bottom Bar.
+ * 'css' corresponds to classes in main.css.
  */
 const GLYPHS = [
-    { id: 'weekend', name: 'Twin Suns', css: 'fmt-weekend', type: 'date', desc: 'Reveals the resting days.' },
-    { id: 'above', name: 'Rising Flame', css: 'fmt-above', type: 'number', desc: 'Highlights values ascending above the mean.' },
-    { id: 'below', name: 'Falling Stone', css: 'fmt-below', type: 'number', desc: 'Highlights values sinking below the mean.' },
-    { id: 'outlier', name: 'Broken Pattern', css: 'fmt-outlier', type: 'number', desc: 'Exposes data that defies the norm.' },
-    { id: 'frequency', name: 'Echo', css: 'fmt-frequency', type: 'any', desc: 'Marks repeating signals.' },
-    { id: 'unique', name: 'Lone Star', css: 'fmt-unique', type: 'any', desc: 'Identifies the singular.' }
+    { id: 'weekend', name: 'Twin Suns', css: 'fmt-weekend', icon: '☀', desc: 'Reveals the resting days (Sat/Sun).' },
+    { id: 'above', name: 'Rising Flame', css: 'fmt-above', icon: '🔥', desc: 'Highlights values ascending above the mean.' },
+    { id: 'below', name: 'Falling Stone', css: 'fmt-below', icon: '🌑', desc: 'Highlights values sinking below the mean.' },
+    { id: 'outlier', name: 'Broken Pattern', css: 'fmt-outlier', icon: '⚡', desc: 'Exposes data that defies the norm.' },
+    { id: 'frequency', name: 'Echo', css: 'fmt-frequency', icon: '〰', desc: 'Marks repeating signals.' },
+    { id: 'unique', name: 'Lone Star', css: 'fmt-unique', icon: '★', desc: 'Identifies singular values.' }
 ];
 
 export class ChallengeScreen {
 
     constructor(params) {
-        this.levelId = params.levelId;
-        this.thresholdTier = params.thresholdTier !== undefined ? params.thresholdTier : 1;
+        this.levelId = params.levelId || 1;
+        // Fallback to GameState if param is missing, default to Hunter (1)
+        this.thresholdTier = (params.thresholdTier !== undefined) 
+            ? params.thresholdTier 
+            : (GameState.selectedTier !== undefined ? GameState.selectedTier : 1);
+            
         this.data = null;
         this.element = null;
         
         // Visual State
         this.activeGlyphs = new Set();
-        this.lensMode = 0; // 0: Standard, 1: Focus, 2: X-Ray
+        this.lensMode = 0; // 0: Standard, 1: Focus, 2: Structure
         this.analyzedMap = new Map(); // Stores cell indices for glyphs
     }
 
@@ -77,12 +82,16 @@ export class ChallengeScreen {
             <!-- ZONE B: CENTER - THE FIELD (Grid + Bottom Bar) -->
             <main class="challenge-field">
                 <div class="grid-wrapper">
+                    <!-- The Grid Component Mount Point -->
                     <div class="dataset-grid" id="grid"></div>
+                    
+                    <!-- Dynamic Lens Summary Overlay -->
+                    <div id="lens-summary" class="lens-summary hidden"></div>
                 </div>
 
                 <!-- ZONE C: BOTTOM PANEL - GLYPH BAR & LENS -->
                 <footer class="mythic-controls">
-                    <div class="lens-selector" id="lens-toggle">
+                    <div class="lens-selector" id="lens-toggle" title="Change Perspective">
                         <span class="lens-icon">👁️</span>
                         <span class="lens-label">Lens: Standard</span>
                     </div>
@@ -90,6 +99,7 @@ export class ChallengeScreen {
                     <div class="glyph-bar">
                         ${GLYPHS.map(g => `
                             <button class="glyph-button" data-glyph="${g.id}" title="${g.desc}">
+                                <span class="glyph-icon">${g.icon}</span>
                                 <span class="glyph-name">${g.name}</span>
                             </button>
                         `).join('')}
@@ -101,20 +111,21 @@ export class ChallengeScreen {
             <aside class="challenge-panel">
                 <div class="scroll-content">
                     <h3 class="panel-header">The Query</h3>
-                    <div id="question" class="question-container"></div>
                     
+                    <!-- Question & Feedback Mount Points -->
+                    <div id="question" class="question-container"></div>
+                    <div id="feedback" class="feedback-container hidden"></div>
+
                     <div class="action-area">
                         <button id="hint-btn" class="control-btn secondary hint-btn">
                             Invoke Hint
                         </button>
                     </div>
-
-                    <div id="feedback" class="feedback-container hidden"></div>
                 </div>
             </aside>
         `;
 
-        // --- Wiring Up Logic ---
+        // --- Event Wiring ---
 
         // Navigation
         el.querySelector('#withdraw-btn').onclick = () => {
@@ -129,20 +140,15 @@ export class ChallengeScreen {
         );
         this.feedback = new FeedbackDisplay(el.querySelector('#feedback'));
 
-        // Hint Button logic (wrapper for existing hint system)
+        // Hint Logic
         this.hintBtn = el.querySelector('#hint-btn');
-        this.hintBtn.onclick = () => {
-            this.grid.applyFormatting(this.data.formatting);
-            this.hintBtn.disabled = true;
-            this.hintBtn.innerHTML = `Hint Invoked <span class="check">✓</span>`;
-            this.hintBtn.classList.add('used');
-        };
+        this.hintBtn.onclick = () => this._handleHint();
 
-        // Lens Toggle
+        // Lens Logic
         const lensBtn = el.querySelector('#lens-toggle');
         lensBtn.onclick = () => this._cycleLens(lensBtn);
 
-        // Glyph Toggles
+        // Glyph Logic
         el.querySelectorAll('.glyph-button').forEach(btn => {
             btn.onclick = () => this._toggleGlyph(btn.dataset.glyph, btn);
         });
@@ -154,31 +160,44 @@ export class ChallengeScreen {
     }
 
     loadLevel() {
+        // Generate Level Data via Engine
         this.data = generateLevel(this.levelId, this.thresholdTier);
 
-        // Render Core Components
+        // Render Components
         this.grid.render(this.data.grid);
         this.question.render(this.data.question);
 
-        // Setup Visuals
+        // Post-Processing: Analyze grid data to power visual glyphs
         this._analyzeGridForVisuals();
+        
+        // Add click interaction for scratchpad (Marking cells)
         this._setupGridInteractions();
 
-        // Configure Hint Button based on Tier/Level config
+        // Configure Hint Button Visibility
         const hintLevel = this.data.thresholdConfig.hintLevel;
         if (hintLevel === 'none') {
             this.hintBtn.style.display = 'none';
         } else {
-            this.hintBtn.style.display = 'block';
+            this.hintBtn.style.display = 'flex';
             this.hintBtn.innerHTML = `Invoke Hint <span class="hint-badge">${hintLevel}</span>`;
             this.hintBtn.disabled = false;
             this.hintBtn.classList.remove('used');
         }
     }
 
+    _handleHint() {
+        // Use the engine's formatting/hint data
+        if (this.data.formatting) {
+            this.grid.applyFormatting(this.data.formatting);
+            this.hintBtn.disabled = true;
+            this.hintBtn.innerHTML = `Hint Invoked <span class="check">✓</span>`;
+            this.hintBtn.classList.add('used');
+        }
+    }
+
     /**
-     * Post-processing step to add marks/interactions to the rendered grid
-     * without modifying the underlying renderer logic.
+     * Enables basic click-to-mark functionality for the player.
+     * This is purely visual scratchpad functionality.
      */
     _setupGridInteractions() {
         const gridCells = this.element.querySelectorAll('.grid-cell');
@@ -190,14 +209,14 @@ export class ChallengeScreen {
     }
 
     /**
-     * Cycles through visual lens modes (Standard -> Focus -> X-Ray)
+     * Cycles through lens modes: Standard -> Focus -> Structure (X-Ray).
      */
     _cycleLens(btn) {
         this.lensMode = (this.lensMode + 1) % 3;
         const gridEl = this.element.querySelector('#grid');
         const label = btn.querySelector('.lens-label');
 
-        // Reset classes
+        // Reset
         gridEl.classList.remove('lens-focus', 'lens-xray');
 
         if (this.lensMode === 0) {
@@ -207,7 +226,7 @@ export class ChallengeScreen {
             label.textContent = "Lens: Focus";
         } else {
             gridEl.classList.add('lens-xray');
-            label.textContent = "Lens: X-Ray";
+            label.textContent = "Lens: Structure";
         }
     }
 
@@ -227,80 +246,83 @@ export class ChallengeScreen {
     }
 
     /**
-     * Applies or removes the CSS class for a specific glyph to relevant cells.
+     * Applies the CSS class associated with a glyph to the pre-calculated indices.
      */
     _applyVisuals(glyphId, apply) {
         const targetIndices = this.analyzedMap.get(glyphId) || [];
         const cells = this.element.querySelectorAll('.grid-cell');
-        const cssClass = GLYPHS.find(g => g.id === glyphId).css;
+        const glyphConfig = GLYPHS.find(g => g.id === glyphId);
+        
+        if (!glyphConfig) return;
 
         targetIndices.forEach(index => {
             if (cells[index]) {
-                if (apply) cells[index].classList.add(cssClass);
-                else cells[index].classList.remove(cssClass);
+                if (apply) cells[index].classList.add(glyphConfig.css);
+                else cells[index].classList.remove(glyphConfig.css);
             }
         });
     }
 
     /**
-     * Analyzes the generated grid data to calculate visual overlays.
-     * This ensures the Glyph Bar works visually without changing game logic.
+     * Scans the grid data to calculate visual groups (above mean, outliers, etc.).
+     * This runs on the client side to provide visual feedback without altering game logic.
      */
     _analyzeGridForVisuals() {
         this.analyzedMap.clear();
         const gridData = this.data.grid;
         if (!gridData || !gridData.length) return;
 
-        // Helper: Is this a number?
-        const isNum = (v) => !isNaN(parseFloat(v));
+        const isNum = (v) => !isNaN(parseFloat(v)) && isFinite(v);
         
-        // 1. Gather numerical data for stats
-        const values = gridData.map((val, idx) => ({ val, idx })).filter(item => isNum(item.val));
-        const numValues = values.map(v => parseFloat(v.val));
+        // 1. Numerical Analysis
+        const numItems = gridData.map((val, idx) => ({ val: parseFloat(val), idx })).filter(x => isNum(x.val));
         
-        if (numValues.length > 0) {
-            const sum = numValues.reduce((a, b) => a + b, 0);
-            const mean = sum / numValues.length;
+        if (numItems.length > 0) {
+            const sum = numItems.reduce((a, b) => a + b.val, 0);
+            const mean = sum / numItems.length;
             
-            // Calc indices
-            const aboveIndices = values.filter(v => parseFloat(v.val) > mean).map(v => v.idx);
-            const belowIndices = values.filter(v => parseFloat(v.val) < mean).map(v => v.idx);
+            // Standard Deviation (Simple) for Outliers
+            const variance = numItems.reduce((a, b) => a + Math.pow(b.val - mean, 2), 0) / numItems.length;
+            const stdDev = Math.sqrt(variance);
+
+            const aboveIndices = numItems.filter(v => v.val > mean).map(v => v.idx);
+            const belowIndices = numItems.filter(v => v.val < mean).map(v => v.idx);
             
-            // Simple visual outlier detection (roughly > 200% of mean or huge deviation)
-            // This is purely visual feedback, not the strict engine logic
-            const outlierIndices = values.filter(v => {
-                const diff = Math.abs(parseFloat(v.val) - mean);
-                return diff > mean * 0.8; // Arbitrary visual threshold
-            }).map(v => v.idx);
+            // Outliers: > 1.5 StdDev from mean (Adjustable visual threshold)
+            const outlierIndices = numItems.filter(v => Math.abs(v.val - mean) > (1.5 * stdDev)).map(v => v.idx);
 
             this.analyzedMap.set('above', aboveIndices);
             this.analyzedMap.set('below', belowIndices);
             this.analyzedMap.set('outlier', outlierIndices);
         }
 
-        // 2. Frequency / Unique
+        // 2. Frequency / Unique Analysis
         const counts = {};
-        gridData.forEach(val => counts[val] = (counts[val] || 0) + 1);
-        
+        gridData.forEach(val => {
+            const key = String(val).toLowerCase();
+            counts[key] = (counts[key] || 0) + 1;
+        });
+
         const uniqueIndices = [];
         const freqIndices = [];
-        
+
         gridData.forEach((val, idx) => {
-            if (counts[val] === 1) uniqueIndices.push(idx);
-            if (counts[val] > 1) freqIndices.push(idx);
+            const key = String(val).toLowerCase();
+            if (counts[key] === 1) uniqueIndices.push(idx);
+            if (counts[key] > 1) freqIndices.push(idx);
         });
 
         this.analyzedMap.set('unique', uniqueIndices);
         this.analyzedMap.set('frequency', freqIndices);
 
-        // 3. Weekend (Mock logic: assumes 7-col grid or date strings)
-        // Since we don't have strict date parsing in this UI layer, 
-        // we leave this empty or perform a basic check if the string contains "Sat"/"Sun"
-        const weekendIndices = gridData.map((val, idx) => {
+        // 3. Weekend Analysis (String based)
+        const weekendIndices = [];
+        gridData.forEach((val, idx) => {
             const s = String(val).toLowerCase();
-            return (s.includes('sat') || s.includes('sun')) ? idx : -1;
-        }).filter(i => i !== -1);
-        
+            if (s.includes('sat') || s.includes('sun')) {
+                weekendIndices.push(idx);
+            }
+        });
         this.analyzedMap.set('weekend', weekendIndices);
     }
 
@@ -311,11 +333,11 @@ export class ChallengeScreen {
         if (input === correct) {
             GameState.completeLevel(this.levelId);
             
-            // Visual success effect on the panel
             this.element.querySelector('.challenge-panel').classList.add('success-pulse');
 
             this.feedback.showCorrect(
                 () => {
+                    // Navigate to next level but keep the same tier
                     UIRouter.navigateTo('ChallengeScreen', {
                         levelId: this.levelId + 1,
                         thresholdTier: this.thresholdTier
@@ -325,7 +347,6 @@ export class ChallengeScreen {
             );
         } else {
             this.feedback.showIncorrect(correct);
-            // Visual shake effect
             const panel = this.element.querySelector('.challenge-panel');
             panel.classList.add('shake');
             setTimeout(() => panel.classList.remove('shake'), 500);
