@@ -1,159 +1,47 @@
-:root {
-    --cell-size: 80px;
-    --grid-gap: 8px;
-    --bg-color: #2b2b36;
-    --cell-bg: #3a3a45;
-    --cell-hover: #454552;
-    --text-primary: #f0f0f0;
-    --accent-color: #4a90e2;
-    --highlight-anim: 0.3s ease-in-out;
-}
+/* Reset & Layout */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #1e1e24; color: #f0f0f0; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; }
+button { cursor: pointer; border: none; font-family: inherit; }
 
-/* --- Grid System --- */
-.dataset-grid {
-    display: grid;
-    gap: var(--grid-gap);
-    margin: 20px auto;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    max-width: 100%;
-    overflow: auto;
-    justify-content: center;
-}
+/* Screen Container */
+#app-root { width: 100%; height: 100%; display: flex; }
+.screen { width: 100%; height: 100%; display: flex; flex-direction: column; }
 
-/* --- Cell Component --- */
-.grid-cell {
-    width: var(--cell-size);
-    height: var(--cell-size);
-    background-color: var(--cell-bg);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 500;
-    border-radius: 4px;
-    transition: all 0.2s ease, transform var(--highlight-anim);
-    cursor: default;
-    user-select: none;
-    border: 2px solid transparent;
-}
+/* Headers */
+.game-header { padding: 15px; background: #2b2b36; border-bottom: 1px solid #444; display: flex; align-items: center; justify-content: space-between; }
+.control-btn { padding: 8px 16px; border-radius: 4px; background: #444; color: white; border: 1px solid #555; }
+.control-btn.primary { background: #4a90e2; border-color: #4a90e2; }
+.control-btn.secondary { background: #6c5ce7; border-color: #6c5ce7; }
+.control-btn:hover { filter: brightness(1.1); }
 
-.grid-cell:hover {
-    background-color: var(--cell-hover);
-}
+/* Layouts */
+.centered-layout { justify-content: center; align-items: center; gap: 20px; text-align: center; }
+.game-content { flex: 1; display: flex; overflow: hidden; }
+.grid-area { flex: 2; background: rgba(0,0,0,0.2); display: flex; justify-content: center; align-items: center; padding: 20px; }
+.sidebar-area { flex: 1; min-width: 300px; max-width: 400px; background: #2b2b36; border-left: 1px solid #444; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
 
-/* --- Formatting Engine Classes (Mapped from formattingEngine.js) --- */
+/* Panels */
+.panel { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid #444; }
+.feedback-panel.success { border-color: #2ecc71; background: rgba(46, 204, 113, 0.1); }
+.feedback-panel.error { border-color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+.hidden { display: none !important; }
 
-/* Dates: Weekends */
-.fmt-weekend {
-    border-color: #ff6b6b;
-    background-color: rgba(255, 107, 107, 0.1);
-    animation: pulse 2s infinite;
-}
+/* Inputs */
+.answer-input { width: 100%; padding: 10px; background: #111; border: 1px solid #555; color: white; margin-bottom: 10px; }
 
-/* Dates: Specific Weekday */
-.fmt-weekday {
-    border-color: #feca57;
-    background-color: rgba(254, 202, 87, 0.1);
-}
+/* Grid */
+.dataset-grid { display: grid; gap: 8px; }
+.grid-cell { width: 60px; height: 60px; background: #3a3a45; display: flex; justify-content: center; align-items: center; border-radius: 4px; font-weight: bold; border: 2px solid transparent; transition: all 0.2s; }
 
-/* Dates/Numbers: Extreme (Min/Max/Earliest/Latest) */
-.fmt-extreme {
-    background-color: #5f27cd;
-    color: white;
-    font-weight: bold;
-    transform: scale(1.05);
-}
+/* Formatting */
+.fmt-weekend { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+.fmt-above { color: #2ecc71; border-color: #2ecc71; }
+.fmt-extreme { background: #6c5ce7; color: white; }
+.fmt-ampm { border-color: #00d2d3; color: #00d2d3; }
 
-/* Ranges (Date/Time) */
-.fmt-range, .fmt-timerange {
-    background-color: rgba(72, 219, 251, 0.15);
-    border-left: 4px solid #48dbfb;
-    border-right: 4px solid #48dbfb;
-}
-
-/* Numbers: Thresholds */
-.fmt-above { color: #1dd1a1; border: 2px solid #1dd1a1; }
-.fmt-below { color: #ff9f43; border: 2px solid #ff9f43; }
-
-/* Numbers: Outlier */
-.fmt-outlier {
-    background-color: #ee5253;
-    color: white;
-    box-shadow: 0 0 10px #ee5253;
-    transform: scale(1.1);
-}
-
-/* Numbers: Cluster */
-.fmt-cluster {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 2px dashed #c8d6e5;
-}
-
-/* Frequency */
-.fmt-frequency, .fmt-unique {
-    border-bottom: 3px solid #f368e0;
-    font-weight: bold;
-}
-
-/* Row/Column Patterns */
-.fmt-rowcol {
-    background-color: rgba(84, 160, 255, 0.2);
-}
-
-/* Time Specific */
-.fmt-earlylate { color: #ff9ff3; font-style: italic; }
-.fmt-ampm { border: 1px solid #00d2d3; color: #00d2d3; }
-
-/* --- Animations --- */
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(255, 107, 107, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
-}
-
-.reveal-anim {
-    animation: fadeIn 0.5s ease-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* --- Panel Layouts --- */
-.challenge-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 900px;
-    height: 100%;
-}
-
-.game-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-}
-
-.controls-area {
-    padding: 20px;
-    background: #222;
-    border-top: 1px solid #444;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.question-box {
-    background: #333;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    width: 100%;
-    text-align: left;
-}
+/* Tier Selector */
+.tier-btn { padding: 10px 15px; background: #222; color: #888; border-radius: 20px; border: 1px solid #444; }
+.tier-btn.active { background: #4a90e2; color: white; border-color: #4a90e2; }
+.level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+.level-node { width: 50px; height: 50px; border-radius: 50%; background: #4a90e2; color: white; font-weight: bold; }
+.level-node.locked { background: #444; color: #666; cursor: not-allowed; }
