@@ -1,0 +1,175 @@
+{
+  "datasetTypes": {
+    "dates": {
+      "generation": {
+        "rangeDaysBefore": 30,
+        "rangeDaysAfter": 30,
+        "ensurePatternPresence": true,
+        "cellValueType": "date"
+      },
+      "patterns": {
+        "weekendHighlight": {
+          "description": "At least one Saturday or Sunday appears in the dataset",
+          "injectionRule": "Force at least one weekend date",
+          "formattingRule": "highlightWeekends",
+          "questions": ["whichDateIsHighlighted", "countWeekendDates", "rowWithEarliestDate", "mostFrequentWeekday"]
+        },
+        "weekdayCluster": {
+          "description": "Multiple dates share the same weekday",
+          "injectionRule": "Inject 2–4 dates with the same weekday",
+          "formattingRule": "highlightSpecificWeekday",
+          "questions": ["whichWeekdayIsMostFrequent", "howManyOfWeekday"]
+        },
+        "earliestOrLatest": {
+          "description": "One date is clearly earliest or latest",
+          "injectionRule": "Inject a min or max date",
+          "formattingRule": "highlightEarliestOrLatest",
+          "questions": ["whichDateIsEarliest", "whichDateIsLatest"]
+        },
+        "dateRange": {
+          "description": "Some dates fall within a specific range",
+          "injectionRule": "Inject dates within a 7-day window",
+          "formattingRule": "highlightDateRange",
+          "questions": ["howManyInRange", "whichDatesInRange"]
+        }
+      },
+      "difficultyScaling": {
+        "levels1to3": "3x3 simple weekend pattern",
+        "levels4to6": "4x4 earliest/latest",
+        "levels7to10": "5x5 weekday clusters",
+        "levels11plus": "6x6 or larger with mixed patterns"
+      }
+    },
+    "numbers": {
+      "generation": {
+        "minValue": 1,
+        "maxValue": 100,
+        "ensurePatternPresence": true,
+        "cellValueType": "number"
+      },
+      "patterns": {
+        "aboveThreshold": {
+          "description": "Values above a threshold appear",
+          "injectionRule": "Inject at least one value > threshold",
+          "formattingRule": "highlightAboveThreshold",
+          "questions": ["whichValueIsHighlighted", "countAboveThreshold"]
+        },
+        "belowThreshold": {
+          "description": "Values below a threshold appear",
+          "injectionRule": "Inject at least one value < threshold",
+          "formattingRule": "highlightBelowThreshold",
+          "questions": ["whichValueIsHighlighted", "countBelowThreshold"]
+        },
+        "outlier": {
+          "description": "One value is far outside the normal range",
+          "injectionRule": "Inject a value 2–3× larger or smaller",
+          "formattingRule": "highlightOutlier",
+          "questions": ["whichValueIsOutlier", "rowWithOutlier"]
+        },
+        "cluster": {
+          "description": "Several values cluster near each other",
+          "injectionRule": "Inject 3–5 values within a narrow band",
+          "formattingRule": "highlightCluster",
+          "questions": ["whichClusterIsLargest", "howManyInCluster"]
+        },
+        "maxOrMin": {
+          "description": "One value is clearly highest or lowest",
+          "injectionRule": "Inject a unique max or min",
+          "formattingRule": "highlightMaxOrMin",
+          "questions": ["whichValueIsHighest", "whichValueIsLowest"]
+        }
+      },
+      "difficultyScaling": {
+        "levels1to3": "3x3 single outlier",
+        "levels4to6": "4x4 threshold patterns",
+        "levels7to10": "5x5 clusters",
+        "levels11plus": "6x6 or larger with mixed patterns"
+      }
+    },
+    "categories": {
+      "generation": {
+        "categoryListSize": { "min": 3, "max": 6 },
+        "ensurePatternPresence": true,
+        "cellValueType": "category"
+      },
+      "patterns": {
+        "mostFrequent": {
+          "description": "One category appears more often than others",
+          "injectionRule": "Inject category X 3–6 times",
+          "formattingRule": "highlightMostFrequent",
+          "questions": ["whichCategoryIsMostFrequent", "howManyTimesCategoryAppears"]
+        },
+        "leastFrequent": {
+          "description": "One category appears only once",
+          "injectionRule": "Inject category X exactly once",
+          "formattingRule": "highlightUnique",
+          "questions": ["whichCategoryIsUnique", "rowWithUniqueCategory"]
+        },
+        "uniqueCategory": {
+          "description": "One category appears that no other cell has",
+          "injectionRule": "Inject a category not used elsewhere",
+          "formattingRule": "highlightUnique",
+          "questions": ["whichCategoryIsUnique", "howManyUniqueCategories"]
+        },
+        "rowOrColumnPattern": {
+          "description": "A row or column shares the same category",
+          "injectionRule": "Fill one row or column with same category",
+          "formattingRule": "highlightRowOrColumnPattern",
+          "questions": ["whichRowHasPattern", "whichColumnHasPattern"]
+        }
+      },
+      "difficultyScaling": {
+        "levels1to3": "3x3 simple frequency",
+        "levels4to6": "4x4 unique category",
+        "levels7to10": "5x5 row/column patterns",
+        "levels11plus": "6x6 or larger with mixed patterns"
+      }
+    },
+    "times": {
+      "generation": {
+        "startTime": "08:00",
+        "endTime": "18:00",
+        "ensurePatternPresence": true,
+        "cellValueType": "time"
+      },
+      "patterns": {
+        "earlyLate": {
+          "description": "Times before or after a threshold",
+          "injectionRule": "Inject times <10:00 or >16:00",
+          "formattingRule": "highlightEarlyLate",
+          "questions": ["whichTimeIsHighlighted", "countEarlyOrLate"]
+        },
+        "amPm": {
+          "description": "AM vs PM distinction",
+          "injectionRule": "Inject at least one PM time",
+          "formattingRule": "highlightAmPm",
+          "questions": ["howManyPmTimes", "whichTimeIsPm"]
+        },
+        "earliestLatest": {
+          "description": "One time is clearly earliest or latest",
+          "injectionRule": "Inject a min or max time",
+          "formattingRule": "highlightEarliestOrLatest",
+          "questions": ["whichTimeIsEarliest", "whichTimeIsLatest"]
+        },
+        "timeRange": {
+          "description": "Times fall within a specific range",
+          "injectionRule": "Inject times between 12:00–14:00",
+          "formattingRule": "highlightTimeRange",
+          "questions": ["howManyInTimeRange", "whichTimesInRange"]
+        }
+      },
+      "difficultyScaling": {
+        "levels1to3": "3x3 earliest/latest",
+        "levels4to6": "4x4 early/late",
+        "levels7to10": "5x5 range patterns",
+        "levels11plus": "6x6 or larger with mixed patterns"
+      }
+    }
+  },
+  "globalRules": {
+    "patternInjection": "Every dataset must contain at least one instance of the intended pattern and avoid accidental multiple patterns unless explicitly required.",
+    "formattingMapping": "Each pattern type maps to exactly one conditional formatting rule.",
+    "questionMapping": "Each pattern type maps to 2–4 question templates.",
+    "difficultyScaling": "Dataset size increases every 2–3 levels, and pattern complexity increases accordingly."
+  }
+}
