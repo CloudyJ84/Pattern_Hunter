@@ -1,92 +1,92 @@
-// Responsible for creating the raw grid data based on datasetRules.json
-
 let rules = null;
 
-export function initDatasetGenerator(datasetRulesConfig) {
-    rules = datasetRulesConfig;
+export function initDatasetGenerator(config) {
+    rules = config;
 }
 
-export function generateRawDataset(datasetType, size) {
-    if (!rules) throw new Error("DatasetGenerator not initialized");
-    
-    const config = rules.datasetTypes[datasetType];
-    if (!config) throw new Error(`Unknown dataset type: ${datasetType}`);
+export function destroyDatasetGenerator() {
+    rules = null;
+}
+
+export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
+    if (!rules) {
+        throw new Error("DatasetGenerator not initialized");
+    }
+
+    const config = rules.datasetTypes?.[datasetType];
+    if (!config) {
+        throw new Error(`Unknown dataset type: ${datasetType}`);
+    }
 
     const { rows, cols } = size;
     const grid = [];
 
+    // Threshold-tier hooks (future use)
+    const distractorDensity = thresholdConfig.distractorDensity || 0;
+    const jitter = thresholdConfig.valueJitter || 0;
+
     for (let r = 0; r < rows; r++) {
         const row = [];
+
         for (let c = 0; c < cols; c++) {
-            let value;
-            switch (datasetType) {
-                case 'dates':
-                    value = generateRandomDate(config.generation);
-                    break;
-                case 'numbers':
-                    value = generateRandomNumber(config.generation);
-                    break;
-                case 'categories':
-                    value = generateRandomCategory(config.generation);
-                    break;
-                case 'times':
-                    value = generateRandomTime(config.generation);
-                    break;
-                default:
-                    value = null;
+            let value = null;
+
+            if (datasetType === 'dates') {
+                value = randomDate(config.generation);
+            } else if (datasetType === 'numbers') {
+                value = randomNumber(config.generation, jitter);
+            } else if (datasetType === 'categories') {
+                value = randomCategory(config.generation);
+            } else if (datasetType === 'times') {
+                value = randomTime(config.generation);
             }
-            // Each cell is an object containing metadata
-            row.push({ row: r, col: c, value: value, type: datasetType });
+
+            // Future: inject distractors here
+            // if (Math.random() < distractorDensity) { ... }
+
+            row.push({
+                row: r,
+                col: c,
+                value,
+                type: datasetType
+            });
         }
+
         grid.push(row);
     }
+
     return grid;
 }
-
-// --- Helper Functions ---
 
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generateRandomDate(genConfig) {
-    const today = new Date();
-    // Clone today to avoid mutating reference
-    const start = new Date(today); 
-    start.setDate(today.getDate() - genConfig.rangeDaysBefore);
-    
-    const end = new Date(today);
-    end.setDate(today.getDate() + genConfig.rangeDaysAfter);
-    
-    const randomTime = start.getTime() + Math.random() * (end.getTime() - start.getTime());
-    const d = new Date(randomTime);
-    d.setHours(0, 0, 0, 0); // Normalize to midnight for cleaner display
+function randomDate(gen) {
+    const d = new Date();
+    d.setDate(d.getDate() + randomInt(-gen.rangeDaysBefore, gen.rangeDaysAfter));
+    d.setHours(0, 0, 0, 0);
     return d;
 }
 
-function generateRandomNumber(genConfig) {
-    return randomInt(genConfig.minValue, genConfig.maxValue);
+function randomNumber(gen, jitter = 0) {
+    let base = randomInt(gen.minValue, gen.maxValue);
+
+    if (jitter > 0) {
+        const delta = Math.floor((Math.random() - 0.5) * jitter);
+        base += delta;
+    }
+
+    return base;
 }
 
-function generateRandomCategory(genConfig) {
-    // Generate a pool of categories (e.g., A-F)
-    const poolSize = 6; 
-    const categories = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].slice(0, poolSize);
-    return categories[randomInt(0, categories.length - 1)];
+function randomCategory(gen) {
+    const cats = ['A', 'B', 'C', 'D', 'E', 'F'];
+    return cats[randomInt(0, cats.length - 1)];
 }
 
-function generateRandomTime(genConfig) {
-    const parseTime = (t) => {
-        const [h, m] = t.split(':').map(Number);
-        return h * 60 + m;
-    };
-    
-    const startMins = parseTime(genConfig.startTime);
-    const endMins = parseTime(genConfig.endTime);
-    const randomMins = randomInt(startMins, endMins);
-    
-    const h = Math.floor(randomMins / 60);
-    const m = randomMins % 60;
-    
+function randomTime(gen) {
+    const h = randomInt(8, 18);
+    const m = randomInt(0, 59);
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
