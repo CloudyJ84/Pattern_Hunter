@@ -8,11 +8,23 @@ export function initFormattingEngine(patternEngineConfig) {
     rules = patternEngineConfig;
 }
 
-export function applyFormatting(dataset, datasetType, patternType) {
-    if (!rules) throw new Error("FormattingEngine not initialized");
+export function destroyFormattingEngine() {
+    rules = null;
+}
 
-    const patternConfig = rules[datasetType][patternType];
-    
+/**
+ * Applies formatting rules to a dataset and returns:
+ * - formattingRule
+ * - cssClass
+ * - highlightedCells (modified by threshold tier)
+ */
+export function applyFormatting(dataset, datasetType, patternType, thresholdConfig = {}) {
+    if (!rules) {
+        throw new Error("FormattingEngine not initialized");
+    }
+
+    const patternConfig = rules[datasetType]?.[patternType];
+
     // Fallback if config missing
     if (!patternConfig) {
         return {
@@ -23,17 +35,32 @@ export function applyFormatting(dataset, datasetType, patternType) {
     }
 
     const formattingRule = patternConfig.formattingRule;
-    
-    // 1. Determine which cells match the logic
-    const highlightedCells = applyHighlightLogic(dataset, datasetType, patternType);
 
-    // 2. Get the CSS class string
+    // 1. Determine all matching cells
+    const allMatches = applyHighlightLogic(dataset, datasetType, patternType);
+
+    // 2. Apply threshold-tier hint logic
+    const hintLevel = thresholdConfig.hintLevel || "medium";
+    let highlightedCells = [];
+
+    if (hintLevel === "none") {
+        // Mythic: no hints
+        highlightedCells = [];
+    } else if (hintLevel === "low") {
+        // Tracker: only one hint
+        highlightedCells = allMatches.slice(0, 1);
+    } else {
+        // Scout / Hunter: full hints
+        highlightedCells = allMatches;
+    }
+
+    // 3. Map formatting rule to CSS class
     const cssClass = getCssClassForRule(formattingRule);
 
     return {
-        formattingRule: formattingRule,
-        cssClass: cssClass,
-        highlightedCells: highlightedCells
+        formattingRule,
+        cssClass,
+        highlightedCells
     };
 }
 
