@@ -1,4 +1,5 @@
 :root {
+    /* --- CORE PALETTE (Excel Roots) --- */
     --bg: #1b1f1b;                /* darker, Excel-friendly background */
     --panel: #222826;             /* subtle green-tinted dark panel */
     --accent: #217346;            /* Excel green */
@@ -6,6 +7,14 @@
     --text: #e8f5e9;              /* soft green-tinted white */
     --success: #2ecc71;
     --error: #e74c3c;
+
+    /* --- MYTHIC PALETTE (The Void & Runes) --- */
+    --void-dark: #0d110d;
+    --void-purple: #4a235a;
+    --rune-gold: #daa520;
+    --rune-blue: #4682b4;
+    --glass-panel: rgba(20, 30, 25, 0.85);
+    --border-subtle: rgba(255, 255, 255, 0.1);
 }
 
 /* Reset */
@@ -228,6 +237,8 @@ button {
 .dataset-grid {
     display: grid;
     gap: 8px;
+    /* Allow transition for lens effects */
+    transition: transform 0.3s ease, gap 0.3s ease;
 }
 
 .grid-cell {
@@ -241,6 +252,8 @@ button {
     font-weight: bold;
     transition: all 0.3s;
     border: 2px solid transparent;
+    position: relative;
+    user-select: none;
 }
 
 /* Formatting */
@@ -282,6 +295,228 @@ button {
 
 .fmt-unique {
     border: 2px dashed #f1c40f;
+}
+
+/* ========================================= */
+/* HOME SCREEN: THE LENS OF TRUTH            */
+/* ========================================= */
+
+.home-screen {
+    /* Cosmic Pivot Table Background */
+    background: radial-gradient(circle at center, #1b261b 0%, #0d110d 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* The Grid Overlay */
+.home-screen::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background-image:
+        linear-gradient(rgba(33, 115, 70, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(33, 115, 70, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: perspective(500px) rotateX(20deg);
+    animation: gridDrift 60s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* The Lens (Central Glow) */
+.home-screen::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(33, 115, 70, 0.1) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    animation: lensBreathe 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.home-content-wrapper {
+    position: relative;
+    z-index: 2; /* Above the grid */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Typography */
+.mythic-title {
+    font-size: 4rem;
+    font-weight: 800;
+    letter-spacing: 8px;
+    color: var(--text);
+    text-shadow: 0 0 20px rgba(33, 115, 70, 0.5), 0 0 10px rgba(0,0,0,0.8);
+    margin: 0;
+    text-transform: uppercase;
+    position: relative;
+    background: linear-gradient(to bottom, #fff, #9bb8a0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-separator {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 20px 0;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+.mythic-subtitle {
+    font-size: 1.1rem;
+    color: #7a8a7a;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+/* Flavor Panel */
+.flavor-panel {
+    margin: 40px 0;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 1px solid var(--accent);
+    border-right: 1px solid var(--accent);
+    backdrop-filter: blur(2px);
+    max-width: 600px;
+    position: relative;
+}
+
+.flavor-panel::before, .flavor-panel::after {
+    content: '';
+    position: absolute;
+    width: 10px; height: 1px;
+    background: var(--accent);
+    top: 0;
+}
+.flavor-panel::before { left: 0; }
+.flavor-panel::after { right: 0; }
+
+.invocation-text {
+    font-family: monospace;
+    color: var(--accent-light);
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(46, 168, 107, 0.3);
+}
+
+/* Button Zone */
+.button-zone {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.home-start-btn {
+    padding: 18px 45px;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: transparent;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 15px rgba(33, 115, 70, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.home-start-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+}
+
+.home-start-btn:hover {
+    background: rgba(33, 115, 70, 0.1);
+    box-shadow: 0 0 25px rgba(33, 115, 70, 0.4);
+    text-shadow: 0 0 8px rgba(255,255,255,0.8);
+    transform: scale(1.02);
+}
+
+.home-start-btn:hover::before {
+    left: 100%;
+}
+
+.home-lore-btn {
+    background: transparent;
+    border: 1px solid #3a4a3a;
+    color: #777;
+    padding: 18px 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+}
+
+.home-lore-btn:hover {
+    border-color: #555;
+    color: #aaa;
+    background: rgba(255,255,255,0.02);
+}
+
+/* Lore Modal */
+.lore-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    backdrop-filter: blur(5px);
+    transition: opacity 0.3s;
+}
+
+.lore-content {
+    background: #151915;
+    border: 1px solid var(--accent);
+    padding: 40px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    position: relative;
+}
+
+.lore-content h2 {
+    color: var(--accent);
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.lore-content p {
+    color: #ccc;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.lore-content strong { color: white; }
+.lore-content em { color: var(--accent-light); }
+
+.lore-footer {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #555 !important;
+    margin-top: 30px;
+    border-top: 1px solid #333;
+    padding-top: 10px;
 }
 
 /* ========================================= */
@@ -559,20 +794,13 @@ button {
     margin: 10px; 
 }
 
-/* Counter-rotate content so numbers are upright */
 .rune-node span {
     transform: rotate(-45deg);
     display: block;
 }
 
-.rune-node .level-num {
-    z-index: 2;
-}
-
-.rune-node .lock-icon {
-    font-size: 1rem;
-    opacity: 0.5;
-}
+.rune-node .level-num { z-index: 2; }
+.rune-node .lock-icon { font-size: 1rem; opacity: 0.5; }
 
 /* UNLOCKED STATE */
 .rune-node.unlocked-path {
@@ -620,234 +848,6 @@ button {
     100% { background-position: 0% 50%; }
 }
 
-.level-select-ritual.ritual-complete .rune-node {
-    transform: rotate(45deg) scale(0);
-    opacity: 0;
-}
-
-/* ========================================= */
-/* HOME SCREEN: THE LENS OF TRUTH            */
-/* ========================================= */
-
-.home-screen {
-    /* Cosmic Pivot Table Background */
-    background: radial-gradient(circle at center, #1b261b 0%, #0d110d 100%);
-    position: relative;
-    overflow: hidden;
-}
-
-/* The Grid Overlay */
-.home-screen::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%; width: 200%; height: 200%;
-    background-image:
-        linear-gradient(rgba(33, 115, 70, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(33, 115, 70, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-    transform: perspective(500px) rotateX(20deg);
-    animation: gridDrift 60s linear infinite;
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* The Lens (Central Glow) */
-.home-screen::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(33, 115, 70, 0.1) 0%, transparent 70%);
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    animation: lensBreathe 8s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.home-content-wrapper {
-    position: relative;
-    z-index: 2; /* Above the grid */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-    padding: 20px;
-}
-
-/* Typography */
-.mythic-title {
-    font-size: 4rem;
-    font-weight: 800;
-    letter-spacing: 8px;
-    color: var(--text);
-    text-shadow: 0 0 20px rgba(33, 115, 70, 0.5), 0 0 10px rgba(0,0,0,0.8);
-    margin: 0;
-    text-transform: uppercase;
-    position: relative;
-    background: linear-gradient(to bottom, #fff, #9bb8a0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.title-separator {
-    width: 100px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    margin: 20px 0;
-    box-shadow: 0 0 10px var(--accent);
-}
-
-.mythic-subtitle {
-    font-size: 1.1rem;
-    color: #7a8a7a;
-    font-family: 'Georgia', serif; /* Shift to serif for mythic feel */
-    font-style: italic;
-    letter-spacing: 1px;
-    opacity: 0.8;
-}
-
-/* Flavor Panel */
-.flavor-panel {
-    margin: 40px 0;
-    padding: 20px 40px;
-    background: rgba(0, 0, 0, 0.4);
-    border-left: 1px solid var(--accent);
-    border-right: 1px solid var(--accent);
-    backdrop-filter: blur(2px);
-    max-width: 600px;
-    position: relative;
-}
-
-.flavor-panel::before, .flavor-panel::after {
-    content: '';
-    position: absolute;
-    width: 10px; height: 1px;
-    background: var(--accent);
-    top: 0;
-}
-.flavor-panel::before { left: 0; }
-.flavor-panel::after { right: 0; }
-
-.invocation-text {
-    font-family: monospace;
-    color: var(--accent-light);
-    font-size: 0.95rem;
-    letter-spacing: 1px;
-    text-shadow: 0 0 5px rgba(46, 168, 107, 0.3);
-}
-
-/* Button Zone */
-.button-zone {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.home-start-btn {
-    padding: 18px 45px;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    background: transparent;
-    border: 1px solid var(--accent);
-    box-shadow: 0 0 15px rgba(33, 115, 70, 0.1);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.home-start-btn::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    transition: left 0.5s;
-}
-
-.home-start-btn:hover {
-    background: rgba(33, 115, 70, 0.1);
-    box-shadow: 0 0 25px rgba(33, 115, 70, 0.4);
-    text-shadow: 0 0 8px rgba(255,255,255,0.8);
-    transform: scale(1.02);
-}
-
-.home-start-btn:hover::before {
-    left: 100%;
-}
-
-.home-lore-btn {
-    background: transparent;
-    border: 1px solid #3a4a3a;
-    color: #777;
-    padding: 18px 30px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.9rem;
-}
-
-.home-lore-btn:hover {
-    border-color: #555;
-    color: #aaa;
-    background: rgba(255,255,255,0.02);
-}
-
-/* Lore Modal */
-.lore-modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(5px);
-    transition: opacity 0.3s;
-}
-
-.lore-content {
-    background: #151915;
-    border: 1px solid var(--accent);
-    padding: 40px;
-    max-width: 500px;
-    text-align: center;
-    box-shadow: 0 0 50px rgba(0,0,0,0.8);
-    position: relative;
-}
-
-.lore-content h2 {
-    color: var(--accent);
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
-}
-
-.lore-content p {
-    color: #ccc;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    font-size: 1rem;
-}
-
-.lore-content strong { color: white; }
-.lore-content em { color: var(--accent-light); }
-
-.lore-footer {
-    font-family: monospace;
-    font-size: 0.8rem;
-    color: #555 !important;
-    margin-top: 30px;
-    border-top: 1px solid #333;
-    padding-top: 10px;
-}
-
-/* Animations */
 @keyframes gridDrift {
     0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
     100% { transform: perspective(500px) rotateX(20deg) translateY(-40px); }
@@ -856,4 +856,360 @@ button {
 @keyframes lensBreathe {
     0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
     50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+}
+
+.level-select-ritual.ritual-complete .rune-node {
+    transform: rotate(45deg) scale(0);
+    opacity: 0;
+}
+
+
+/* ========================================= */
+/* CHALLENGE SCREEN: TRIAL OF THE FIELD      */
+/* ========================================= */
+
+.challenge-screen {
+    display: flex;
+    flex-direction: row;
+    background: var(--bg);
+    overflow: hidden;
+}
+
+/* ZONE A: THE HUNTER'S ANCHOR (Left Nav) */
+.nav-panel {
+    width: 260px;
+    min-width: 260px;
+    background: var(--panel);
+    border-right: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    z-index: 10;
+    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+}
+
+.nav-top {
+    margin-bottom: 30px;
+}
+
+.nav-back {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+}
+
+.tier-display {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tier-rune {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+}
+
+.tier-info .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #666;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.tier-info .value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+/* Tier Colors in Challenge Screen */
+.class-scout { color: var(--rune-gold); text-shadow: 0 0 8px rgba(218, 165, 32, 0.4); }
+.class-hunter { color: var(--accent); text-shadow: 0 0 8px rgba(33, 115, 70, 0.4); }
+.class-tracker { color: var(--rune-blue); text-shadow: 0 0 8px rgba(70, 130, 180, 0.4); }
+.class-mythic { color: #d8bfd8; text-shadow: 0 0 8px rgba(148, 0, 211, 0.4); }
+
+.tier-info .mult {
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #888;
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.tier-flavor {
+    margin-top: 15px;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: #777;
+    line-height: 1.4;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 10px;
+}
+
+.level-indicator {
+    margin-top: auto;
+    text-align: center;
+    opacity: 0.5;
+}
+
+.level-indicator .label { font-size: 0.8rem; text-transform: uppercase; display: block; }
+.level-indicator .value { font-size: 2rem; font-weight: bold; font-family: monospace; }
+
+
+/* ZONE B: THE FIELD (Center) */
+.challenge-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: radial-gradient(circle at center, #1b221b 0%, #0e110e 100%);
+    overflow: hidden;
+}
+
+/* Grid Wrapper with subtle background grid */
+.grid-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    overflow: auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Mythic Background Grid for The Field */
+.grid-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* ZONE C: BOTTOM CONTROLS (Glyph Bar) */
+.mythic-controls {
+    height: 90px;
+    background: var(--glass-panel);
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+}
+
+.lens-selector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid #3a4a3a;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.lens-selector:hover {
+    border-color: var(--accent);
+    background: rgba(33, 115, 70, 0.1);
+}
+
+.lens-icon { font-size: 1.5rem; }
+.lens-label { font-size: 0.9rem; font-weight: bold; color: #ccc; }
+
+.glyph-bar {
+    display: flex;
+    gap: 10px;
+}
+
+.glyph-button {
+    background: transparent;
+    border: 1px solid #444;
+    color: #777;
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.glyph-button:hover {
+    border-color: #666;
+    color: #aaa;
+    background: rgba(255,255,255,0.02);
+}
+
+.glyph-button.active {
+    border-color: var(--accent);
+    color: var(--accent-light);
+    background: rgba(33, 115, 70, 0.15);
+    box-shadow: 0 0 15px rgba(33, 115, 70, 0.2);
+}
+
+.glyph-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 2px;
+    background: var(--accent);
+    box-shadow: 0 0 5px var(--accent);
+}
+
+/* ZONE D: THE CHALLENGE SCROLL (Right Panel) */
+.challenge-panel {
+    width: 320px;
+    min-width: 320px;
+    background: var(--panel);
+    border-left: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+}
+
+.scroll-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 20px;
+}
+
+.panel-header {
+    font-size: 1.2rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 15px;
+}
+
+.question-container {
+    background: rgba(0,0,0,0.2);
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #333;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #eee;
+}
+
+.action-area {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+}
+
+.hint-btn {
+    width: 100%;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hint-btn .hint-badge {
+    background: rgba(0,0,0,0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.hint-btn.used {
+    background: #222;
+    border-color: #333;
+    color: #555;
+}
+
+.hint-btn.used .check { color: var(--success); }
+
+/* GRID INTERACTIONS & LENS EFFECTS */
+
+/* Standard marked cell (User Interaction) */
+.grid-cell.marked {
+    border-color: var(--rune-gold);
+    box-shadow: inset 0 0 0 1px var(--rune-gold);
+}
+
+.grid-cell.marked::after {
+    content: '✖';
+    position: absolute;
+    top: 2px; right: 2px;
+    font-size: 0.6rem;
+    color: var(--rune-gold);
+}
+
+/* Lens Mode: Focus (Blur out non-hovered) */
+.dataset-grid.lens-focus .grid-cell:not(:hover) {
+    opacity: 0.6;
+    filter: blur(1px);
+    transition: opacity 0.2s, filter 0.2s;
+}
+.dataset-grid.lens-focus .grid-cell:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    background: var(--panel);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+/* Lens Mode: X-Ray (Outline only, high contrast) */
+.dataset-grid.lens-xray .grid-cell {
+    background: transparent;
+    border: 1px solid #444;
+    color: #aaa;
+}
+.dataset-grid.lens-xray .grid-cell:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: #fff;
+    color: #fff;
+}
+.dataset-grid.lens-xray .grid-cell.marked {
+    border-color: var(--error);
+    color: var(--error);
+}
+
+/* Visual Feedback Animations */
+.challenge-panel.success-pulse {
+    animation: successPulse 0.5s ease-out;
+}
+
+.challenge-panel.shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes successPulse {
+    0% { box-shadow: -5px 0 15px rgba(0,0,0,0.3); border-left-color: rgba(255,255,255,0.05); }
+    50% { box-shadow: -5px 0 40px rgba(46, 204, 113, 0.3); border-left-color: var(--success); }
+    100% { box-shadow: -5px 0 15px rgba(0,0,0,0.3); border-left-color: rgba(255,255,255,0.05); }
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
 }
