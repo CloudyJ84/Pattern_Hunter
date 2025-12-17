@@ -1,21 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pattern Hunter Dev Harness</title>
-  <link rel="stylesheet" href="./src/ui/styles/layout.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Hunter</title>
+
+    <!-- Excel‑green theme color -->
+    <meta name="theme-color" content="#217346">
+
+    <link rel="stylesheet" href="./src/ui/styles/main.css">
 </head>
 <body>
-  <main class="app-container">
-    <section id="controls-bar" class="controls-section"></section>
-    <section id="grid-container" class="grid-section"></section>
-    <section id="question-panel" class="question-section"></section>
-    <section id="feedback-panel" class="feedback-section hidden"></section>
-    <section id="debug-toggle-container" class="debug-toggle-section"></section>
-    <section id="debug-panel" class="debug-section hidden"></section>
-  </main>
+    <noscript>
+        <div style="padding: 2rem; text-align: center; font-family: sans-serif;">
+            <h2>Pattern Hunter requires JavaScript</h2>
+            <p>Please enable JavaScript in your browser to continue.</p>
+        </div>
+    </noscript>
 
-  <script type="module" src="./main.js"></script>
+    <div id="app-root">
+        <div class="loading-screen">
+            <h1>Pattern Hunter</h1>
+            <p>Initializing Engines...</p>
+        </div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
 </body>
 </html>
