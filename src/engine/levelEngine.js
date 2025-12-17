@@ -9,63 +9,73 @@ export function initLevelEngine(levelProgressionConfig) {
     progressionRules = levelProgressionConfig;
 }
 
-export function generateLevel(levelNumber) {
-    if (!progressionRules) throw new Error("LevelEngine not initialized");
+export function generateLevel(levelNumber, thresholdTier = 1) {
+    if (!progressionRules) {
+        throw new Error("LevelEngine not initialized");
+    }
 
     // 1. Get Level Config
     const config = getLevelConfig(levelNumber);
-    if (!config) throw new Error(`No configuration found for level ${levelNumber}`);
+    if (!config) {
+        throw new Error(`No configuration found for level ${levelNumber}`);
+    }
 
-    // 2. Determine Parameters
-    // Handle "5-7" string ranges if present, or use object
+    // 2. Threshold Tier Config
+    const thresholdConfig = getThresholdConfig(thresholdTier);
+
+    // 3. Dataset Size
     let rows = config.datasetSize.rows;
     let cols = config.datasetSize.cols;
-    
-    // 3. Choose Dataset Type
-    // If array, pick random. 
-    const datasetType = Array.isArray(config.datasetTypes) 
+
+    // 4. Dataset Type
+    const datasetType = Array.isArray(config.datasetTypes)
         ? config.datasetTypes[Math.floor(Math.random() * config.datasetTypes.length)]
         : config.datasetTypes;
 
-    // 4. Choose Pattern
+    // 5. Pattern Type
     let patternType;
-    if (config.patternTypes === "ALL" || (Array.isArray(config.patternTypes) && config.patternTypes.length > 0)) {
-        // Real app would check available patterns for the datasetType
-        // For now we assume the list in config is valid for the chosen datasetType
-        // OR we pick a random one if "ALL"
-        if (config.patternTypes === "ALL") {
-             patternType = "random"; // logic needed to fetch available patterns
-        } else {
-             patternType = config.patternTypes[Math.floor(Math.random() * config.patternTypes.length)];
-        }
+    if (Array.isArray(config.patternTypes)) {
+        patternType = config.patternTypes[Math.floor(Math.random() * config.patternTypes.length)];
+    } else if (config.patternTypes === "ALL") {
+        // TODO: pull from patternEngine rules for datasetType
+        patternType = "random";
+    } else {
+        patternType = config.patternTypes;
     }
 
-    // 5. Generate Raw Dataset
-    let dataset = generateRawDataset(datasetType, { rows, cols });
+    // 6. Generate Raw Dataset
+    let dataset = generateRawDataset(datasetType, { rows, cols }, thresholdConfig);
 
-    // 6. Inject Pattern
-    dataset = injectPattern(dataset, datasetType, patternType);
+    // 7. Inject Pattern
+    const patternResult = injectPattern(dataset, datasetType, patternType, thresholdConfig);
+    dataset = patternResult.dataset || dataset;
 
-    // 7. Apply Formatting (Calculate highlights)
-    const formattingResult = applyFormatting(dataset, datasetType, patternType);
+    // 8. Apply Formatting
+    const formattingResult = applyFormatting(dataset, datasetType, patternType, thresholdConfig);
 
-    // 8. Generate Question
-    const question = generateQuestion(patternType, datasetType, dataset, formattingResult.highlightedCells);
+    // 9. Generate Question
+    const question = generateQuestion(
+        patternType,
+        datasetType,
+        dataset,
+        formattingResult.highlightedCells,
+        thresholdConfig
+    );
 
-    // 9. Return Challenge Object
+    // 10. Return Challenge Object
     return {
         level: levelNumber,
-        datasetType: datasetType,
-        patternType: patternType,
+        datasetType,
+        patternType,
         grid: dataset,
         formatting: formattingResult,
-        question: question,
-        config: config
+        question,
+        thresholdConfig,
+        config
     };
 }
 
 function getLevelConfig(level) {
-    // Find the config block that contains this level
     const match = progressionRules.find(rule => {
         if (Array.isArray(rule.levels)) {
             return rule.levels.includes(level);
@@ -75,5 +85,17 @@ function getLevelConfig(level) {
         }
         return false;
     });
-    return match || progressionRules[progressionRules.length - 1]; // Fallback
+
+    return match || progressionRules[progressionRules.length - 1];
+}
+
+function getThresholdConfig(tier) {
+    const tiers = [
+        { tier: 0, name: "Scout", hintLevel: "high", rewardMultiplier: 1.0 },
+        { tier: 1, name: "Hunter", hintLevel: "medium", rewardMultiplier: 1.5 },
+        { tier: 2, name: "Tracker", hintLevel: "low", rewardMultiplier: 2.0 },
+        { tier: 3, name: "Mythic", hintLevel: "none", rewardMultiplier: 3.0 }
+    ];
+
+    return tiers[tier] || tiers[1];
 }
