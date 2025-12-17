@@ -1,9 +1,9 @@
 :root {
-    --bg: #1b1f1b;               /* darker, Excel-friendly background */
-    --panel: #222826;            /* subtle green-tinted dark panel */
-    --accent: #217346;           /* Excel green */
-    --accent-light: #2ea86b;     /* lighter Excel green for hover/active */
-    --text: #e8f5e9;             /* soft green-tinted white */
+    --bg: #1b1f1b;                /* darker, Excel-friendly background */
+    --panel: #222826;             /* subtle green-tinted dark panel */
+    --accent: #217346;            /* Excel green */
+    --accent-light: #2ea86b;      /* lighter Excel green for hover/active */
+    --text: #e8f5e9;              /* soft green-tinted white */
     --success: #2ecc71;
     --error: #e74c3c;
 }
@@ -282,4 +282,350 @@ button {
 
 .fmt-unique {
     border: 2px dashed #f1c40f;
+}
+
+/* ========================================= */
+/* MYTHIC INITIATION UI LAYERS         */
+/* ========================================= */
+
+/* Container overrides for Ritual Screen */
+.level-select-ritual {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    /* Blend the base background into something darker/deeper */
+    background: linear-gradient(to bottom, var(--bg), #111511);
+    overflow-y: auto;
+}
+
+/* 1. Header Area */
+.ritual-header {
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid #3a4a3a;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+.nav-rune {
+    background: transparent;
+    border: 1px solid #3a4a3a;
+    color: #889988;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-rune:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: rgba(33, 115, 70, 0.1);
+}
+
+.title-block {
+    flex: 1;
+    text-align: center;
+}
+
+.title-block h2 {
+    font-size: 1.8rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    text-shadow: 0 0 10px rgba(33, 115, 70, 0.4);
+}
+
+.title-block .subtitle {
+    font-size: 0.9rem;
+    color: #7a8a7a;
+    font-style: italic;
+    font-family: serif; /* Mythic feel */
+}
+
+.spacer { width: 90px; }
+
+/* 2. Zones */
+.tier-selection-zone, .level-grid-zone {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.section-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #556655;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+/* 3. Tier Cards (The Vow) */
+.tier-cards-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.ritual-card {
+    background: rgba(30, 35, 30, 0.7);
+    border: 1px solid #3a4a3a;
+    border-radius: 6px;
+    width: 200px;
+    min-height: 250px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    overflow: hidden;
+    /* CSS Stone Texture */
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.ritual-card:hover {
+    transform: translateY(-5px);
+    background: rgba(40, 45, 40, 0.9);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+}
+
+.card-inner {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tier-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+.tier-mult {
+    font-family: monospace;
+    font-size: 0.9rem;
+    background: rgba(0,0,0,0.4);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #ccc;
+}
+
+.card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.flavor-text {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #99aa99;
+    line-height: 1.4;
+    margin-bottom: 15px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #778877;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding-top: 10px;
+}
+
+.active-indicator {
+    margin-top: 15px;
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    padding: 5px;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-transform: uppercase;
+    animation: fadeIn 0.4s ease-out;
+    border-radius: 2px;
+}
+
+/* 4. Tier Identities */
+
+/* Scout: Gold / Warm */
+.tier-scout { border-color: #8a7a4a; }
+.tier-scout:hover { border-color: #DAA520; box-shadow: 0 0 15px rgba(218, 165, 32, 0.2); }
+.tier-scout .tier-name { color: #DAA520; }
+.tier-scout.active { 
+    border-color: #FFD700; 
+    background: rgba(40, 35, 20, 0.9);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); 
+    transform: scale(1.05);
+    opacity: 1;
+}
+.tier-scout .active-indicator { color: #FFD700; border: 1px solid #FFD700; }
+
+/* Hunter: Bronze / Earthy Green (Base Theme) */
+.tier-hunter { border-color: #5d4037; }
+.tier-hunter:hover { border-color: #cd7f32; box-shadow: 0 0 15px rgba(205, 127, 50, 0.2); }
+.tier-hunter .tier-name { color: #cd7f32; }
+.tier-hunter.active { 
+    border-color: #2ecc71; /* Shift to success green for active state */
+    background: rgba(30, 40, 30, 0.9);
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.3); 
+    transform: scale(1.05);
+    opacity: 1;
+}
+.tier-hunter .active-indicator { color: #2ecc71; border: 1px solid #2ecc71; }
+
+/* Tracker: Steel Blue / Cool */
+.tier-tracker { border-color: #34495e; }
+.tier-tracker:hover { border-color: #4682B4; box-shadow: 0 0 15px rgba(70, 130, 180, 0.2); }
+.tier-tracker .tier-name { color: #87CEEB; }
+.tier-tracker.active { 
+    border-color: #00BFFF; 
+    background: rgba(20, 30, 40, 0.9);
+    box-shadow: 0 0 20px rgba(0, 191, 255, 0.3); 
+    transform: scale(1.05);
+    opacity: 1;
+}
+.tier-tracker .active-indicator { color: #00BFFF; border: 1px solid #00BFFF; }
+
+/* Mythic: Void / Purple / Gradient */
+.tier-mythic { 
+    border-color: #4a235a; 
+    background: linear-gradient(135deg, rgba(20,0,20,0.8), rgba(40,0,40,0.8)); 
+}
+.tier-mythic:hover { border-color: #9400D3; box-shadow: 0 0 15px rgba(148, 0, 211, 0.3); }
+.tier-mythic .tier-name { color: #D8BFD8; text-shadow: 0 0 5px #9400D3; }
+.tier-mythic.active { 
+    border-color: #FF00FF; 
+    box-shadow: 0 0 30px rgba(255, 0, 255, 0.25); 
+    background: linear-gradient(135deg, #2a0e35, #000);
+    background-size: 200% 200%;
+    animation: voidShift 4s ease infinite;
+    transform: scale(1.05);
+    opacity: 1;
+}
+.tier-mythic .active-indicator { color: #FF00FF; border: 1px solid #FF00FF; }
+
+/* 5. The Path (Runes) */
+.runic-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    padding: 20px;
+    max-width: 800px;
+    margin-top: 10px;
+}
+
+.rune-node {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    background: #222;
+    border: 2px solid #444;
+    color: #666;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    transform: rotate(45deg); /* Diamond Shape */
+    margin: 10px; 
+}
+
+/* Counter-rotate content so numbers are upright */
+.rune-node span {
+    transform: rotate(-45deg);
+    display: block;
+}
+
+.rune-node .level-num {
+    z-index: 2;
+}
+
+.rune-node .lock-icon {
+    font-size: 1rem;
+    opacity: 0.5;
+}
+
+/* UNLOCKED STATE */
+.rune-node.unlocked-path {
+    background: #1e2e1e;
+    border-color: var(--accent);
+    color: var(--text);
+    box-shadow: 0 0 10px rgba(33, 115, 70, 0.2);
+}
+
+.rune-node.unlocked-path:hover {
+    transform: rotate(45deg) scale(1.15);
+    background: var(--accent);
+    border-color: var(--accent-light);
+    box-shadow: 0 0 25px var(--accent-light);
+    color: white;
+    z-index: 5;
+}
+
+.rune-node.unlocked-path .rune-glow {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
+}
+
+/* LOCKED STATE */
+.rune-node.locked-void {
+    background: #151515;
+    border-color: #2a2a2a;
+    color: #333;
+    cursor: not-allowed;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    /* Etched effect */
+}
+
+/* 6. Animations */
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 5px var(--accent); }
+    50% { box-shadow: 0 0 20px var(--accent-light); }
+    100% { box-shadow: 0 0 5px var(--accent); }
+}
+
+@keyframes voidShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Ritual Completion Effect (Optional hook for JS) */
+.level-select-ritual.ritual-complete .rune-node {
+    transform: rotate(45deg) scale(0);
+    opacity: 0;
 }
