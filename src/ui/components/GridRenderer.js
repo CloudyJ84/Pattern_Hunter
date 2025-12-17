@@ -1,49 +1,55 @@
 import { Cell } from './Cell.js';
 
 export class GridRenderer {
-    constructor(containerId) {
-        this.container = document.getElementById(containerId);
+
+    constructor(container) {
+        this.container = container;
+        this.element = container;
         this.cells = [];
     }
 
     render(gridData) {
+        if (!Array.isArray(gridData) || gridData.length === 0) {
+            console.error("GridRenderer: invalid gridData", gridData);
+            this.container.innerHTML = '';
+            return;
+        }
+
         this.container.innerHTML = '';
         this.cells = [];
 
-        const rows = gridData.length;
+        // Set column count based on first row
         const cols = gridData[0].length;
-
-        // --- CSS Grid Logic ---
-        // Dynamically set columns variable for CSS
-        this.container.style.setProperty('--cols', cols);
-        this.container.style.display = 'grid';
         this.container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-        this.container.style.gap = '8px';
-        
-        gridData.forEach(row => {
-            row.forEach(cellData => {
+
+        // Build cells
+        for (const row of gridData) {
+            for (const cellData of row) {
                 const cell = new Cell(cellData);
                 this.cells.push(cell);
                 this.container.appendChild(cell.element);
-            });
-        });
+            }
+        }
     }
 
     applyFormatting(formattingResult) {
         if (!formattingResult || !formattingResult.highlightedCells) return;
 
-        const { cssClass, highlightedCells } = formattingResult;
-        
-        // Optimize lookup
-        const highlightMap = new Set(
-            highlightedCells.map(c => `${c.row},${c.col}`)
+        const highlighted = new Set(
+            formattingResult.highlightedCells.map(c => `${c.row},${c.col}`)
         );
 
-        this.cells.forEach(cell => {
+        for (const cell of this.cells) {
             const key = `${cell.data.row},${cell.data.col}`;
-            if (highlightMap.has(key)) {
-                cell.highlight(cssClass);
+            if (highlighted.has(key)) {
+                cell.highlight(formattingResult.cssClass);
             }
-        });
+        }
+    }
+
+    destroy() {
+        // No persistent listeners, but lifecycle consistency matters
+        this.cells = [];
+        this.container.innerHTML = '';
     }
 }
