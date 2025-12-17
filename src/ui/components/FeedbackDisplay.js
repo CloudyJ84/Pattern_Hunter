@@ -1,26 +1,56 @@
 export class FeedbackDisplay {
-    constructor(containerId) {
-        this.container = document.getElementById(containerId);
+
+    constructor(container) {
+        this.container = container;
+        this.element = container;
     }
 
-    showCorrect() {
-        this.container.classList.remove('hidden');
+    showCorrect(onNext, multiplier = 1) {
+        if (typeof onNext !== 'function') {
+            console.error("FeedbackDisplay.showCorrect: onNext must be a function");
+            return;
+        }
+
+        // Reset + apply success styling
+        this.container.className = 'panel feedback-panel success';
+
         this.container.innerHTML = `
-            <h3 style="color: var(--success); margin: 0;">Correct!</h3>
-            <p>Well done. Proceed to next level.</p>
+            <h3>Correct!</h3>
+            <p>Reward Multiplier: <strong>${multiplier}x</strong></p>
+            <button class="control-btn primary full-width">Next Level</button>
         `;
+
+        const btn = this.container.querySelector('button');
+        btn.onclick = onNext;
+
+        this.container.classList.remove('hidden');
     }
 
     showIncorrect(correctAnswer) {
-        this.container.classList.remove('hidden');
+        // Reset + apply error styling
+        this.container.className = 'panel feedback-panel error';
+
         this.container.innerHTML = `
-            <h3 style="color: var(--error); margin: 0;">Incorrect</h3>
-            <p>The correct answer was: <strong>${correctAnswer}</strong></p>
+            <h3>Incorrect</h3>
+            <p>Answer: <strong>${correctAnswer}</strong></p>
+            <button class="control-btn secondary full-width">Try Again</button>
         `;
+
+        const btn = this.container.querySelector('button');
+        btn.onclick = () => this.clear();
+
+        this.container.classList.remove('hidden');
     }
 
     clear() {
         this.container.innerHTML = '';
         this.container.classList.add('hidden');
+    }
+
+    destroy() {
+        // Lifecycle consistency with other components
+        this.clear();
+        this.element = null;
+        this.container = null;
     }
 }
