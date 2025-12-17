@@ -17,6 +17,7 @@ import { UIRouter } from './ui/UIRouter.js';
 // Helper to load JSON files
 async function loadJSON(path) {
     const response = await fetch(path);
+    if (!response.ok) throw new Error(`Failed to load ${path}`);
     return response.json();
 }
 
@@ -24,11 +25,11 @@ async function init() {
     try {
         console.log("Initializing Pattern Hunter…");
 
-        // Load engine configuration files
-        const datasetRules = await loadJSON('./data/datasetRules.json');
-        const patternRules = await loadJSON('./data/patternEngine.json');
-        const questionRules = await loadJSON('./data/questionGenerator.json');
-        const levelProgression = await loadJSON('./data/levelProgression.json');
+        // Load engine configuration files from src/data/
+        const datasetRules = await loadJSON('./src/data/datasetRules.json');
+        const patternRules = await loadJSON('./src/data/patternEngine.json');
+        const questionRules = await loadJSON('./src/data/questionGenerator.json');
+        const levelProgression = await loadJSON('./src/data/levelProgression.json');
 
         // Initialize engines
         initDatasetGenerator(datasetRules);
