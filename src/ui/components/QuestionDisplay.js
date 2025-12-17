@@ -1,59 +1,56 @@
 export class QuestionDisplay {
-    constructor(containerId, onSubmitCallback) {
-        this.container = document.getElementById(containerId);
-        this.onSubmitCallback = onSubmitCallback;
+
+    constructor(container, onSubmit) {
+        this.container = container;
+        this.onSubmit = onSubmit;
+        this.element = container;
     }
 
-    /**
-     * Renders the question UI.
-     * @param {Object} questionData - { text, type, answer }
-     */
-    render(questionData) {
-        this.container.innerHTML = '';
+    render(question) {
+        if (!question || !question.text) {
+            console.error("QuestionDisplay: invalid question object", question);
+            this.container.innerHTML = "<h3>Invalid question</h3>";
+            return;
+        }
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'question-box reveal-anim';
+        this.container.innerHTML = `
+            <h3>${question.text}</h3>
+            <div class="input-group"></div>
+        `;
 
-        // Question Text
-        const text = document.createElement('h3');
-        text.textContent = questionData.text;
-        wrapper.appendChild(text);
-
-        // Input Area
-        const inputGroup = document.createElement('div');
-        inputGroup.className = 'input-group';
-        inputGroup.style.marginTop = '15px';
-        inputGroup.style.display = 'flex';
-        inputGroup.style.gap = '10px';
+        const group = this.container.querySelector('.input-group');
 
         const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Your answer...';
         input.className = 'answer-input';
-        input.style.padding = '8px';
-        input.style.flex = '1';
+        input.placeholder = "Type answer…";
 
         const btn = document.createElement('button');
         btn.textContent = 'Submit';
-        btn.className = 'primary-btn';
-        btn.onclick = () => this.handleSubmit(input.value);
+        btn.className = 'control-btn primary';
 
-        // Allow Enter key
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.handleSubmit(input.value);
-        });
+        const submit = () => {
+            const value = input.value?.trim();
+            if (value) {
+                this.onSubmit(value);
+            }
+        };
 
-        inputGroup.appendChild(input);
-        inputGroup.appendChild(btn);
-        wrapper.appendChild(inputGroup);
+        btn.onclick = submit;
+        input.onkeypress = (e) => {
+            if (e.key === 'Enter') submit();
+        };
 
-        this.container.appendChild(wrapper);
+        group.appendChild(input);
+        group.appendChild(btn);
+
+        // Focus after render
+        setTimeout(() => input.focus(), 50);
     }
 
-    handleSubmit(value) {
-        if (!value) return;
-        if (this.onSubmitCallback) {
-            this.onSubmitCallback(value);
-        }
+    destroy() {
+        // Lifecycle consistency with other components
+        this.container.innerHTML = '';
+        this.element = null;
+        this.onSubmit = null;
     }
 }
