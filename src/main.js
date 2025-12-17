@@ -1,45 +1,47 @@
 console.log("main.js loaded");
 
-// Import engine initializers
-import { initDatasetGenerator } from './src/engine/datasetGenerator.js';
-import { initPatternEngine } from './src/engine/patternEngine.js';
-import { initQuestionEngine } from './src/engine/questionEngine.js';
-import { initFormattingEngine } from './src/engine/formattingEngine.js';
-import { initLevelEngine } from './src/engine/levelEngine.js';
+// Engine initializers
+import { initDatasetGenerator } from './engine/datasetGenerator.js';
+import { initPatternEngine } from './engine/patternEngine.js';
+import { initQuestionEngine } from './engine/questionEngine.js';
+import { initFormattingEngine } from './engine/formattingEngine.js';
+import { initLevelEngine } from './engine/levelEngine.js';
 
-// Import UI
-import { UIManager } from './src/ui/UIManager.js';
+// Router
+import { UIRouter } from './ui/UIRouter.js';
 
 // Helper to load JSON files
 async function loadJSON(path) {
-  const response = await fetch(path);
-  return response.json();
+    const response = await fetch(path);
+    return response.json();
 }
 
 async function init() {
-  console.log("init() started");
+    console.log("Initializing Pattern Hunter…");
 
-  // Load all JSON configuration files
-  const datasetRules = await loadJSON('./data/datasetRules.json');
-  const patternEngine = await loadJSON('./data/patternEngine.json');
-  const questionGenerator = await loadJSON('./data/questionGenerator.json');
-  const levelProgression = await loadJSON('./data/levelProgression.json');
+    // Load engine configuration files
+    const datasetRules = await loadJSON('./data/datasetRules.json');
+    const patternRules = await loadJSON('./data/patternEngine.json');
+    const questionRules = await loadJSON('./data/questionGenerator.json');
+    const levelProgression = await loadJSON('./data/levelProgression.json');
 
-  // Initialize all engine modules
-  initDatasetGenerator(datasetRules);
-  initPatternEngine(patternEngine);
-  initQuestionEngine(questionGenerator);
-  initFormattingEngine(patternEngine); // formatting rules live in patternEngine.json
-  initLevelEngine(levelProgression);
+    // Initialize engines
+    initDatasetGenerator(datasetRules);
+    initPatternEngine(patternRules);
+    initQuestionEngine(questionRules);
+    initFormattingEngine(patternRules); // formatting rules live in patternEngine.json
+    initLevelEngine(levelProgression);
 
-  console.log("All engines initialized");
+    console.log("All engines initialized.");
 
-  // Boot the UI
-  new UIManager();
+    // Initialize Router
+    UIRouter.init("app-root");
 
-  console.log("UI initialized");
-  console.log("init() finished");
+    // Navigate to Home Screen
+    UIRouter.navigateTo("HomeScreen");
+
+    console.log("Router initialized and HomeScreen loaded.");
 }
 
-// Run the initialization
+// Start the app
 init();
