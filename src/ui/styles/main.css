@@ -1004,6 +1004,24 @@ button {
     z-index: -1;
 }
 
+/* Lens Summary Overlay */
+.lens-summary {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 20;
+    pointer-events: none;
+    font-size: 0.9rem;
+    font-family: monospace;
+}
+
 /* ZONE C: BOTTOM CONTROLS (Glyph Bar) */
 .mythic-controls {
     height: 90px;
@@ -1055,7 +1073,12 @@ button {
     transition: all 0.2s;
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
+
+.glyph-icon { font-size: 1.1rem; }
 
 .glyph-button:hover {
     border-color: #666;
@@ -1176,11 +1199,13 @@ button {
     box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
 
-/* Lens Mode: X-Ray (Outline only, high contrast) */
+/* Lens Mode: Structure (X-Ray) */
 .dataset-grid.lens-xray .grid-cell {
     background: transparent;
     border: 1px solid #444;
     color: #aaa;
+    /* Hide formatted backgrounds in structure mode if present inline, 
+       but here we rely on classes. */
 }
 .dataset-grid.lens-xray .grid-cell:hover {
     background: rgba(255,255,255,0.05);
