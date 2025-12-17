@@ -1,70 +1,41 @@
-/**
- * Represents a single cell in the dataset grid.
- * Responsible for rendering value types correctly and applying visual states.
- */
 export class Cell {
-    constructor(cellData) {
-        this.data = cellData; // { row, col, value, type }
+    constructor(data) {
+        this.data = data;
         this.element = document.createElement('div');
-        this.init();
+        this.element.className = 'grid-cell';
+        this.render();
     }
 
-    init() {
-        this.element.className = 'grid-cell reveal-anim';
-        this.element.dataset.row = this.data.row;
-        this.element.dataset.col = this.data.col;
-        
-        // Render content based on type
-        this.element.textContent = this.formatValue();
-        
-        // Stagger animation based on index
-        const delay = (this.data.row * 0.1) + (this.data.col * 0.1);
-        this.element.style.animationDelay = `${delay}s`;
-    }
+    render() {
+        let val = this.data.value;
 
-    formatValue() {
-        const val = this.data.value;
-        const type = this.data.type;
-
-        if (val === null || val === undefined) return '-';
-
-        switch (type) {
-            case 'dates':
-                return val instanceof Date 
-                    ? val.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) 
-                    : String(val);
-            
-            case 'times':
-                return String(val); // Already HH:MM from engine
-            
-            case 'numbers':
-                return String(val);
-            
-            case 'categories':
-                return String(val).toUpperCase();
-            
-            default:
-                return String(val);
+        // Simple date display fallback
+        if (val instanceof Date) {
+            val = val.getDate();
         }
+
+        // Defensive fallback for null/undefined
+        if (val === null || val === undefined) {
+            val = '';
+        }
+
+        this.element.textContent = val;
     }
 
-    /**
-     * Applies a formatting class to the cell.
-     * @param {string} cssClass - The class name from formattingEngine
-     */
     highlight(cssClass) {
-        if (cssClass && cssClass !== 'fmt-default') {
-            this.element.classList.add(cssClass);
-        }
+        if (!cssClass || cssClass === 'fmt-default') return;
+        this.element.classList.add(cssClass);
     }
 
-    /**
-     * Removes formatting classes.
-     * @param {string} cssClass 
-     */
-    resetHighlight(cssClass) {
-        if (cssClass) {
-            this.element.classList.remove(cssClass);
-        }
+    clearFormatting() {
+        // Remove all fmt-* classes if needed
+        const classes = [...this.element.classList].filter(c => c.startsWith('fmt-'));
+        classes.forEach(c => this.element.classList.remove(c));
+    }
+
+    destroy() {
+        // Lifecycle consistency with other components
+        this.element = null;
+        this.data = null;
     }
 }
