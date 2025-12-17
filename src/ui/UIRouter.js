@@ -10,12 +10,44 @@ const ROUTES = {
 
 export const UIRouter = {
     container: null,
-    init(container) { this.container = container; },
+    currentScreen: null,
+
+    init(containerId) {
+        const el = document.getElementById(containerId);
+        if (!el) {
+            console.error(`UIRouter: container #${containerId} not found`);
+            return;
+        }
+        this.container = el;
+    },
+
     navigateTo(screenName, params = {}) {
-        if(!this.container) return;
+        if (!this.container) return;
+
+        // Cleanup previous screen
+        if (this.currentScreen && typeof this.currentScreen.destroy === 'function') {
+            this.currentScreen.destroy();
+        }
+
+        // Clear container
         this.container.innerHTML = '';
+
+        // Resolve screen class
         const ScreenClass = ROUTES[screenName];
+        if (!ScreenClass) {
+            console.error("Unknown route:", screenName);
+            return;
+        }
+
+        // Instantiate and mount
         const instance = new ScreenClass(params);
-        this.container.appendChild(instance.mount());
+        this.currentScreen = instance;
+
+        const element = instance.mount();
+        if (element) {
+            this.container.appendChild(element);
+        } else {
+            console.error(`${screenName} did not return a valid DOM element from mount().`);
+        }
     }
 };
