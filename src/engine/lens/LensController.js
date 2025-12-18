@@ -28,6 +28,18 @@ export const LensController = {
     _activeLensId: 'lens_standard',
 
     /**
+     * Maps legacy lens IDs to new modular lens types.
+     * These types correspond to token bundles in lenses.css and LensRenderer.
+     */
+    _typeMap: {
+        'lens_standard': 'heatmap',   // Neutral base lens
+        'lens_focus': 'cluster',      // Focus = segmentation
+        'lens_xray': 'pivot',         // X-Ray = structural view
+        'lens_summary': 'timeline',   // Summary = temporal emphasis
+        'lens_void': 'anomaly'        // Fallback
+    },
+
+    /**
      * Registers a new lens definition into the codex.
      * Overwrites any existing lens with the same ID.
      * * @param {Object} lensDef - The lens definition object.
@@ -50,7 +62,6 @@ export const LensController = {
         }
 
         this._registry.set(lensDef.id, lensDef);
-        // console.debug(`LensController: Registered perspective "${lensDef.id}"`);
     },
 
     /**
@@ -100,12 +111,29 @@ export const LensController = {
         try {
             // Execute the ritual (Compute the lens output)
             const output = lens.compute(gridData, patternMetadata, datasetRules, tierConfig);
-            
-            // Ensure the output adheres to the basic contract structure
+
+            // Determine modular lens type
+            const type = this._typeMap[lens.id] || 'heatmap';
+
+            // Build the new modular contract
             return {
                 id: lens.id,
                 name: lens.name,
                 description: lens.description || '',
+
+                // NEW: modular lens type for token system
+                type,
+
+                // NEW: summary text (fallback to lens name)
+                summary: output.summary || lens.name,
+
+                // NEW: FX layers (optional)
+                fx: output.fx || [],
+
+                // NEW: legacy CSS class bridge
+                cssClass: output.cssClass || null,
+
+                // Existing fields
                 overlays: output.overlays || [],
                 annotations: output.annotations || [],
                 highlights: output.highlights || [],
@@ -137,6 +165,9 @@ export const LensController = {
             id: 'lens_void',
             name: 'Void',
             description: 'No vision available.',
+            type: 'anomaly',
+            summary: 'No Data',
+            fx: [],
             overlays: [],
             annotations: [],
             highlights: [],
@@ -169,7 +200,9 @@ LensController.registerLens({
             overlays: [],
             annotations: [],
             highlights: [],
-            legends: []
+            legends: [],
+            fx: [],
+            summary: 'Standard View'
         };
     }
 });
