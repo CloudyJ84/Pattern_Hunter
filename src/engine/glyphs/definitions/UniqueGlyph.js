@@ -14,14 +14,22 @@ export const UniqueGlyph = {
     category: "uniqueness",
 
     compute(gridData, patternMetadata, datasetRules) {
-        // Safe access to unique indices
-        const indices = patternMetadata.frequency && patternMetadata.frequency.uniqueIndices 
-            ? patternMetadata.frequency.uniqueIndices 
-            : [];
+        // New pattern engine structure possibilities:
+        // patternMetadata.unique.indices = [...]
+        // patternMetadata.uniques.indices = [...]
+        // patternMetadata.frequency.unique = [...]
+        // Legacy: patternMetadata.frequency.uniqueIndices = [...]
+
+        const indices =
+            patternMetadata?.unique?.indices ||             // NEW schema
+            patternMetadata?.uniques?.indices ||            // alt schema
+            patternMetadata?.frequency?.unique ||           // alt schema
+            patternMetadata?.frequency?.uniqueIndices ||    // legacy schema
+            [];
 
         return {
-            indices: indices,
-            strength: 1.5, // Slightly higher emphasis for uniqueness
+            indices,
+            strength: 1.5,
             category: "uniqueness"
         };
     }
