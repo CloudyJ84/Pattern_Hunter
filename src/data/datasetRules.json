@@ -1,7 +1,7 @@
 {
   "datasetTypes": {
     "numbers": {
-      "id": "dataset_numbers",
+      "id": "numbers",
       "flavor": {
         "name": "The Arithmancer's Grid",
         "description": "A field of raw quantitative data where outliers and clusters hide among the noise."
@@ -75,7 +75,7 @@
       }
     },
     "dates": {
-      "id": "dataset_dates",
+      "id": "dates",
       "flavor": {
         "name": "The Chronomancer's Timeline",
         "description": "A sequence of days where weekends and weekdays form temporal rhythms."
@@ -135,7 +135,7 @@
       }
     },
     "times": {
-      "id": "dataset_times",
+      "id": "times",
       "flavor": {
         "name": "The Clockwork Register",
         "description": "A precise log of moments, split by the meridian and defined by the hour."
@@ -195,7 +195,7 @@
       }
     },
     "categories": {
-      "id": "dataset_categories",
+      "id": "categories",
       "flavor": {
         "name": "The Archivist's Taxonomy",
         "description": "A categorical inventory where rarity and frequency define the structure."
