@@ -1,52 +1,226 @@
 [
   {
-    "levels": [1, 2, 3],
-    "datasetSize": { "rows": 3, "cols": 3 },
-    "datasetTypes": ["numbers"],
-    "patternTypes": ["aboveThreshold"],
-    "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold"],
-    "notes": "Intro band. Simple numeric patterns only. Guaranteed compatibility."
-  },
-  {
-    "levels": [4, 5, 6],
-    "datasetSize": { "rows": 4, "cols": 4 },
-    "datasetTypes": ["numbers", "dates", "times"],
+    "id": "band_initiate",
+    "levels": [
+      1,
+      2,
+      3
+    ],
+    "datasetSize": {
+      "rows": 3,
+      "cols": 3
+    },
+    "datasetTypes": [
+      "dataset_numbers"
+    ],
     "patternTypes": {
-      "numbers": ["aboveThreshold"],
-      "dates": ["earliestOrLatest", "weekendHighlight"],
-      "times": ["earlyLate", "amPm"]
+      "dataset_numbers": [
+        "pattern_num_above_threshold",
+        "pattern_num_below_threshold"
+      ]
     },
     "questionTypes": {
-      "numbers": ["whichValueIsHighlighted", "countAboveThreshold"],
-      "dates": ["whichDateIsEarliest", "whichDateIsLatest", "whichDateIsHighlighted"],
-      "times": ["whichTimeIsEarliest", "whichTimeIsLatest", "howManyPmTimes", "countEarlyOrLate"]
+      "dataset_numbers": [
+        "question_count_above_threshold"
+      ]
     },
-    "notes": "Introduces dates and times with dataset-specific pattern pools."
+    "difficulty": {
+      "patternComplexity": 1,
+      "questionComplexity": 1,
+      "formattingComplexity": 1
+    },
+    "tierScaling": {
+      "minTier": 1,
+      "maxTier": 1,
+      "recommendedTier": 1
+    },
+    "unlocks": {
+      "glyphs": [
+        "glyph_reveal_basic"
+      ],
+      "datasetTypes": [
+        "dataset_numbers"
+      ]
+    },
+    "notes": "The Initiate's Path. Simple numeric thresholds to teach the mechanics of the Lens."
   },
   {
-    "levels": [7, 8, 9, 10],
-    "datasetSize": { "rows": 5, "cols": 5 },
-    "datasetTypes": ["numbers", "dates", "times", "categories"],
+    "id": "band_apprentice",
+    "levels": [
+      4,
+      5,
+      6
+    ],
+    "datasetSize": {
+      "rows": 4,
+      "cols": 4
+    },
+    "datasetTypes": [
+      "dataset_numbers",
+      "dataset_dates",
+      "dataset_times"
+    ],
     "patternTypes": {
-      "numbers": ["aboveThreshold", "maxOrMin", "cluster"],
-      "dates": ["earliestOrLatest", "weekdayCluster", "dateRange"],
-      "times": ["earlyLate", "amPm", "timeRange"],
-      "categories": ["mostFrequent", "leastFrequent", "uniqueCategory"]
+      "dataset_numbers": [
+        "pattern_num_extremes",
+        "pattern_num_above_threshold"
+      ],
+      "dataset_dates": [
+        "pattern_date_weekend",
+        "pattern_date_extremes"
+      ],
+      "dataset_times": [
+        "pattern_time_ampm",
+        "pattern_time_extremes"
+      ]
     },
     "questionTypes": {
-      "numbers": ["whichValueIsHighest", "whichValueIsLowest", "howManyInCluster"],
-      "dates": ["whichDateIsEarliest", "whichDateIsLatest", "whichDatesInRange", "mostFrequentWeekday"],
-      "times": ["whichTimeIsEarliest", "whichTimeIsLatest", "howManyInRange"],
-      "categories": ["whichCategoryIsMostFrequent", "whichCategoryIsUnique", "howManyUniqueCategories"]
+      "dataset_numbers": [
+        "question_find_extremes",
+        "question_count_above_threshold"
+      ],
+      "dataset_dates": [
+        "question_find_weekend",
+        "question_count_range"
+      ],
+      "dataset_times": [
+        "question_count_pm",
+        "question_find_earliest"
+      ]
     },
-    "notes": "Full pattern variety. Dataset-specific logic prevents mismatches."
+    "difficulty": {
+      "patternComplexity": 2,
+      "questionComplexity": 2,
+      "formattingComplexity": 2
+    },
+    "tierScaling": {
+      "minTier": 1,
+      "maxTier": 2,
+      "recommendedTier": 2
+    },
+    "unlocks": {
+      "lensModes": [
+        "lens_chrono_filter"
+      ],
+      "datasetTypes": [
+        "dataset_dates",
+        "dataset_times"
+      ]
+    },
+    "notes": "The Apprentice's Trials. Introduction of temporal data and extreme value logic."
   },
   {
-    "levels": "11+",
-    "datasetSize": { "rows": 6, "cols": 6 },
-    "datasetTypes": ["numbers", "dates", "times", "categories"],
-    "patternTypes": "ALL_SAFE",
-    "questionTypes": "ALL_SAFE",
-    "notes": "Endless mode. Engine filters patterns by dataset type to avoid mismatches."
+    "id": "band_adept",
+    "levels": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "datasetSize": {
+      "rows": 5,
+      "cols": 5
+    },
+    "datasetTypes": [
+      "dataset_numbers",
+      "dataset_dates",
+      "dataset_times",
+      "dataset_categories"
+    ],
+    "patternTypes": {
+      "dataset_numbers": [
+        "pattern_num_cluster",
+        "pattern_num_outlier",
+        "pattern_num_extremes"
+      ],
+      "dataset_dates": [
+        "pattern_date_weekday_cluster",
+        "pattern_date_range"
+      ],
+      "dataset_times": [
+        "pattern_time_range",
+        "pattern_time_threshold"
+      ],
+      "dataset_categories": [
+        "pattern_cat_most_frequent",
+        "pattern_cat_least_frequent",
+        "pattern_cat_unique"
+      ]
+    },
+    "questionTypes": {
+      "dataset_numbers": [
+        "question_find_outlier",
+        "question_find_extremes"
+      ],
+      "dataset_dates": [
+        "question_most_frequent_weekday",
+        "question_count_range"
+      ],
+      "dataset_times": [
+        "question_in_time_range",
+        "question_count_pm"
+      ],
+      "dataset_categories": [
+        "question_find_unique",
+        "question_count_category"
+      ]
+    },
+    "difficulty": {
+      "patternComplexity": 3,
+      "questionComplexity": 3,
+      "formattingComplexity": 3
+    },
+    "tierScaling": {
+      "minTier": 2,
+      "maxTier": 3,
+      "recommendedTier": 3
+    },
+    "unlocks": {
+      "datasetTypes": [
+        "dataset_categories"
+      ],
+      "patternFamilies": [
+        "clustering",
+        "uniqueness"
+      ]
+    },
+    "notes": "The Adept's Challenge. Complex clustering and categorical taxonomy. Full variety."
+  },
+  {
+    "id": "band_mastery_endless",
+    "levels": "endless",
+    "datasetSize": {
+      "rows": 6,
+      "cols": 6
+    },
+    "datasetTypes": [
+      "dataset_numbers",
+      "dataset_dates",
+      "dataset_times",
+      "dataset_categories"
+    ],
+    "patternTypes": {
+      "dataset_numbers": "ALL_SAFE",
+      "dataset_dates": "ALL_SAFE",
+      "dataset_times": "ALL_SAFE",
+      "dataset_categories": "ALL_SAFE"
+    },
+    "questionTypes": {
+      "dataset_numbers": "ALL_SAFE",
+      "dataset_dates": "ALL_SAFE",
+      "dataset_times": "ALL_SAFE",
+      "dataset_categories": "ALL_SAFE"
+    },
+    "difficulty": {
+      "patternComplexity": 5,
+      "questionComplexity": 5,
+      "formattingComplexity": 5
+    },
+    "tierScaling": {
+      "minTier": 3,
+      "maxTier": 5,
+      "recommendedTier": 4
+    },
+    "notes": "The Void. Endless scaling with dynamic grid sizes and all safe patterns enabled."
   }
 ]
