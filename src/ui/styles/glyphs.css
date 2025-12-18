@@ -1,0 +1,383 @@
+/* ==========================================================================
+   MYTHIC DIGITAL // GLYPH SYSTEM
+   Codex: main.css
+   Architect: Modular CSS Extraction
+   
+   This file systematizes the visual logic of the "Mythic Digital" identity
+   into a token-based glyph engine. It preserves the depth, glow, and 
+   ritualistic aesthetic of the original source.
+========================================================================== 
+*/
+
+/* ========================================= */
+/* 1. BASE GLYPH CONTAINER                   */
+/* ========================================= */
+
+.glyph {
+    /* Layout & Positioning */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+
+    /* Typography Defaults */
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: bold;
+    color: var(--text);
+    text-align: center;
+    user-select: none;
+
+    /* Mythic Motion Physics */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Ensure inner content resets rotation if parent is rotated */
+.glyph > .glyph-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Pass interactions to container */
+}
+
+/* ========================================= */
+/* 2. SIZE TOKENS                            */
+/* ========================================= */
+
+/* Icon / Tiny Indicator */
+.glyph--xs {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+}
+
+/* Control / Button Cap */
+.glyph--sm {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+}
+
+/* Standard Node (Matches .level-node) */
+.glyph--md {
+    width: 50px;
+    height: 50px;
+    font-size: 1rem;
+}
+
+/* Rune / Cell (Matches .rune-node, .grid-cell) */
+.glyph--lg {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+}
+
+/* Hero / Tier Sigil */
+.glyph--xl {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+}
+
+/* ========================================= */
+/* 3. ROLE TOKENS (SEMANTIC TYPES)           */
+/* ========================================= */
+
+/* ROLE: DATASET (The Grid Cell) 
+   Context: Raw data, Excel roots, square structure */
+.glyph--dataset {
+    background: #2c332c;
+    border-radius: 4px; /* Slight soft edge */
+    border: 2px solid transparent; /* Ready for state colors */
+}
+
+/* ROLE: PATTERN (The Rune)
+   Context: Ritual path, diamond shape, border-heavy */
+.glyph--pattern {
+    background: #222;
+    border: 2px solid #444;
+    transform: rotate(45deg); /* The Diamond Shift */
+    color: #666;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8); /* Inner void depth */
+}
+
+/* Counter-rotate content for legibility */
+.glyph--pattern > * {
+    transform: rotate(-45deg);
+}
+
+/* ROLE: QUESTION (The Node)
+   Context: Progress points, standard circular indicators */
+.glyph--question {
+    border-radius: 50%;
+    background: var(--panel);
+    border: 1px solid var(--border-subtle);
+}
+
+/* ROLE: THRESHOLD (The Limit)
+   Context: Borders, container edges */
+.glyph--threshold {
+    background: transparent;
+    border: 1px solid #3a4a3a;
+    border-radius: 20px; /* Pill shape pill-logic */
+    color: #9bb8a0;
+}
+
+/* ROLE: WARNING (The Outlier)
+   Context: Critical data points, immediate attention */
+.glyph--warning {
+    background: #e74c3c;
+    color: white;
+    box-shadow: 0 0 10px #e74c3c;
+    border-radius: 4px;
+    z-index: 5;
+}
+
+/* ROLE: REWARD (The Treasure)
+   Context: Unlocked path, high value */
+.glyph--reward {
+    background: linear-gradient(135deg, var(--rune-gold), #b8860b);
+    border: 1px solid #fff;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(218, 165, 32, 0.4);
+}
+
+/* ========================================= */
+/* 4. STATE TOKENS (RITUAL STATES)           */
+/* ========================================= */
+
+/* State: Dormant (Locked / Void) */
+.glyph--dormant {
+    background: #151515; /* Void Dark */
+    border-color: #2a2a2a;
+    color: #333;
+    cursor: not-allowed;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    filter: grayscale(100%);
+}
+
+/* State: Active (Standard Operation) */
+.glyph--active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent-light);
+    opacity: 1;
+}
+
+/* State: Charged (Hover / Selected / High Energy) */
+.glyph--charged {
+    background: var(--accent); /* Fallback */
+    border-color: var(--accent-light);
+    color: white;
+    /* Mythic Lift */
+    transform: scale(1.15) rotate(0deg); /* Reset rotate for non-patterns, override for patterns below */
+    z-index: 10;
+    box-shadow: 0 0 25px rgba(46, 168, 107, 0.5); /* Strong glow */
+}
+
+/* Specific Charged override for Patterns to maintain diamond shape */
+.glyph--pattern.glyph--charged {
+    transform: rotate(45deg) scale(1.15);
+    background: var(--accent);
+}
+
+/* State: Cooldown (Post-interaction) */
+.glyph--cooldown {
+    border-color: var(--rune-blue);
+    color: var(--rune-blue);
+    background: rgba(70, 130, 180, 0.1);
+}
+
+/* State: Disabled */
+.glyph--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: brightness(0.5);
+}
+
+/* ========================================= */
+/* 5. FX LAYERS                              */
+/* ========================================= */
+
+.glyph-layer {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    overflow: hidden;
+}
+
+/* Glow: Soft radial emanation */
+.glyph-layer--glow {
+    box-shadow: 0 0 15px var(--accent);
+    opacity: 0.5;
+    mix-blend-mode: screen;
+}
+
+/* Grid: The tactical overlay (from .ritual-card) */
+.glyph-layer--grid {
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 10px 10px;
+    opacity: 0.3;
+}
+
+/* Sigil: Inner iconography containment */
+.glyph-layer--sigil {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+/* Overlay: Glass/Lens effect */
+.glyph-layer--overlay {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+}
+
+/* ========================================= */
+/* 6. ANIMATION TOKENS                       */
+/* ========================================= */
+
+/* Pulse: The heartbeat of the system */
+.glyph-anim--pulse {
+    animation: glyphPulse 3s infinite ease-in-out;
+}
+
+/* Flicker: Unstable void energy */
+.glyph-anim--flicker {
+    animation: glyphFlicker 0.1s infinite;
+}
+
+/* Breath: Slow expansion (Lens) */
+.glyph-anim--breath {
+    animation: glyphBreath 8s ease-in-out infinite;
+}
+
+/* Keyframe Translations from main.css */
+@keyframes glyphPulse {
+    0% { box-shadow: 0 0 5px var(--accent); }
+    50% { box-shadow: 0 0 20px var(--accent-light); }
+    100% { box-shadow: 0 0 5px var(--accent); }
+}
+
+@keyframes glyphFlicker {
+    0% { opacity: 0.9; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+@keyframes glyphBreath {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+
+/* ========================================= */
+/* 7. LEGACY BRIDGE                          */
+/* ========================================= */
+/* Direct mapping of main.css classes to the new 
+   token system to ensure zero visual regression 
+   while enabling gradual engine migration.
+*/
+
+/* Legacy: .level-node (The round levels) */
+.level-node {
+    /* Base + Question Role + Medium Size */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    font-weight: bold;
+    user-select: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    
+    /* Default Active State */
+    background: var(--accent);
+    color: white;
+}
+
+.level-node.locked {
+    /* Dormant State */
+    background: #2a2f2a;
+    color: #4f5f4f;
+    cursor: not-allowed;
+}
+
+/* Legacy: .rune-node (The diamond ritual path) */
+.rune-node {
+    /* Base + Pattern Role + Large Size */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    font-weight: bold;
+    user-select: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+    
+    /* Pattern Specifics */
+    transform: rotate(45deg);
+    background: #222;
+    border: 2px solid #444;
+    color: #666;
+}
+
+/* Inner span rotation fix for legacy runes */
+.rune-node span {
+    transform: rotate(-45deg);
+    display: block;
+}
+
+/* Unlocked Path = Charged State */
+.rune-node.unlocked-path {
+    background: #1e2e1e;
+    border-color: var(--accent);
+    color: var(--text);
+    box-shadow: 0 0 10px rgba(33, 115, 70, 0.2);
+}
+
+.rune-node.unlocked-path:hover {
+    transform: rotate(45deg) scale(1.15);
+    background: var(--accent);
+    border-color: var(--accent-light);
+    box-shadow: 0 0 25px var(--accent-light);
+    color: white;
+    z-index: 5;
+}
+
+/* Locked Void = Dormant State */
+.rune-node.locked-void {
+    background: #151515;
+    border-color: #2a2a2a;
+    color: #333;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+}
+
+/* Legacy: .grid-cell (The dataset) */
+.grid-cell {
+    /* Base + Dataset Role + Large Size */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    font-weight: bold;
+    user-select: none;
+    transition: all 0.3s; /* Keeping slightly simpler transition from main.css */
+
+    width: 60px;
+    height: 60px;
+    background: #2c332c;
+    border-radius: 4px;
+    border: 2px solid transparent;
+}
