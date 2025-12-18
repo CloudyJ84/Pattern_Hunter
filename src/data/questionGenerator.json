@@ -1,44 +1,561 @@
 {
   "questionGenerator": {
     "dateQuestions": {
-      "whichDateIsHighlighted": { "templates": ["Which date is highlighted in the dataset?"], "answerLogic": "highlightedValue", "appliesTo": ["dates"] },
-      "countWeekendDates": { "templates": ["How many weekend dates are highlighted?"], "answerLogic": "highlightedCount", "appliesTo": ["dates"] },
-      "rowWithEarliestDate": { "templates": ["Which row contains the earliest date?"], "answerLogic": "rowOfMinValue", "appliesTo": ["dates"] },
-      "mostFrequentWeekday": { "templates": ["Which weekday appears most often in the dataset?"], "answerLogic": "mostFrequentWeekday", "appliesTo": ["dates"] },
-      "whichDateIsEarliest": { "templates": ["What is the earliest date in the dataset?"], "answerLogic": "minValue", "appliesTo": ["dates"] },
-      "whichDateIsLatest": { "templates": ["What is the latest date in the dataset?"], "answerLogic": "maxValue", "appliesTo": ["dates"] },
-      "howManyInRange": { "templates": ["How many dates fall within the highlighted range?"], "answerLogic": "highlightedCount", "appliesTo": ["dates"] },
-      "whichDatesInRange": { "templates": ["Which dates fall within the highlighted range?"], "answerLogic": "highlightedList", "appliesTo": ["dates"] }
+      "whichDateIsHighlighted": {
+        "id": "whichDateIsHighlighted",
+        "templates": ["Which date is highlighted?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which date is highlighted?"],
+          "hunter": ["Identify the marked day."],
+          "tracker": ["Read the mark."],
+          "mythic": ["Name the chosen time."]
+        },
+        "answerLogic": "highlightedValue",
+        "semanticTags": ["highlight", "value"]
+      },
+      "countWeekendDates": {
+        "id": "countWeekendDates",
+        "templates": ["How many weekend dates are highlighted?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "patternIds": ["twin_suns"],
+          "requiresHighlightedCells": true,
+          "requiresGlyphs": ["weekend"]
+        },
+        "tierPhrasing": {
+          "scout": ["How many weekend dates are highlighted?"],
+          "hunter": ["Count the Twin Suns revealed in the grid."],
+          "tracker": ["Count the days of rest."],
+          "mythic": ["Quantify the Twin Suns."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["frequency", "weekend"]
+      },
+      "rowWithEarliestDate": {
+        "id": "rowWithEarliestDate",
+        "templates": ["Which row contains the earliest date?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "patternIds": ["time_anchor"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which row contains the earliest date?"],
+          "hunter": ["Where does the timeline begin?"],
+          "tracker": ["Locate the origin."],
+          "mythic": ["Row of the Alpha."]
+        },
+        "answerLogic": "rowOfMinValue",
+        "semanticTags": ["row", "min"]
+      },
+      "mostFrequentWeekday": {
+        "id": "mostFrequentWeekday",
+        "templates": ["Which weekday appears most often?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "patternIds": ["day_alignment"],
+          "requiresLensSummary": ["frequencySummary"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which weekday appears most often?"],
+          "hunter": ["What day aligns most frequently?"],
+          "tracker": ["Identify the recurring day."],
+          "mythic": ["Name the alignment."]
+        },
+        "answerLogic": "mostFrequentWeekday",
+        "semanticTags": ["frequency", "alignment"]
+      },
+      "whichDateIsEarliest": {
+        "id": "whichDateIsEarliest",
+        "templates": ["What is the earliest date?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "datasetType": "dates"
+        },
+        "tierPhrasing": {
+          "scout": ["What is the earliest date?"],
+          "hunter": ["Find the beginning of the archive."],
+          "tracker": ["Identify the start."],
+          "mythic": ["The Alpha point."]
+        },
+        "answerLogic": "minValue",
+        "semanticTags": ["min", "extremes"]
+      },
+      "whichDateIsLatest": {
+        "id": "whichDateIsLatest",
+        "templates": ["What is the latest date?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "datasetType": "dates"
+        },
+        "tierPhrasing": {
+          "scout": ["What is the latest date?"],
+          "hunter": ["Find the end of the timeline."],
+          "tracker": ["Identify the end."],
+          "mythic": ["The Omega point."]
+        },
+        "answerLogic": "maxValue",
+        "semanticTags": ["max", "extremes"]
+      },
+      "howManyInRange": {
+        "id": "howManyInRange",
+        "templates": ["How many dates fall within the range?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "patternIds": ["temporal_rift"],
+          "requiresRange": true,
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["How many dates fall within the highlighted range?"],
+          "hunter": ["Count the days within the Rift."],
+          "tracker": ["Quantify the span."],
+          "mythic": ["Measure the Rift."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["range", "count"]
+      },
+      "whichDatesInRange": {
+        "id": "whichDatesInRange",
+        "templates": ["Which dates fall within the range?"],
+        "appliesTo": ["dates"],
+        "requirements": {
+          "patternIds": ["temporal_rift"],
+          "requiresRange": true,
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which dates fall within the highlighted range?"],
+          "hunter": ["List the days trapped in the Rift."],
+          "tracker": ["Identify the span contents."],
+          "mythic": ["Read the Rift."]
+        },
+        "answerLogic": "highlightedList",
+        "semanticTags": ["range", "list"]
+      }
     },
     "numberQuestions": {
-      "whichValueIsHighlighted": { "templates": ["Which value is highlighted in the dataset?"], "answerLogic": "highlightedValue", "appliesTo": ["numbers"] },
-      "countAboveThreshold": { "templates": ["How many values are above the threshold?"], "answerLogic": "highlightedCount", "appliesTo": ["numbers"] },
-      "countBelowThreshold": { "templates": ["How many values are below the threshold?"], "answerLogic": "highlightedCount", "appliesTo": ["numbers"] },
-      "whichValueIsOutlier": { "templates": ["Which value is the outlier?"], "answerLogic": "highlightedValue", "appliesTo": ["numbers"] },
-      "rowWithOutlier": { "templates": ["Which row contains the outlier?"], "answerLogic": "rowOfHighlighted", "appliesTo": ["numbers"] },
-      "whichClusterIsLargest": { "templates": ["Which value cluster appears most often?"], "answerLogic": "clusterIdentifier", "appliesTo": ["numbers"] },
-      "howManyInCluster": { "templates": ["How many values are in the highlighted cluster?"], "answerLogic": "highlightedCount", "appliesTo": ["numbers"] },
-      "whichValueIsHighest": { "templates": ["Which value is the highest?"], "answerLogic": "maxValue", "appliesTo": ["numbers"] },
-      "whichValueIsLowest": { "templates": ["Which value is the lowest?"], "answerLogic": "minValue", "appliesTo": ["numbers"] }
+      "whichValueIsHighlighted": {
+        "id": "whichValueIsHighlighted",
+        "templates": ["Which value is highlighted?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which value is highlighted?"],
+          "hunter": ["Read the marked glyph."],
+          "tracker": ["Identify target."],
+          "mythic": ["Speak the mark."]
+        },
+        "answerLogic": "highlightedValue",
+        "semanticTags": ["highlight", "value"]
+      },
+      "countAboveThreshold": {
+        "id": "countAboveThreshold",
+        "templates": ["How many values are above the threshold?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["rising_flame"],
+          "requiresHighlightedCells": true,
+          "requiresGlyphs": ["above"]
+        },
+        "tierPhrasing": {
+          "scout": ["How many values are above the average?"],
+          "hunter": ["Count the Rising Flames."],
+          "tracker": ["Count the ascent."],
+          "mythic": ["Quantify the rise."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["threshold", "count", "above"]
+      },
+      "countBelowThreshold": {
+        "id": "countBelowThreshold",
+        "templates": ["How many values are below the threshold?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["falling_stone"],
+          "requiresHighlightedCells": true,
+          "requiresGlyphs": ["below"]
+        },
+        "tierPhrasing": {
+          "scout": ["How many values are below the average?"],
+          "hunter": ["Count the Falling Stones."],
+          "tracker": ["Count the descent."],
+          "mythic": ["Quantify the fall."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["threshold", "count", "below"]
+      },
+      "whichValueIsOutlier": {
+        "id": "whichValueIsOutlier",
+        "templates": ["Which value is the outlier?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["broken_pattern"],
+          "requiresHighlightedCells": true,
+          "requiresGlyphs": ["outlier"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which value is the outlier?"],
+          "hunter": ["Identify the Broken Pattern."],
+          "tracker": ["Find the deviation."],
+          "mythic": ["Name the anomaly."]
+        },
+        "answerLogic": "highlightedValue",
+        "semanticTags": ["outlier", "value"]
+      },
+      "rowWithOutlier": {
+        "id": "rowWithOutlier",
+        "templates": ["Which row contains the outlier?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["broken_pattern"],
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which row contains the outlier?"],
+          "hunter": ["In which stratum does the anomaly lie?"],
+          "tracker": ["Locate the deviation row."],
+          "mythic": ["Vector of the Broken Pattern."]
+        },
+        "answerLogic": "rowOfHighlighted",
+        "semanticTags": ["outlier", "row"]
+      },
+      "whichClusterIsLargest": {
+        "id": "whichClusterIsLargest",
+        "templates": ["Which cluster is largest?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["convergence"],
+          "requiresLensSummary": ["stats"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which value cluster appears most often?"],
+          "hunter": ["Where is the Convergence strongest?"],
+          "tracker": ["Identify the densest cluster."],
+          "mythic": ["Center of Convergence."]
+        },
+        "answerLogic": "clusterIdentifier",
+        "semanticTags": ["cluster", "max"]
+      },
+      "howManyInCluster": {
+        "id": "howManyInCluster",
+        "templates": ["How many values are in the cluster?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["convergence"],
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["How many values are in the highlighted cluster?"],
+          "hunter": ["Count the stones in the Convergence."],
+          "tracker": ["Cluster size."],
+          "mythic": ["Measure the density."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["cluster", "count"]
+      },
+      "whichValueIsHighest": {
+        "id": "whichValueIsHighest",
+        "templates": ["Which value is highest?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["peak_valley"],
+          "requiresLensSummary": ["stats"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which value is the highest?"],
+          "hunter": ["Find the Peak."],
+          "tracker": ["Maximum value."],
+          "mythic": ["The Zenith."]
+        },
+        "answerLogic": "maxValue",
+        "semanticTags": ["max", "extremes"]
+      },
+      "whichValueIsLowest": {
+        "id": "whichValueIsLowest",
+        "templates": ["Which value is lowest?"],
+        "appliesTo": ["numbers"],
+        "requirements": {
+          "patternIds": ["peak_valley"],
+          "requiresLensSummary": ["stats"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which value is the lowest?"],
+          "hunter": ["Find the Valley."],
+          "tracker": ["Minimum value."],
+          "mythic": ["The Nadir."]
+        },
+        "answerLogic": "minValue",
+        "semanticTags": ["min", "extremes"]
+      }
     },
     "categoryQuestions": {
-      "whichCategoryIsMostFrequent": { "templates": ["Which category appears most often?"], "answerLogic": "mostFrequentCategory", "appliesTo": ["categories"] },
-      "howManyTimesCategoryAppears": { "templates": ["How many times does the highlighted category appear?"], "answerLogic": "highlightedCount", "appliesTo": ["categories"] },
-      "whichCategoryIsUnique": { "templates": ["Which category appears only once?"], "answerLogic": "uniqueCategory", "appliesTo": ["categories"] },
-      "rowWithUniqueCategory": { "templates": ["Which row contains the unique category?"], "answerLogic": "rowOfUnique", "appliesTo": ["categories"] },
-      "howManyUniqueCategories": { "templates": ["How many unique categories appear in the dataset?"], "answerLogic": "uniqueCategoryCount", "appliesTo": ["categories"] },
-      "whichRowHasPattern": { "templates": ["Which row contains the repeated category pattern?"], "answerLogic": "rowOfPattern", "appliesTo": ["categories"] },
-      "whichColumnHasPattern": { "templates": ["Which column contains the repeated category pattern?"], "answerLogic": "columnOfPattern", "appliesTo": ["categories"] }
+      "whichCategoryIsMostFrequent": {
+        "id": "whichCategoryIsMostFrequent",
+        "templates": ["Which category is most frequent?"],
+        "appliesTo": ["categories"],
+        "requirements": {
+          "patternIds": ["echo"],
+          "requiresLensSummary": ["frequencySummary"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which category appears most often?"],
+          "hunter": ["What is the loudest Echo?"],
+          "tracker": ["Most frequent element."],
+          "mythic": ["Name the Resonance."]
+        },
+        "answerLogic": "mostFrequentCategory",
+        "semanticTags": ["frequency", "max"]
+      },
+      "howManyTimesCategoryAppears": {
+        "id": "howManyTimesCategoryAppears",
+        "templates": ["How many times does the category appear?"],
+        "appliesTo": ["categories"],
+        "requirements": {
+          "patternIds": ["echo"],
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["How many times does the highlighted category appear?"],
+          "hunter": ["Count the Echoes."],
+          "tracker": ["Count repetition."],
+          "mythic": ["Measure the Resonance."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["frequency", "count"]
+      },
+      "whichCategoryIsUnique": {
+        "id": "whichCategoryIsUnique",
+        "templates": ["Which category is unique?"],
+        "appliesTo": ["categories"],
+        "requirements": {
+          "patternIds": ["lone_star", "silent_note"],
+          "requiresGlyphs": ["unique"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which category appears only once?"],
+          "hunter": ["Identify the Lone Star."],
+          "tracker": ["Find the unique element."],
+          "mythic": ["Name the Solitude."]
+        },
+        "answerLogic": "uniqueCategory",
+        "semanticTags": ["unique", "value"]
+      },
+      "rowWithUniqueCategory": {
+        "id": "rowWithUniqueCategory",
+        "templates": ["Which row contains the unique category?"],
+        "appliesTo": ["categories"],
+        "requirements": {
+          "patternIds": ["silent_note"],
+          "requiresRowStructure": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which row contains the unique category?"],
+          "hunter": ["Where does the Silent Note hide?"],
+          "tracker": ["Locate the unique row."],
+          "mythic": ["Vector of Silence."]
+        },
+        "answerLogic": "rowOfUnique",
+        "semanticTags": ["unique", "row"]
+      },
+      "howManyUniqueCategories": {
+        "id": "howManyUniqueCategories",
+        "templates": ["How many unique categories are there?"],
+        "appliesTo": ["categories"],
+        "requirements": {
+          "datasetType": "categories",
+          "requiresLensSummary": ["categoryCounts"]
+        },
+        "tierPhrasing": {
+          "scout": ["How many unique categories appear in the dataset?"],
+          "hunter": ["Count the distinct voices."],
+          "tracker": ["Unique count."],
+          "mythic": ["Quantify diversity."]
+        },
+        "answerLogic": "uniqueCategoryCount",
+        "semanticTags": ["unique", "count"]
+      },
+      "whichRowHasPattern": {
+        "id": "whichRowHasPattern",
+        "templates": ["Which row has the pattern?"],
+        "appliesTo": ["categories"],
+        "requirements": {
+          "patternIds": ["vector_alignment"],
+          "requiresRowStructure": true,
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which row contains the repeated category pattern?"],
+          "hunter": ["Which stratum is Aligned?"],
+          "tracker": ["Identify the aligned row."],
+          "mythic": ["Horizontal Alignment."]
+        },
+        "answerLogic": "rowOfPattern",
+        "semanticTags": ["row", "pattern"]
+      },
+      "whichColumnHasPattern": {
+        "id": "whichColumnHasPattern",
+        "templates": ["Which column has the pattern?"],
+        "appliesTo": ["categories"],
+        "requirements": {
+          "patternIds": ["vector_alignment"],
+          "requiresColumnStructure": true,
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which column contains the repeated category pattern?"],
+          "hunter": ["Which pillar is Aligned?"],
+          "tracker": ["Identify the aligned column."],
+          "mythic": ["Vertical Alignment."]
+        },
+        "answerLogic": "columnOfPattern",
+        "semanticTags": ["column", "pattern"]
+      }
     },
     "timeQuestions": {
-      "whichTimeIsHighlighted": { "templates": ["Which time is highlighted in the dataset?"], "answerLogic": "highlightedValue", "appliesTo": ["times"] },
-      "countEarlyOrLate": { "templates": ["How many times fall outside the normal range?"], "answerLogic": "highlightedCount", "appliesTo": ["times"] },
-      "howManyPmTimes": { "templates": ["How many times are in the PM range?"], "answerLogic": "highlightedCount", "appliesTo": ["times"] },
-      "whichTimeIsPm": { "templates": ["Which time is in the PM range?"], "answerLogic": "highlightedList", "appliesTo": ["times"] },
-      "whichTimeIsEarliest": { "templates": ["Which time is the earliest?"], "answerLogic": "minValue", "appliesTo": ["times"] },
-      "whichTimeIsLatest": { "templates": ["Which time is the latest?"], "answerLogic": "maxValue", "appliesTo": ["times"] },
-      "howManyInTimeRange": { "templates": ["How many times fall within the highlighted time range?"], "answerLogic": "highlightedCount", "appliesTo": ["times"] },
-      "whichTimesInRange": { "templates": ["Which times fall within the highlighted time range?"], "answerLogic": "highlightedList", "appliesTo": ["times"] }
+      "whichTimeIsHighlighted": {
+        "id": "whichTimeIsHighlighted",
+        "templates": ["Which time is highlighted?"],
+        "appliesTo": ["times"],
+        "requirements": {
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which time is highlighted?"],
+          "hunter": ["Identify the marked moment."],
+          "tracker": ["Read the timestamp."],
+          "mythic": ["Name the moment."]
+        },
+        "answerLogic": "highlightedValue",
+        "semanticTags": ["highlight", "value"]
+      },
+      "countEarlyOrLate": {
+        "id": "countEarlyOrLate",
+        "templates": ["Count early or late times."],
+        "appliesTo": ["times"],
+        "requirements": {
+          "patternIds": ["dawn_dusk"],
+          "requiresHighlightedCells": true,
+          "requiresGlyphs": ["outlier"]
+        },
+        "tierPhrasing": {
+          "scout": ["How many times fall outside the normal range?"],
+          "hunter": ["Count the moments of Dawn and Dusk."],
+          "tracker": ["Count outliers."],
+          "mythic": ["Quantify the fringes."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["extremes", "count"]
+      },
+      "howManyPmTimes": {
+        "id": "howManyPmTimes",
+        "templates": ["Count PM times."],
+        "appliesTo": ["times"],
+        "requirements": {
+          "patternIds": ["meridian_shift"],
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["How many times are in the PM range?"],
+          "hunter": ["Count the hours past the Meridian."],
+          "tracker": ["PM count."],
+          "mythic": ["Measure the shadow."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["pm", "count"]
+      },
+      "whichTimeIsPm": {
+        "id": "whichTimeIsPm",
+        "templates": ["Which time is PM?"],
+        "appliesTo": ["times"],
+        "requirements": {
+          "patternIds": ["meridian_shift"],
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which time is in the PM range?"],
+          "hunter": ["Identify the post-meridian mark."],
+          "tracker": ["Identify PM."],
+          "mythic": ["Name the shadow hour."]
+        },
+        "answerLogic": "highlightedList",
+        "semanticTags": ["pm", "list"]
+      },
+      "whichTimeIsEarliest": {
+        "id": "whichTimeIsEarliest",
+        "templates": ["Which time is earliest?"],
+        "appliesTo": ["times"],
+        "requirements": {
+          "patternIds": ["chrono_limit"],
+          "requiresLensSummary": ["stats"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which time is the earliest?"],
+          "hunter": ["Find the first grain of sand."],
+          "tracker": ["Identify start."],
+          "mythic": ["The First Moment."]
+        },
+        "answerLogic": "minValue",
+        "semanticTags": ["min", "extremes"]
+      },
+      "whichTimeIsLatest": {
+        "id": "whichTimeIsLatest",
+        "templates": ["Which time is latest?"],
+        "appliesTo": ["times"],
+        "requirements": {
+          "patternIds": ["chrono_limit"],
+          "requiresLensSummary": ["stats"]
+        },
+        "tierPhrasing": {
+          "scout": ["Which time is the latest?"],
+          "hunter": ["Find the last grain of sand."],
+          "tracker": ["Identify end."],
+          "mythic": ["The Final Moment."]
+        },
+        "answerLogic": "maxValue",
+        "semanticTags": ["max", "extremes"]
+      },
+      "howManyInTimeRange": {
+        "id": "howManyInTimeRange",
+        "templates": ["How many times in range?"],
+        "appliesTo": ["times"],
+        "requirements": {
+          "patternIds": ["hour_glass"],
+          "requiresRange": true,
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["How many times fall within the highlighted range?"],
+          "hunter": ["Count the sands in the Hourglass."],
+          "tracker": ["Range count."],
+          "mythic": ["Measure the flow."]
+        },
+        "answerLogic": "highlightedCount",
+        "semanticTags": ["range", "count"]
+      },
+      "whichTimesInRange": {
+        "id": "whichTimesInRange",
+        "templates": ["Which times are in range?"],
+        "appliesTo": ["times"],
+        "requirements": {
+          "patternIds": ["hour_glass"],
+          "requiresRange": true,
+          "requiresHighlightedCells": true
+        },
+        "tierPhrasing": {
+          "scout": ["Which times fall within the highlighted range?"],
+          "hunter": ["Read the sands in the Hourglass."],
+          "tracker": ["List range."],
+          "mythic": ["Name the flow."]
+        },
+        "answerLogic": "highlightedList",
+        "semanticTags": ["range", "list"]
+      }
     }
   }
 }
