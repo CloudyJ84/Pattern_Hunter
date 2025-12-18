@@ -13,12 +13,22 @@ export const OutlierGlyph = {
     description: "Highlights values that defy the expected structure.",
     category: "anomaly",
 
-    /**
-     * Reads the outlier indices from the pattern metadata.
-     */
     compute(gridData, patternMetadata, datasetRules) {
+        // New pattern engine structure:
+        // patternMetadata.outliers.indices = [...]
+        // patternMetadata.anomaly.indices = [...]
+        // patternMetadata.outlier.indices = [...]
+        // Legacy: patternMetadata.outliers = [...]
+
+        const indices =
+            patternMetadata?.outliers?.indices ||   // NEW schema
+            patternMetadata?.anomaly?.indices ||    // alt schema
+            patternMetadata?.outlier?.indices ||    // alt schema
+            patternMetadata?.outliers ||            // legacy schema
+            [];
+
         return {
-            indices: patternMetadata.outliers || [],
+            indices,
             strength: 1.0,
             category: "anomaly"
         };
