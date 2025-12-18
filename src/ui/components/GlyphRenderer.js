@@ -1,5 +1,7 @@
 /**
  * GlyphRenderer.js
+ * * SYSTEM ARCHITECT: Modular CSS Implementation
+ * CODEX: main.css & glyphs.css
  * * A pure UI component responsible for manifesting "Glyphs" — symbolic overlays
  * that highlight semantic structure in the dataset.
  * * "Runes awakening on the surface of the grid, revealing truths the world was not ready to speak aloud."
@@ -7,7 +9,39 @@
  * - Stateless: Does not store game logic, only renders provided GlyphOutput objects.
  * - Non-destructive: Applies reversible CSS classes and DOM overlays.
  * - Layered: Operates on a dedicated visual layer above the grid but below lenses.
+ * - Hybrid: Supports both legacy 'fmt-' classes and new modular 'glyph--' tokens.
  */
+
+// --- MYTHIC TOKEN DEFINITIONS ---
+// Maps engine IDs to the new visual language of glyphs.css
+const GLYPH_TOKEN_MAP = {
+    // [LEGACY MAPPINGS]
+    // The "Outlier": A warning from the void. Data that refuses to fit.
+    'outlier':   ['glyph', 'glyph--warning', 'glyph--md'],
+    
+    // "Extreme Values": High energy, potentially unstable.
+    'extreme':   ['glyph', 'glyph--warning', 'glyph--lg', 'glyph--charged'],
+    
+    // "Weekend": The resting time, a structural pattern in the timeline.
+    'weekend':   ['glyph', 'glyph--dataset', 'glyph--md'],
+    
+    // "Above Average": A minor victory.
+    'above':     ['glyph', 'glyph--reward', 'glyph--sm'],
+    
+    // "Below Average": A minor deficit.
+    'below':     ['glyph', 'glyph--warning', 'glyph--sm'],
+
+    // "Unique": A singularity. Treasure in the noise.
+    'unique':    ['glyph', 'glyph--reward', 'glyph--md', 'glyph--charged'],
+    
+    // [SEMANTIC ROLES]
+    'pattern':   ['glyph', 'glyph--pattern', 'glyph--md'],   // The Rune
+    'dataset':   ['glyph', 'glyph--dataset', 'glyph--lg'],   // The Cell
+    'question':  ['glyph', 'glyph--question', 'glyph--md'],  // The Oracle
+    'threshold': ['glyph', 'glyph--threshold', 'glyph--sm'], // The Gate
+    'reward':    ['glyph', 'glyph--reward', 'glyph--md'],    // The Gold
+    'warning':   ['glyph', 'glyph--warning', 'glyph--md']    // The Hazard
+};
 
 export class GlyphRenderer {
     /**
@@ -16,8 +50,12 @@ export class GlyphRenderer {
     constructor(gridElement) {
         this.gridElement = gridElement;
         
-        // Track active glyph IDs to manage toggling and clearing
+        // Track active glyph IDs to manage toggling
         this.activeGlyphs = new Set();
+        
+        // Registry to store exactly what classes were applied for each glyph ID
+        // Structure: Map<glyphId, { cssClass: string, tokens: string[] }>
+        this.registry = new Map();
         
         // Create a dedicated layer for symbolic icons/runes
         this.overlayLayer = this._initOverlayLayer();
@@ -44,12 +82,29 @@ export class GlyphRenderer {
     render(glyphOutput) {
         if (!glyphOutput || !glyphOutput.indices) return;
 
+        // RESOLVE TOKENS: Consult the Codex
+        const tokens = this._getTokens(glyphOutput);
+
+        // Register the exact configuration for this render pass
+        this.registry.set(glyphOutput.id, {
+            cssClass: glyphOutput.cssClass,
+            tokens: tokens
+        });
+
         // 1. Apply CSS classes to the grid cells (The "Glow")
         glyphOutput.indices.forEach(index => {
             const cell = this._getCellByIndex(index);
             if (cell) {
-                // Add the primary semantic class (e.g., 'fmt-outlier')
-                cell.classList.add(glyphOutput.cssClass);
+                // [LEGACY] Add the primary semantic class (e.g., 'fmt-outlier')
+                if (glyphOutput.cssClass) {
+                    cell.classList.add(glyphOutput.cssClass);
+                }
+
+                // [MODULAR] Apply the new token bundle
+                if (tokens.length > 0) {
+                    cell.classList.add(...tokens);
+                }
+
                 // Mark with specific glyph ID for precise removal later
                 cell.classList.add(`glyph-id-${glyphOutput.id}`);
                 
@@ -63,7 +118,7 @@ export class GlyphRenderer {
         // 2. Render Symbolic Icons (The "Rune")
         // We only add icons if specifically requested, to avoid clutter
         if (glyphOutput.icon) {
-            this._renderIcons(glyphOutput);
+            this._renderIcons(glyphOutput, tokens);
         }
     }
 
@@ -83,55 +138,34 @@ export class GlyphRenderer {
      * @param {string} glyphId 
      */
     _clearGlyph(glyphId) {
+        // Retrieve the configuration used to render this glyph
+        const entry = this.registry.get(glyphId);
+
         // 1. Remove CSS classes from cells
         const affectedCells = this.gridElement.querySelectorAll(`.glyph-id-${glyphId}`);
         affectedCells.forEach(cell => {
-            // We need to know the original cssClass to remove it safely.
-            // Since we don't store the glyphOutput object, we remove the ID class
-            // and rely on a DOM query to clean up known glyph classes if needed,
-            // or we can iterate the classList.
-            // A safer approach for exact reversibility:
-            // The prompt implies we might not have the original object in clear().
-            // However, typical usage involves toggling with the object.
-            // If strictly ID-based clearing is needed without the object:
-            
             // Remove the tracking class
             cell.classList.remove(`glyph-id-${glyphId}`);
             
-            // We also need to remove the visual class (e.g. 'fmt-outlier'). 
-            // In a robust implementation, we might store a map of id -> class.
-            // For this implementation, we will assume standard classes don't conflict,
-            // but to be safe, we should ideally have the class name.
-            // *Optimization*: For this renderer, we expect 'toggle' to be the primary interaction.
-            // If called blindly, we might leave the formatting class. 
-            // Let's refine: We will check if the cell has other glyph-ids.
-            // If not, we clean up specific known glyph classes? 
-            // BETTER: The prompt says "remove all glyph-related CSS classes".
-            // We will remove the class that matches the glyph's known style if possible, 
-            // or relies on the specific ID marker to style.
+            // Remove Legacy Class
+            if (entry && entry.cssClass) {
+                cell.classList.remove(entry.cssClass);
+            }
+
+            // Remove Modular Tokens
+            if (entry && entry.tokens) {
+                cell.classList.remove(...entry.tokens);
+            }
             
-            // *Implementation Choice*: To ensure clean removal without the config object,
-            // we will clean up ALL classes that start with 'fmt-' IF no other glyphs are active?
-            // No, that's too aggressive.
-            // We will rely on the fact that toggle() provides the object usually.
-            // If clear(id) is called, we assume the caller accepts that we might miss the specific fmt class
-            // UNLESS we store a lookup.
+            // Cleanup custom properties
+            cell.style.removeProperty('--glyph-strength');
         });
-        
-        // *Revision*: Let's store a tiny local lookup for ID -> CSS Class to ensure perfect clearing.
-        if (!this.registry) this.registry = new Map();
-        
-        // (This logic actually belongs in render/toggle to populate the registry)
-        // See _registerGlyph and _unregisterGlyph below.
-        const registeredClass = this.registry.get(glyphId);
-        if (registeredClass) {
-             affectedCells.forEach(cell => cell.classList.remove(registeredClass));
-        }
 
         // 2. Remove Overlay Icons
         const icons = this.overlayLayer.querySelectorAll(`[data-glyph-origin="${glyphId}"]`);
         icons.forEach(icon => icon.remove());
         
+        // Clean up registry
         this.registry.delete(glyphId);
     }
 
@@ -142,11 +176,13 @@ export class GlyphRenderer {
         // Clear all cells
         const cells = this.gridElement.querySelectorAll('.grid-cell');
         cells.forEach(cell => {
-            // Remove all classes starting with 'glyph-id-' or 'fmt-'
-            // This is a "hard reset"
+            // Remove all classes starting with 'glyph-id-', 'fmt-', or 'glyph'
+            // This is a "hard reset" for the ritual space
             const classesToRemove = [];
             cell.classList.forEach(cls => {
-                if (cls.startsWith('glyph-id-') || cls.startsWith('fmt-')) {
+                if (cls.startsWith('glyph-id-') || 
+                    cls.startsWith('fmt-') || 
+                    cls.startsWith('glyph')) {
                     classesToRemove.push(cls);
                 }
             });
@@ -158,12 +194,49 @@ export class GlyphRenderer {
         this.overlayLayer.innerHTML = '';
         
         this.activeGlyphs.clear();
-        if (this.registry) this.registry.clear();
+        this.registry.clear();
     }
 
     /* -------------------------------------------------------------------------- */
     /* INTERNAL HELPERS                                                           */
     /* -------------------------------------------------------------------------- */
+
+    /**
+     * Resolves the appropriate token bundle for a glyph.
+     * Maps ID -> Tokens, or Category -> Tokens, or falls back to generic defaults.
+     */
+    _getTokens(glyphOutput) {
+        let tokens = [];
+
+        // 1. Direct ID Mapping (Specific overrides)
+        if (GLYPH_TOKEN_MAP[glyphOutput.id]) {
+            tokens = [...GLYPH_TOKEN_MAP[glyphOutput.id]];
+        }
+        // 2. Category Mapping (Broad strokes)
+        else if (glyphOutput.category && GLYPH_TOKEN_MAP[glyphOutput.category]) {
+            tokens = [...GLYPH_TOKEN_MAP[glyphOutput.category]];
+        }
+        // 3. Fallback based on CSS class hints
+        else if (glyphOutput.cssClass && glyphOutput.cssClass.includes('outlier')) {
+            tokens = [...GLYPH_TOKEN_MAP['outlier']];
+        } 
+        else {
+            // Default generic glyph
+            tokens = ['glyph', 'glyph--dataset', 'glyph--md'];
+        }
+
+        // 4. Apply State Modifiers (The Ritual Charge)
+        // If the glyph is marked as "extreme" or has high strength, charge it.
+        if (glyphOutput.strength > 0.8 || glyphOutput.id === 'extreme') {
+            if (!tokens.includes('glyph--charged')) {
+                tokens.push('glyph--charged');
+            }
+            // Add pulse animation for high energy glyphs
+            tokens.push('glyph-anim--pulse');
+        }
+
+        return tokens;
+    }
 
     /**
      * Initializes the overlay layer DOM element.
@@ -188,34 +261,37 @@ export class GlyphRenderer {
 
     /**
      * Renders icon overlays for a glyph.
+     * Now updated to respect the token system.
      */
-    _renderIcons(glyphOutput) {
-        // Register the class for cleanup
-        if (!this.registry) this.registry = new Map();
-        this.registry.set(glyphOutput.id, glyphOutput.cssClass);
-
+    _renderIcons(glyphOutput, tokens) {
         glyphOutput.indices.forEach(index => {
             const cell = this._getCellByIndex(index);
             if (cell) {
                 const icon = document.createElement('div');
+                
+                // Base icon class + The gathered tokens
                 icon.className = 'glyph-icon-marker fade-in';
+                // We add the tokens to the icon too, so it inherits the "Warning" or "Reward" colors
+                if (tokens) icon.classList.add(...tokens);
+                
+                // Ensure it floats
+                icon.style.position = 'absolute';
                 icon.innerHTML = glyphOutput.icon;
                 icon.setAttribute('data-glyph-origin', glyphOutput.id);
                 
                 // Position logic
                 const rect = this._getRelativeRect(cell);
-                icon.style.position = 'absolute';
                 
                 // Center the rune
                 icon.style.left = `${rect.x + (rect.width / 2)}px`;
                 icon.style.top = `${rect.y + (rect.height / 2)}px`;
                 icon.style.transform = 'translate(-50%, -50%)'; // CSS centering
                 
-                // Mythic animation hook
+                // Mythic animation hook - Legacy + New
                 if (glyphOutput.category === 'anomaly') {
-                    icon.classList.add('pulse-anomaly');
+                    icon.classList.add('glyph-anim--flicker'); // New token
                 } else if (glyphOutput.category === 'temporal') {
-                    icon.classList.add('shimmer-temporal');
+                    icon.classList.add('glyph-anim--breath'); // New token
                 }
 
                 this.overlayLayer.appendChild(icon);
@@ -257,7 +333,7 @@ export class GlyphRenderer {
         icon: '⚡',
         cssClass: 'fmt-outlier',
         indices: [4, 12, 15],
-        category: 'anomaly'
+        category: 'warning' // Now maps to glyph--warning
     };
 
     // 3. Render
