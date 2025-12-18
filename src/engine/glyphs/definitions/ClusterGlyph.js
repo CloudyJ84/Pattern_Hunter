@@ -14,15 +14,22 @@ export const ClusterGlyph = {
     category: "pattern",
 
     compute(gridData, patternMetadata, datasetRules) {
-        if (!patternMetadata.clusters || !Array.isArray(patternMetadata.clusters)) {
+        // New pattern engine structure:
+        // patternMetadata.clusters = [{ indices: [...] }, ...]
+        const clusters =
+            patternMetadata?.clusters ||      // NEW schema
+            patternMetadata?.clusterGroups || // possible alt schema
+            [];
+
+        if (!Array.isArray(clusters)) {
             return { indices: [] };
         }
 
-        // Flatten all cluster indices
-        const indices = patternMetadata.clusters.flatMap(c => c.indices);
+        // Flatten all cluster indices safely
+        const indices = clusters.flatMap(c => c?.indices || []);
 
         return {
-            indices: indices,
+            indices,
             strength: 1.1,
             category: "pattern"
         };
