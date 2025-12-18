@@ -4,11 +4,11 @@
  * It manages the registry of runic symbols (glyphs) and determines which ones
  * awaken based on the hidden structure of the dataset.
  * * "The codex of runes — a registry of symbols that awaken when the world’s hidden structures align."
- * * * Responsibilities:
+ * * Responsibilities:
  * - Registering glyph definitions (Plug-ins).
  * - Computing active glyphs by cross-referencing definitions with pattern metadata.
  * - Providing a pure, deterministic output for the UI to render.
- * * * Constraints:
+ * * Constraints:
  * - Pure engine logic. No UI, DOM, or CSS.
  * - Deterministic output.
  */
@@ -20,6 +20,20 @@ export const GlyphController = {
      * Maps glyphId -> GlyphDefinition
      */
     _registry: new Map(),
+
+    /**
+     * Maps legacy glyph IDs to new modular glyph categories.
+     * These categories correspond to token bundles in glyphs.css and GlyphRenderer.
+     */
+    _categoryMap: {
+        'weekend': 'dataset',
+        'above': 'reward',
+        'below': 'warning',
+        'outlier': 'warning',
+        'unique': 'reward',
+        'frequency': 'pattern',   // or dataset, depending on your design
+        'general': 'dataset'
+    },
 
     /**
      * Registers a new glyph definition into the codex.
@@ -46,7 +60,6 @@ export const GlyphController = {
         }
 
         this._registry.set(glyphDef.id, glyphDef);
-        // console.debug(`GlyphController: Registered rune "${glyphDef.id}"`);
     },
 
     /**
@@ -81,11 +94,19 @@ export const GlyphController = {
         for (const glyphDef of this._registry.values()) {
             try {
                 // Execute the ritual (Compute the glyph's presence)
-                // Note: Glyphs primarily interpret patternMetadata; they rarely calculate from scratch.
                 const result = glyphDef.compute(gridData, patternMetadata, datasetRules);
 
                 // If the glyph returned valid indices, it has "awakened"
                 if (result && Array.isArray(result.indices) && result.indices.length > 0) {
+
+                    // Determine modular glyph category
+                    const category =
+                        result.category ||
+                        glyphDef.category ||
+                        this._categoryMap[glyphDef.id] ||
+                        'dataset';
+
+                    // Build the new modular contract
                     outputs.push({
                         // Static definition data
                         id: glyphDef.id,
@@ -93,17 +114,21 @@ export const GlyphController = {
                         icon: glyphDef.icon,
                         cssClass: glyphDef.cssClass,
                         description: glyphDef.description || '',
-                        
+
+                        // NEW: modular category for token system
+                        category,
+
                         // Computed instance data
                         indices: result.indices,
                         strength: result.strength || 1.0,
-                        category: result.category || glyphDef.category || 'general',
+
+                        // Optional metadata
                         meta: result.meta || {}
                     });
                 }
             } catch (error) {
                 console.error(`GlyphController: The rune "${glyphDef.id}" failed to manifest.`, error);
-                // We swallow the error to ensure other glyphs still render
+                // Continue processing other glyphs
             }
         }
 
