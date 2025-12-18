@@ -1,115 +1,573 @@
 {
   "numbers": {
-    "aboveThreshold": {
-      "injectPattern": "inject at least one value > threshold",
-      "formattingRule": "highlightAboveThreshold",
-      "highlightLogic": "value > threshold",
-      "questionTypes": ["whichValueIsHighlighted", "countAboveThreshold"]
+    "rising_flame": {
+      "id": "rising_flame",
+      "label": "Rising Flame",
+      "difficulty": 1,
+      "category": "threshold",
+      "requires": {
+        "datasetType": "numbers",
+        "minRows": 5
+      },
+      "semantics": {
+        "structure": "elevation",
+        "location": "scattered",
+        "visibility": "highlighted_values",
+        "playerGoal": "identify values ascending above the mean",
+        "questionFocus": ["value_above_mean", "count_above_mean"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["above"],
+        "lensSummaries": ["stats"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["value_above_mean"],
+        "avoidQuestionTypes": ["value_below_mean", "min_value"]
+      },
+      "scoring": {
+        "basePoints": 100,
+        "difficultyMultiplier": 1.0,
+        "bonusConditions": ["noHints"]
+      }
     },
-    "belowThreshold": {
-      "injectPattern": "inject at least one value < threshold",
-      "formattingRule": "highlightBelowThreshold",
-      "highlightLogic": "value < threshold",
-      "questionTypes": ["whichValueIsHighlighted", "countBelowThreshold"]
+    "falling_stone": {
+      "id": "falling_stone",
+      "label": "Falling Stone",
+      "difficulty": 1,
+      "category": "threshold",
+      "requires": {
+        "datasetType": "numbers",
+        "minRows": 5
+      },
+      "semantics": {
+        "structure": "depression",
+        "location": "scattered",
+        "visibility": "highlighted_values",
+        "playerGoal": "identify values sinking below the mean",
+        "questionFocus": ["value_below_mean", "count_below_mean"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["below"],
+        "lensSummaries": ["stats"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["value_below_mean"],
+        "avoidQuestionTypes": ["value_above_mean", "max_value"]
+      },
+      "scoring": {
+        "basePoints": 100,
+        "difficultyMultiplier": 1.0,
+        "bonusConditions": ["noHints"]
+      }
     },
-    "outlier": {
-      "injectPattern": "inject a value 2–3× larger or smaller",
-      "formattingRule": "highlightOutlier",
-      "highlightLogic": "value is > mean+2sd or < mean-2sd",
-      "questionTypes": ["whichValueIsOutlier", "rowWithOutlier"]
+    "broken_pattern": {
+      "id": "broken_pattern",
+      "label": "Broken Pattern",
+      "difficulty": 2,
+      "category": "outlier",
+      "requires": {
+        "datasetType": "numbers",
+        "minRows": 5
+      },
+      "semantics": {
+        "structure": "deviation",
+        "location": "single_point",
+        "visibility": "highlighted_value",
+        "playerGoal": "find the statistical anomaly",
+        "questionFocus": ["outlier_value", "row_of_outlier"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["outlier"],
+        "lensSummaries": ["stats", "outlier_density"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["value_above_mean", "max_value", "min_value"],
+        "avoidQuestionTypes": ["frequency_count"]
+      },
+      "scoring": {
+        "basePoints": 150,
+        "difficultyMultiplier": 1.5,
+        "bonusConditions": ["firstTry"]
+      }
     },
-    "cluster": {
-      "injectPattern": "inject 3–5 values within narrow band",
-      "formattingRule": "highlightCluster",
-      "highlightLogic": "values within cluster range",
-      "questionTypes": ["whichClusterIsLargest", "howManyInCluster"]
+    "convergence": {
+      "id": "convergence",
+      "label": "Convergence",
+      "difficulty": 2,
+      "category": "cluster",
+      "requires": {
+        "datasetType": "numbers",
+        "minRows": 10
+      },
+      "semantics": {
+        "structure": "grouping",
+        "location": "value_band",
+        "visibility": "highlighted_cluster",
+        "playerGoal": "identify the dense grouping of values",
+        "questionFocus": ["cluster_size", "cluster_range"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true,
+        "requiresRange": true
+      },
+      "context": {
+        "glyphsToActivate": ["frequency"],
+        "lensSummaries": ["stats"],
+        "highlightRange": true
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["highlight_value"],
+        "avoidQuestionTypes": ["outlier_value"]
+      },
+      "scoring": {
+        "basePoints": 120,
+        "difficultyMultiplier": 1.2
+      }
     },
-    "maxOrMin": {
-      "injectPattern": "inject unique max or min",
-      "formattingRule": "highlightMaxOrMin",
-      "highlightLogic": "value === max or value === min",
-      "questionTypes": ["whichValueIsHighest", "whichValueIsLowest"]
+    "peak_valley": {
+      "id": "peak_valley",
+      "label": "Peak and Valley",
+      "difficulty": 1,
+      "category": "extremes",
+      "requires": {
+        "datasetType": "numbers"
+      },
+      "semantics": {
+        "structure": "boundary",
+        "location": "extremities",
+        "visibility": "highlighted_min_max",
+        "playerGoal": "find the absolute limits of the dataset",
+        "questionFocus": ["min_value", "max_value"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["unique"],
+        "lensSummaries": ["stats"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["min_value", "max_value"],
+        "avoidQuestionTypes": ["frequency_count"]
+      },
+      "scoring": {
+        "basePoints": 80,
+        "difficultyMultiplier": 1.0
+      }
     }
   },
-
   "dates": {
-    "weekendHighlight": {
-      "injectPattern": "ensure at least one weekend date",
-      "formattingRule": "highlightWeekends",
-      "highlightLogic": "cells where date.getDay() is 0 or 6",
-      "questionTypes": ["whichDateIsHighlighted", "countWeekendDates", "rowWithEarliestDate", "mostFrequentWeekday"]
+    "twin_suns": {
+      "id": "twin_suns",
+      "label": "Twin Suns",
+      "difficulty": 2,
+      "category": "weekend",
+      "requires": {
+        "datasetType": "dates",
+        "minRows": 7
+      },
+      "semantics": {
+        "structure": "recurrence",
+        "location": "scattered",
+        "visibility": "highlighted_weekends",
+        "playerGoal": "identify the days of rest",
+        "questionFocus": ["count_weekends", "identify_date_pattern"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["weekend"],
+        "lensSummaries": ["frequencySummary"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["count_weekends"],
+        "avoidQuestionTypes": ["min_value", "max_value"]
+      },
+      "scoring": {
+        "basePoints": 110,
+        "difficultyMultiplier": 1.2
+      }
     },
-    "weekdayCluster": {
-      "injectPattern": "inject 2–4 dates with same weekday",
-      "formattingRule": "highlightSpecificWeekday",
-      "highlightLogic": "cells matching chosen weekday",
-      "questionTypes": ["whichWeekdayIsMostFrequent", "howManyOfWeekday"]
+    "day_alignment": {
+      "id": "day_alignment",
+      "label": "Day Alignment",
+      "difficulty": 2,
+      "category": "frequency",
+      "requires": {
+        "datasetType": "dates",
+        "minRows": 7
+      },
+      "semantics": {
+        "structure": "repetition",
+        "location": "scattered",
+        "visibility": "highlighted_weekday",
+        "playerGoal": "spot the repeating day of the week",
+        "questionFocus": ["most_frequent_weekday", "count_specific_weekday"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["frequency"],
+        "lensSummaries": ["frequencySummary"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["frequency_count"],
+        "avoidQuestionTypes": ["unique_category"]
+      },
+      "scoring": {
+        "basePoints": 120,
+        "difficultyMultiplier": 1.3
+      }
     },
-    "earliestOrLatest": {
-      "injectPattern": "inject a min or max date",
-      "formattingRule": "highlightEarliestOrLatest",
-      "highlightLogic": "min or max date in dataset",
-      "questionTypes": ["whichDateIsEarliest", "whichDateIsLatest"]
+    "time_anchor": {
+      "id": "time_anchor",
+      "label": "Time Anchor",
+      "difficulty": 1,
+      "category": "extremes",
+      "requires": {
+        "datasetType": "dates"
+      },
+      "semantics": {
+        "structure": "boundary",
+        "location": "extremities",
+        "visibility": "highlighted_earliest_latest",
+        "playerGoal": "find the beginning or the end",
+        "questionFocus": ["earliest_date", "latest_date"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["unique"],
+        "lensSummaries": ["stats"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["identify_date_pattern"],
+        "avoidQuestionTypes": ["count_weekends"]
+      },
+      "scoring": {
+        "basePoints": 90,
+        "difficultyMultiplier": 1.0
+      }
     },
-    "dateRange": {
-      "injectPattern": "inject dates within a 7-day window",
-      "formattingRule": "highlightDateRange",
-      "highlightLogic": "dates between start and end",
-      "questionTypes": ["howManyInRange", "whichDatesInRange"]
+    "temporal_rift": {
+      "id": "temporal_rift",
+      "label": "Temporal Rift",
+      "difficulty": 2,
+      "category": "range",
+      "requires": {
+        "datasetType": "dates",
+        "minRows": 10
+      },
+      "semantics": {
+        "structure": "continuity",
+        "location": "range",
+        "visibility": "highlighted_range",
+        "playerGoal": "identify a continuous block of time",
+        "questionFocus": ["dates_in_range", "count_range"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true,
+        "requiresRange": true
+      },
+      "context": {
+        "glyphsToActivate": ["frequency"],
+        "lensSummaries": ["stats"],
+        "highlightRange": true
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["highlight_value"],
+        "avoidQuestionTypes": ["outlier_value"]
+      },
+      "scoring": {
+        "basePoints": 130,
+        "difficultyMultiplier": 1.4
+      }
     }
   },
-
   "times": {
-    "earlyLate": {
-      "injectPattern": "inject times <10:00 or >16:00",
-      "formattingRule": "highlightEarlyLate",
-      "highlightLogic": "time < threshold or time > threshold",
-      "questionTypes": ["whichTimeIsHighlighted", "countEarlyOrLate"]
+    "dawn_dusk": {
+      "id": "dawn_dusk",
+      "label": "Dawn and Dusk",
+      "difficulty": 1,
+      "category": "threshold",
+      "requires": {
+        "datasetType": "times"
+      },
+      "semantics": {
+        "structure": "boundary_exclusion",
+        "location": "scattered",
+        "visibility": "highlighted_extremes",
+        "playerGoal": "identify times outside standard business hours",
+        "questionFocus": ["count_early_late", "identify_time"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["outlier"],
+        "lensSummaries": ["stats"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["highlight_value"],
+        "avoidQuestionTypes": ["frequency_count"]
+      },
+      "scoring": {
+        "basePoints": 100,
+        "difficultyMultiplier": 1.1
+      }
     },
-    "amPm": {
-      "injectPattern": "inject at least one PM time",
-      "formattingRule": "highlightAmPm",
-      "highlightLogic": "time.getHours() >= 12",
-      "questionTypes": ["howManyPmTimes", "whichTimeIsPm"]
+    "meridian_shift": {
+      "id": "meridian_shift",
+      "label": "Meridian Shift",
+      "difficulty": 1,
+      "category": "binary",
+      "requires": {
+        "datasetType": "times"
+      },
+      "semantics": {
+        "structure": "division",
+        "location": "scattered",
+        "visibility": "highlighted_pm",
+        "playerGoal": "distinguish post-meridian times",
+        "questionFocus": ["count_pm", "identify_pm"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["above"],
+        "lensSummaries": ["categoryCounts"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["frequency_count"],
+        "avoidQuestionTypes": ["unique_category"]
+      },
+      "scoring": {
+        "basePoints": 90,
+        "difficultyMultiplier": 1.0
+      }
     },
-    "earliestLatest": {
-      "injectPattern": "inject min or max time",
-      "formattingRule": "highlightEarliestOrLatest",
-      "highlightLogic": "time === min or time === max",
-      "questionTypes": ["whichTimeIsEarliest", "whichTimeIsLatest"]
+    "chrono_limit": {
+      "id": "chrono_limit",
+      "label": "Chronological Limit",
+      "difficulty": 1,
+      "category": "extremes",
+      "requires": {
+        "datasetType": "times"
+      },
+      "semantics": {
+        "structure": "boundary",
+        "location": "extremities",
+        "visibility": "highlighted_min_max",
+        "playerGoal": "find the earliest or latest timestamp",
+        "questionFocus": ["earliest_time", "latest_time"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["unique"],
+        "lensSummaries": ["stats"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["highlight_value"],
+        "avoidQuestionTypes": ["frequency_count"]
+      },
+      "scoring": {
+        "basePoints": 80,
+        "difficultyMultiplier": 1.0
+      }
     },
-    "timeRange": {
-      "injectPattern": "inject times between 12:00–14:00",
-      "formattingRule": "highlightTimeRange",
-      "highlightLogic": "time between start and end",
-      "questionTypes": ["howManyInTimeRange", "whichTimesInRange"]
+    "hour_glass": {
+      "id": "hour_glass",
+      "label": "Hourglass",
+      "difficulty": 2,
+      "category": "range",
+      "requires": {
+        "datasetType": "times"
+      },
+      "semantics": {
+        "structure": "concentration",
+        "location": "range",
+        "visibility": "highlighted_window",
+        "playerGoal": "identify times within a specific window",
+        "questionFocus": ["count_in_range", "times_in_range"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true,
+        "requiresRange": true
+      },
+      "context": {
+        "glyphsToActivate": ["frequency"],
+        "lensSummaries": ["stats"],
+        "highlightRange": true
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["frequency_count"],
+        "avoidQuestionTypes": ["outlier_value"]
+      },
+      "scoring": {
+        "basePoints": 120,
+        "difficultyMultiplier": 1.2
+      }
     }
   },
-
   "categories": {
-    "mostFrequent": {
-      "injectPattern": "inject category X 3–6 times",
-      "formattingRule": "highlightMostFrequent",
-      "highlightLogic": "cells matching most frequent category",
-      "questionTypes": ["whichCategoryIsMostFrequent", "howManyTimesCategoryAppears"]
+    "echo": {
+      "id": "echo",
+      "label": "Echo of the Archive",
+      "difficulty": 2,
+      "category": "frequency",
+      "requires": {
+        "datasetType": "categories",
+        "minRows": 5
+      },
+      "semantics": {
+        "structure": "repetition",
+        "location": "scattered",
+        "visibility": "highlighted_frequency",
+        "playerGoal": "identify the most frequent category",
+        "questionFocus": ["frequency_count", "most_frequent"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["frequency"],
+        "lensSummaries": ["frequencySummary"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["frequency_count"],
+        "avoidQuestionTypes": ["unique_category"]
+      },
+      "scoring": {
+        "basePoints": 100,
+        "difficultyMultiplier": 1.1
+      }
     },
-    "leastFrequent": {
-      "injectPattern": "inject category X exactly once",
-      "formattingRule": "highlightUnique",
-      "highlightLogic": "cells with category count === 1",
-      "questionTypes": ["whichCategoryIsUnique", "rowWithUniqueCategory"]
+    "silent_note": {
+      "id": "silent_note",
+      "label": "The Silent Note",
+      "difficulty": 3,
+      "category": "unique",
+      "requires": {
+        "datasetType": "categories",
+        "minRows": 5
+      },
+      "semantics": {
+        "structure": "isolation",
+        "location": "single_point",
+        "visibility": "highlighted_unique",
+        "playerGoal": "find the category that appears exactly once",
+        "questionFocus": ["unique_category", "row_of_unique"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["unique"],
+        "lensSummaries": ["categoryCounts"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["unique_category"],
+        "avoidQuestionTypes": ["frequency_count", "most_frequent"]
+      },
+      "scoring": {
+        "basePoints": 150,
+        "difficultyMultiplier": 1.4
+      }
     },
-    "uniqueCategory": {
-      "injectPattern": "inject category not used elsewhere",
-      "formattingRule": "highlightUnique",
-      "highlightLogic": "cells with category count === 1",
-      "questionTypes": ["whichCategoryIsUnique", "howManyUniqueCategories"]
+    "lone_star": {
+      "id": "lone_star",
+      "label": "The Lone Star",
+      "difficulty": 3,
+      "category": "unique",
+      "requires": {
+        "datasetType": "categories",
+        "minRows": 5
+      },
+      "semantics": {
+        "structure": "singularity",
+        "location": "single_point",
+        "visibility": "highlighted_unique",
+        "playerGoal": "identify the anomaly in the pattern",
+        "questionFocus": ["unique_category", "count_unique"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true
+      },
+      "context": {
+        "glyphsToActivate": ["unique"],
+        "lensSummaries": ["categoryCounts"],
+        "highlightColumn": false
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["unique_category"],
+        "avoidQuestionTypes": ["frequency_count"]
+      },
+      "scoring": {
+        "basePoints": 150,
+        "difficultyMultiplier": 1.4
+      }
     },
-    "rowOrColumnPattern": {
-      "injectPattern": "fill one row or column with same category",
-      "formattingRule": "highlightRowOrColumnPattern",
-      "highlightLogic": "cells in the patterned row/column",
-      "questionTypes": ["whichRowHasPattern", "whichColumnHasPattern"]
+    "vector_alignment": {
+      "id": "vector_alignment",
+      "label": "Vector Alignment",
+      "difficulty": 2,
+      "category": "sequence",
+      "requires": {
+        "datasetType": "categories",
+        "minRows": 4,
+        "minCols": 2
+      },
+      "semantics": {
+        "structure": "linearity",
+        "location": "row_or_column",
+        "visibility": "highlighted_vector",
+        "playerGoal": "find the row or column filled with a single category",
+        "questionFocus": ["highlight_row", "highlight_column"]
+      },
+      "contextRequirements": {
+        "requiresHighlightedCells": true,
+        "requiresColumnStructure": true
+      },
+      "context": {
+        "glyphsToActivate": ["frequency"],
+        "lensSummaries": ["categoryCounts"],
+        "highlightColumn": true
+      },
+      "questionHints": {
+        "preferredQuestionTypes": ["highlight_row", "highlight_column"],
+        "avoidQuestionTypes": ["unique_category"]
+      },
+      "scoring": {
+        "basePoints": 130,
+        "difficultyMultiplier": 1.3
+      }
     }
   }
 }
