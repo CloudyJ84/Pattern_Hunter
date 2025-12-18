@@ -1,26 +1,17 @@
 [
   {
     "id": "band_initiate",
-    "levels": [
-      1,
-      2,
-      3
-    ],
-    "datasetSize": {
-      "rows": 3,
-      "cols": 3
-    },
-    "datasetTypes": [
-      "dataset_numbers"
-    ],
+    "levels": [1, 2, 3],
+    "datasetSize": { "rows": 3, "cols": 3 },
+    "datasetTypes": ["numbers"],
     "patternTypes": {
-      "dataset_numbers": [
+      "numbers": [
         "pattern_num_above_threshold",
         "pattern_num_below_threshold"
       ]
     },
     "questionTypes": {
-      "dataset_numbers": [
+      "numbers": [
         "question_count_above_threshold"
       ]
     },
@@ -35,55 +26,41 @@
       "recommendedTier": 1
     },
     "unlocks": {
-      "glyphs": [
-        "glyph_reveal_basic"
-      ],
-      "datasetTypes": [
-        "dataset_numbers"
-      ]
+      "glyphs": ["glyph_reveal_basic"],
+      "datasetTypes": ["numbers"]
     },
     "notes": "The Initiate's Path. Simple numeric thresholds to teach the mechanics of the Lens."
   },
+
   {
     "id": "band_apprentice",
-    "levels": [
-      4,
-      5,
-      6
-    ],
-    "datasetSize": {
-      "rows": 4,
-      "cols": 4
-    },
-    "datasetTypes": [
-      "dataset_numbers",
-      "dataset_dates",
-      "dataset_times"
-    ],
+    "levels": [4, 5, 6],
+    "datasetSize": { "rows": 4, "cols": 4 },
+    "datasetTypes": ["numbers", "dates", "times"],
     "patternTypes": {
-      "dataset_numbers": [
+      "numbers": [
         "pattern_num_extremes",
         "pattern_num_above_threshold"
       ],
-      "dataset_dates": [
+      "dates": [
         "pattern_date_weekend",
         "pattern_date_extremes"
       ],
-      "dataset_times": [
+      "times": [
         "pattern_time_ampm",
         "pattern_time_extremes"
       ]
     },
     "questionTypes": {
-      "dataset_numbers": [
+      "numbers": [
         "question_find_extremes",
         "question_count_above_threshold"
       ],
-      "dataset_dates": [
+      "dates": [
         "question_find_weekend",
         "question_count_range"
       ],
-      "dataset_times": [
+      "times": [
         "question_count_pm",
         "question_find_earliest"
       ]
@@ -99,68 +76,51 @@
       "recommendedTier": 2
     },
     "unlocks": {
-      "lensModes": [
-        "lens_chrono_filter"
-      ],
-      "datasetTypes": [
-        "dataset_dates",
-        "dataset_times"
-      ]
+      "lensModes": ["lens_chrono_filter"],
+      "datasetTypes": ["dates", "times"]
     },
     "notes": "The Apprentice's Trials. Introduction of temporal data and extreme value logic."
   },
+
   {
     "id": "band_adept",
-    "levels": [
-      7,
-      8,
-      9,
-      10
-    ],
-    "datasetSize": {
-      "rows": 5,
-      "cols": 5
-    },
-    "datasetTypes": [
-      "dataset_numbers",
-      "dataset_dates",
-      "dataset_times",
-      "dataset_categories"
-    ],
+    "levels": [7, 8, 9, 10],
+    "datasetSize": { "rows": 5, "cols": 5 },
+    "datasetTypes": ["numbers", "dates", "times", "categories"],
     "patternTypes": {
-      "dataset_numbers": [
+      "numbers": [
         "pattern_num_cluster",
         "pattern_num_outlier",
         "pattern_num_extremes"
       ],
-      "dataset_dates": [
+      "dates": [
         "pattern_date_weekday_cluster",
         "pattern_date_range"
       ],
-      "dataset_times": [
+      "times": [
         "pattern_time_range",
         "pattern_time_threshold"
       ],
-      "dataset_categories": [
+      "categories": [
         "pattern_cat_most_frequent",
         "pattern_cat_least_frequent",
         "pattern_cat_unique"
       ]
     },
     "questionTypes": {
-      "dataset_numbers": [
+      "numbers": [
         "question_find_outlier",
         "question_find_extremes"
       ],
-      "dataset_dates": [
+      "dates": [
         "question_most_frequent_weekday",
         "question_count_range"
       ],
-      "dataset_times": [
+      "times": [
         "question_in_time_range",
         "question_count_pm"
       ],
-      "dataset_categories": [
+      "categories": [
         "question_find_unique",
         "question_count_category"
       ]
@@ -176,40 +136,28 @@
       "recommendedTier": 3
     },
     "unlocks": {
-      "datasetTypes": [
-        "dataset_categories"
-      ],
-      "patternFamilies": [
-        "clustering",
-        "uniqueness"
-      ]
+      "datasetTypes": ["categories"],
+      "patternFamilies": ["clustering", "uniqueness"]
     },
     "notes": "The Adept's Challenge. Complex clustering and categorical taxonomy. Full variety."
   },
+
   {
     "id": "band_mastery_endless",
     "levels": "endless",
-    "datasetSize": {
-      "rows": 6,
-      "cols": 6
-    },
-    "datasetTypes": [
-      "dataset_numbers",
-      "dataset_dates",
-      "dataset_times",
-      "dataset_categories"
-    ],
+    "datasetSize": { "rows": 6, "cols": 6 },
+    "datasetTypes": ["numbers", "dates", "times", "categories"],
     "patternTypes": {
-      "dataset_numbers": "ALL_SAFE",
-      "dataset_dates": "ALL_SAFE",
-      "dataset_times": "ALL_SAFE",
-      "dataset_categories": "ALL_SAFE"
+      "numbers": "ALL_SAFE",
+      "dates": "ALL_SAFE",
+      "times": "ALL_SAFE",
+      "categories": "ALL_SAFE"
     },
     "questionTypes": {
-      "dataset_numbers": "ALL_SAFE",
-      "dataset_dates": "ALL_SAFE",
-      "dataset_times": "ALL_SAFE",
-      "dataset_categories": "ALL_SAFE"
+      "numbers": "ALL_SAFE",
+      "dates": "ALL_SAFE",
+      "times": "ALL_SAFE",
+      "categories": "ALL_SAFE"
     },
     "difficulty": {
       "patternComplexity": 5,
