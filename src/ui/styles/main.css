@@ -1,80 +1,80 @@
 /* =============================================================================
-   PATTERN HUNTER - MYTHIC STYLESHEET
+   PATTERN HUNTER - MYTHIC STYLESHEET (ENHANCED)
    "The visible skin of the hidden machine."
-=============================================================================
-*/
+============================================================================= */
 
-/* 1. ROOT VARIABLES (TOKENS)
-   The primitive constants of the world.
-*/
+/* 1. ROOT VARIABLES (THE CODEX) */
 :root {
-    /* --- CORE PALETTE (Excel Roots, Deepened) --- */
-    --bg-depth: #0f120f;          /* Deep void background */
-    --bg-surface: #1b1f1b;        /* Surface background */
-    --bg-panel: #222826;          /* Panel background */
-    --bg-glass: rgba(20, 30, 25, 0.9); /* Glass overlay */
+    /* --- CORE VOID PALETTE --- */
+    --bg-depth: #0b0f0b;          /* Deepest Void */
+    --bg-surface: #141814;        /* Standard Surface */
+    --bg-panel: #1a201d;          /* Panel Base */
+    --bg-glass-weak: rgba(20, 30, 25, 0.6);
+    --bg-glass-strong: rgba(10, 15, 12, 0.9);
     
-    --accent-primary: #217346;    /* Excel Green (The Order) */
-    --accent-bright: #2ea86b;     /* Active Green */
-    --accent-dim: #164a2e;        /* Passive Green */
-    
-    --text-main: #e8f5e9;         /* Primary text */
-    --text-muted: #9bb8a0;        /* Secondary text */
-    --text-dim: #556655;          /* Disabled/Subtle text */
+    /* --- EXCEL ROOTS (The Order) --- */
+    --accent-primary: #217346;    /* Base Order Green */
+    --accent-bright: #2ea86b;     /* Active Order */
+    --accent-dim: #113a23;        /* Dormant Order */
+    --accent-glow: rgba(46, 204, 113, 0.4);
 
-    /* --- SEMANTIC COLORS --- */
+    /* --- TEXT HIERARCHY --- */
+    --text-main: #e8f5e9;         /* Rune White */
+    --text-muted: #8fa394;        /* Stone Grey */
+    --text-dim: #4a5a50;          /* Shadow Grey */
+
+    /* --- SEMANTIC SIGNALS --- */
     --success: #2ecc71;
     --warning: #f1c40f;
     --error: #e74c3c;
     --info: #3498db;
 
-    /* --- MYTHIC PALETTE (Glyphs & Tiers) --- */
-    /* Tiers */
+    /* --- MYTHIC TIERS (The Vows) --- */
     --tier-scout: #daa520;        /* Gold */
-    --tier-hunter: #2ecc71;       /* Green */
-    --tier-tracker: #3498db;      /* Blue */
-    --tier-mythic: #9b59b6;       /* Purple/Void */
+    --tier-hunter: #27ae60;       /* Forest */
+    --tier-tracker: #2980b9;      /* Steel */
+    --tier-mythic: #9b59b6;       /* Void Purple */
 
-    /* Glyphs */
-    --glyph-outlier: #e74c3c;     /* Red/Broken */
-    --glyph-above: #2ecc71;       /* Green/Growth */
-    --glyph-below: #e67e22;       /* Orange/Decline */
-    --glyph-frequency: #e056fd;   /* Pink/Echo */
-    --glyph-unique: #f1c40f;      /* Yellow/Star */
-    --glyph-weekend: #ff6b6b;     /* Soft Red/Rest */
-    --glyph-cluster: #00d2d3;     /* Cyan/Ice */
-    --glyph-sequence: #54a0ff;    /* Blue/Flow */
+    /* --- GLYPH FREQUENCIES (The Runes) --- */
+    --glyph-outlier: #e74c3c;     /* Anomaly Red */
+    --glyph-above: #2ecc71;       /* Growth Green */
+    --glyph-below: #e67e22;       /* Decay Orange */
+    --glyph-frequency: #d63031;   /* Echo Crimson */
+    --glyph-unique: #f1c40f;      /* Star Gold */
+    --glyph-weekend: #ff7675;     /* Rest Pink */
+    --glyph-cluster: #00cec9;     /* Ice Cyan */
+    --glyph-sequence: #74b9ff;    /* Flow Blue */
 
-    /* --- SPACING SCALE --- */
+    /* --- HUD & BORDERS --- */
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-bright: rgba(255, 255, 255, 0.2);
+    --hud-line: 1px solid var(--border-subtle);
+    --hud-glow: 0 0 10px rgba(33, 115, 70, 0.2);
+
+    /* --- SPACING & DIMENSIONS --- */
     --space-xs: 4px;
     --space-sm: 8px;
     --space-md: 16px;
     --space-lg: 24px;
     --space-xl: 40px;
-    --space-xxl: 80px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
 
-    /* --- BORDERS & SHADOWS --- */
-    --border-subtle: rgba(255, 255, 255, 0.1);
-    --border-accent: rgba(46, 168, 107, 0.5);
-    
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 8px rgba(0,0,0,0.4);
-    --shadow-lg: 0 8px 16px rgba(0,0,0,0.5);
-    --shadow-glow-green: 0 0 15px rgba(46, 204, 113, 0.3);
-
-    /* --- ANIMATIONS --- */
-    --trans-fast: 0.15s ease;
-    --trans-normal: 0.3s ease;
-    --trans-slow: 0.5s ease-in-out;
+    /* --- ANIMATION TOKENS --- */
+    --trans-flash: 0.1s ease-out;
+    --trans-fast: 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    --trans-normal: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --trans-slow: 0.6s ease-in-out;
 }
 
-/* 2. RESETS & BASICS
-   Clearing the slate.
-*/
+/* 2. RESETS & COSMIC BASE */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-dim) var(--bg-depth);
 }
 
 body {
@@ -84,6 +84,8 @@ body {
     height: 100vh;
     overflow: hidden;
     line-height: 1.5;
+    /* Subtle digital grain texture */
+    background-image: radial-gradient(circle at center, rgba(33, 115, 70, 0.05) 0%, transparent 70%);
 }
 
 button {
@@ -92,17 +94,17 @@ button {
     font-family: inherit;
     background: none;
     color: inherit;
+    user-select: none;
 }
 
-/* 3. LAYOUT PRIMITIVES
-   The skeleton of the UI.
-*/
+/* 3. LAYOUT PRIMITIVES */
 .screen {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
+    background: radial-gradient(circle at 50% 30%, #1a221a 0%, var(--bg-depth) 100%);
 }
 
 .centered-layout {
@@ -112,98 +114,120 @@ button {
     gap: var(--space-lg);
 }
 
-.fade-in {
-    animation: fadeIn var(--trans-normal);
-}
+.fade-in { animation: hudFadeIn var(--trans-normal) forwards; opacity: 0; }
+.hidden { display: none !important; }
 
-.hidden {
-    display: none !important;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* 4. BUTTONS
-   Interactions with the machine.
-*/
+/* 4. BUTTONS (THE INTERFACE) */
 .control-btn {
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     transition: all var(--trans-fast);
     border: 1px solid var(--border-subtle);
-    background: var(--bg-panel);
+    background: rgba(255, 255, 255, 0.03);
     color: var(--text-muted);
+    position: relative;
+    overflow: hidden;
+}
+
+.control-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 2px; height: 100%;
+    background: var(--accent-primary);
+    opacity: 0;
+    transition: opacity var(--trans-fast);
 }
 
 .control-btn:hover:not(:disabled) {
-    border-color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.08);
     color: var(--text-main);
-    background: rgba(255,255,255,0.05);
+    border-color: var(--border-bright);
+    box-shadow: 0 0 15px rgba(255,255,255,0.05);
 }
 
+.control-btn:hover::before { opacity: 1; }
+
 .control-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    filter: grayscale(1);
 }
 
 .control-btn.primary {
-    background: var(--accent-primary);
+    background: var(--accent-dim);
     border-color: var(--accent-primary);
     color: #fff;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .control-btn.primary:hover:not(:disabled) {
-    background: var(--accent-bright);
-    box-shadow: var(--shadow-glow-green);
+    background: var(--accent-primary);
+    box-shadow: 0 0 20px var(--accent-glow);
+    text-shadow: 0 0 5px rgba(255,255,255,0.5);
     transform: translateY(-1px);
 }
 
-.control-btn.secondary {
-    background: rgba(255,255,255,0.05);
-}
-
-/* 5. PANELS
-   Containers of knowledge.
-*/
+/* 5. PANELS (THE HUD) */
 .panel {
-    background: var(--bg-panel);
+    background: var(--bg-glass-strong);
     border: 1px solid var(--border-subtle);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     padding: var(--space-md);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
 }
 
-.panel-glass {
-    background: var(--bg-glass);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--border-subtle);
+.nav-panel {
+    border-right: 1px solid var(--border-subtle);
+    background: linear-gradient(to bottom, var(--bg-panel), var(--bg-depth));
 }
 
-/* 6. GRID SYSTEM (LAYERED ARCHITECTURE)
-   The Field where patterns emerge.
-*/
+.challenge-panel {
+    border-left: 1px solid var(--border-subtle);
+    background: linear-gradient(to bottom, var(--bg-panel), var(--bg-depth));
+}
+
+/* 6. GRID SYSTEM (THE FIELD) */
+.grid-wrapper {
+    position: relative;
+    perspective: 1000px; /* Slight depth for 3D feel */
+}
+
+/* The Matrix Background Pattern */
+.grid-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background-image: 
+        linear-gradient(var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.05;
+    transform: rotateX(20deg) scale(1.5);
+    pointer-events: none;
+    z-index: 0;
+}
+
 .dataset-grid {
     display: grid;
     gap: var(--space-sm);
+    padding: var(--space-md);
     position: relative;
-    /* Ensure grid is an anchor for absolute overlays */
-    isolation: isolate; 
+    isolation: isolate;
+    transform-style: preserve-3d;
 }
 
-/* Layer 1: The Grid Cells (Base Data) */
+/* --- LAYER 1: GRID CELLS (Digital Stones) --- */
 .grid-cell {
     width: 60px;
     height: 60px;
-    background: var(--bg-surface);
-    border: 2px solid transparent; /* Reserve space for highlights */
-    border-radius: 4px;
+    background: linear-gradient(145deg, var(--bg-surface), #0f120f);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -214,30 +238,83 @@ button {
     position: relative;
     z-index: 1;
     user-select: none;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 2px 4px rgba(0,0,0,0.3);
 }
 
+/* Hover State: The Awakening */
 .grid-cell:hover {
-    background: #2a332a;
+    transform: translateY(-2px) scale(1.02);
+    border-color: var(--accent-primary);
     color: var(--text-main);
-    transform: scale(1.05);
-    z-index: 2;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 
+        0 0 15px var(--accent-glow),
+        inset 0 0 10px rgba(33, 115, 70, 0.1);
+    z-index: 10;
+    background: var(--bg-panel);
 }
 
-/* Scratchpad Marking (User Interaction) */
+/* Interaction: Scratchpad Mark */
 .grid-cell.marked {
-    box-shadow: inset 0 0 0 1px var(--warning);
+    border-color: var(--warning);
+    box-shadow: inset 0 0 5px rgba(241, 196, 15, 0.2);
 }
 .grid-cell.marked::after {
-    content: '';
+    content: '×';
     position: absolute;
-    top: 4px; right: 4px;
-    width: 6px; height: 6px;
-    background: var(--warning);
-    border-radius: 50%;
+    top: 2px; right: 4px;
+    font-size: 10px;
+    color: var(--warning);
+    opacity: 0.8;
 }
 
-/* Layer 2: Glyph Overlays (Above Cells, Below Lens) */
+/* --- LAYER 2: GLYPH OVERLAYS (Runic Meaning) --- */
+/* These classes are applied directly to the cell by the renderer
+   for formatting, but icons live in the overlay layer. */
+
+/* Base Glyph Style */
+.grid-cell[class*="glyph-"] {
+    transition: all var(--trans-normal);
+}
+
+/* Specific Glyphs */
+.glyph-outlier {
+    background: rgba(231, 76, 60, 0.1) !important;
+    border-color: var(--glyph-outlier) !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.3) !important;
+    animation: runePulse 2s infinite alternate;
+}
+
+.glyph-above {
+    color: var(--glyph-above) !important;
+    border-bottom: 2px solid var(--glyph-above) !important;
+}
+
+.glyph-below {
+    color: var(--glyph-below) !important;
+    border-top: 2px solid var(--glyph-below) !important;
+}
+
+.glyph-frequency {
+    color: var(--glyph-frequency) !important;
+    background: rgba(214, 48, 49, 0.05) !important;
+    border: 1px dashed var(--glyph-frequency) !important;
+}
+
+.glyph-unique {
+    color: var(--glyph-unique) !important;
+    border: 1px solid var(--glyph-unique) !important;
+    box-shadow: inset 0 0 10px rgba(241, 196, 15, 0.1) !important;
+}
+
+.glyph-weekend {
+    background: rgba(255, 118, 117, 0.08) !important;
+    color: var(--glyph-weekend) !important;
+}
+
+/* Layer 2b: Floating Icons */
 .glyph-overlay-layer {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -245,190 +322,89 @@ button {
     z-index: 5;
 }
 
-/* Layer 3: Lens SVG Layer (Lines, Regions) */
+.glyph-icon-marker {
+    position: absolute;
+    font-size: 1.2rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+    animation: runeFloat 3s ease-in-out infinite;
+    z-index: 6;
+}
+
+/* --- LAYER 3: LENS OVERLAYS (The Vision) --- */
 .lens-svg-layer {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none;
-    z-index: 10;
-}
-
-/* Layer 4: Lens Annotations (Text Labels) */
-.lens-annotations-layer {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    pointer-events: none;
     z-index: 20;
+    /* Blend mode for light effects */
+    mix-blend-mode: screen; 
 }
 
-/* 7. LENS OVERLAYS (Visuals)
-   Styles for the renderer output.
-*/
-
-/* SVG Lines */
+/* SVG Elements */
 .lens-line {
     stroke-width: 2;
     stroke-linecap: round;
     opacity: 0.8;
-    transition: stroke-dashoffset 0.5s ease;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
 }
+.lens-line-flow { stroke: var(--tier-tracker); stroke-dasharray: 6; animation: dashFlow 30s linear infinite; }
+.lens-line-ghost { stroke: var(--text-dim); stroke-dasharray: 2 4; opacity: 0.4; }
 
-.lens-line-flow { stroke: var(--tier-tracker); stroke-dasharray: 4; animation: dashFlow 20s linear infinite; }
-.lens-line-connection { stroke: var(--text-muted); opacity: 0.5; }
-.lens-line-ghost { stroke: var(--text-dim); stroke-dasharray: 2, 4; opacity: 0.3; }
-
-/* SVG Regions */
-.lens-region {
-    fill: rgba(33, 115, 70, 0.1);
-    stroke: var(--accent-primary);
-    stroke-width: 1;
-    rx: 4;
-}
-
-/* SVG Halos */
 .lens-halo {
     fill: none;
     stroke: var(--tier-mythic);
-    stroke-width: 2;
-    opacity: 0.6;
+    stroke-width: 1.5;
+    opacity: 0.7;
     animation: runePulse 3s infinite;
 }
 
+.lens-region {
+    fill: rgba(33, 115, 70, 0.1);
+    stroke: var(--accent-bright);
+    stroke-width: 1;
+    stroke-dasharray: 4;
+}
+
 /* Annotations */
+.lens-annotations-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 30;
+}
+
 .lens-annotation {
     position: absolute;
-    transform: translate(-50%, -100%);
-    padding: 2px 6px;
+    transform: translate(-50%, -120%);
+    padding: 2px 8px;
     border-radius: 4px;
-    font-size: 0.75rem;
-    pointer-events: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    font-family: monospace;
     white-space: nowrap;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-}
-
-.lens-text-header {
-    font-weight: bold;
-    color: #fff;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.8);
     border: 1px solid var(--border-subtle);
-    margin-top: -5px;
+    color: var(--accent-bright);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    animation: hudFadeIn 0.3s ease-out;
 }
 
-.lens-text-rune {
-    font-family: serif;
-    color: var(--tier-scout);
-    font-size: 1.2rem;
-    text-shadow: 0 0 5px var(--tier-scout);
-}
-
-/* Cell Highlights triggered by Lens */
+/* Lens Highlights (Applied to cells) */
 .lens-highlight-focus {
     border-color: var(--accent-bright) !important;
-    background: rgba(46, 204, 113, 0.1) !important;
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+    box-shadow: 0 0 15px var(--accent-glow), inset 0 0 5px var(--accent-bright) !important;
+    z-index: 10;
 }
 
 .lens-highlight-dim {
     opacity: 0.3;
-    filter: grayscale(0.8);
+    filter: grayscale(0.8) blur(0.5px);
+    transform: scale(0.95);
 }
 
-/* 8. GLYPH OVERLAYS & FORMATTING
-   Semantic Styles mapped to Renderer Classes.
-*/
-
-/* Outlier */
-.fmt-outlier {
-    background: rgba(231, 76, 60, 0.15) !important;
-    border-color: var(--glyph-outlier) !important;
-    color: #fff !important;
-    animation: runePulse 2s infinite alternate;
-}
-
-/* Above Mean */
-.fmt-above {
-    color: var(--glyph-above) !important;
-    border-bottom: 2px solid var(--glyph-above);
-}
-
-/* Below Mean */
-.fmt-below {
-    color: var(--glyph-below) !important;
-    border-top: 2px solid var(--glyph-below);
-}
-
-/* Frequency */
-.fmt-frequency {
-    color: var(--glyph-frequency) !important;
-    background: rgba(224, 86, 253, 0.05);
-    border: 1px dashed var(--glyph-frequency);
-}
-
-/* Unique */
-.fmt-unique {
-    color: var(--glyph-unique) !important;
-    box-shadow: inset 0 0 10px rgba(241, 196, 15, 0.1);
-    border: 1px solid var(--glyph-unique);
-}
-
-/* Weekend */
-.fmt-weekend {
-    background: rgba(255, 107, 107, 0.08) !important;
-    color: var(--glyph-weekend) !important;
-}
-
-/* Glyph Icons (rendered in overlay layer) */
-.glyph-icon-marker {
-    font-size: 1.5rem;
-    filter: drop-shadow(0 0 4px rgba(0,0,0,0.8));
-    animation: runeFloat 3s ease-in-out infinite;
-    pointer-events: none;
-}
-
-/* 9. ANIMATIONS
-   The breath of the machine.
-*/
-@keyframes runePulse {
-    0% { box-shadow: 0 0 5px currentColor; opacity: 0.8; }
-    100% { box-shadow: 0 0 15px currentColor; opacity: 1; }
-}
-
-@keyframes runeFloat {
-    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
-    50% { transform: translate(-50%, -50%) translateY(-4px); }
-}
-
-@keyframes dashFlow {
-    to { stroke-dashoffset: -100; }
-}
-
-@keyframes voidShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-.rune-shimmer {
-    position: relative;
-    overflow: hidden;
-}
-.rune-shimmer::after {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    animation: shimmer 2s infinite;
-}
-@keyframes shimmer {
-    100% { left: 200%; }
-}
-
-/* 10. HOME SCREEN
-   The gateway.
-*/
+/* 7. HOME SCREEN (THE GATE) */
 .home-screen {
-    background: radial-gradient(circle at center, #1b261b 0%, var(--bg-depth) 100%);
+    background: radial-gradient(circle at center, #1b261b 0%, #000 100%);
 }
 
 .home-content-wrapper {
@@ -442,23 +418,25 @@ button {
 }
 
 .mythic-title {
-    font-size: 4rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
+    font-size: 4.5rem;
+    font-weight: 900;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
-    background: linear-gradient(to bottom, #fff, var(--text-muted));
+    color: transparent;
+    background: linear-gradient(180deg, #fff 0%, var(--text-muted) 100%);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 20px rgba(33, 115, 70, 0.3));
-    margin-bottom: var(--space-md);
+    background-clip: text;
+    filter: drop-shadow(0 0 25px rgba(33, 115, 70, 0.4));
+    margin-bottom: var(--space-sm);
+    animation: runeShimmer 5s infinite linear;
 }
 
 .mythic-subtitle {
-    font-family: serif;
+    font-family: 'Georgia', serif;
     font-style: italic;
     color: var(--text-muted);
     font-size: 1.2rem;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
     opacity: 0.8;
 }
 
@@ -466,31 +444,27 @@ button {
     margin-top: var(--space-xl);
     padding: 20px 60px;
     font-size: 1.2rem;
-    letter-spacing: 3px;
+    letter-spacing: 4px;
     text-transform: uppercase;
+    background: transparent;
     border: 1px solid var(--accent-primary);
-    background: rgba(33, 115, 70, 0.05);
     color: var(--text-main);
-    transition: all var(--trans-normal);
     box-shadow: 0 0 20px rgba(33, 115, 70, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--trans-normal);
 }
 
 .home-start-btn:hover {
-    background: var(--accent-primary);
-    box-shadow: 0 0 40px rgba(33, 115, 70, 0.4);
+    background: rgba(33, 115, 70, 0.1);
+    box-shadow: 0 0 40px var(--accent-glow);
+    border-color: var(--accent-bright);
     transform: scale(1.05);
 }
 
-/* 11. RITUAL UI (LEVEL SELECT)
-   The path of ascension.
-*/
-.level-select-ritual {
-    background: linear-gradient(to bottom, var(--bg-surface), var(--bg-depth));
-    overflow-y: auto;
-}
-
+/* 8. RITUAL UI (THE PATH) */
 .ritual-header {
-    background: var(--bg-glass);
+    background: var(--bg-glass-strong);
     padding: var(--space-md) var(--space-xl);
     border-bottom: 1px solid var(--border-subtle);
     display: flex;
@@ -499,248 +473,150 @@ button {
     position: sticky;
     top: 0;
     z-index: 50;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
 }
 
-.ritual-header h2 {
-    font-size: 1.5rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--accent-bright);
-}
-
-.tier-cards-container {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-lg);
-    padding: var(--space-xl);
-    flex-wrap: wrap;
-}
-
+/* Tier Cards */
 .ritual-card {
-    width: 240px;
+    width: 220px;
+    min-height: 280px;
     background: var(--bg-panel);
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     padding: var(--space-lg);
     transition: all var(--trans-normal);
     position: relative;
-    overflow: hidden;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
 }
 
 .ritual-card:hover {
     transform: translateY(-5px);
-    border-color: var(--border-accent);
-}
-
-.ritual-card.active {
-    transform: translateY(-5px) scale(1.02);
+    border-color: var(--border-bright);
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.runic-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--space-lg);
-    padding: var(--space-xl);
-    max-width: 1000px;
-    margin: 0 auto;
+.ritual-card.active {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
 }
 
-.rune-node {
-    width: 60px;
-    height: 60px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border-subtle);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    color: var(--text-dim);
-    transform: rotate(45deg);
-    transition: all var(--trans-normal);
-    cursor: pointer;
+/* Tier Identities */
+.tier-scout.active { border-color: var(--tier-scout); box-shadow: 0 0 20px rgba(218, 165, 32, 0.2); }
+.tier-scout .tier-name { color: var(--tier-scout); }
+
+.tier-hunter.active { border-color: var(--tier-hunter); box-shadow: 0 0 20px rgba(46, 204, 113, 0.2); }
+.tier-hunter .tier-name { color: var(--tier-hunter); }
+
+.tier-tracker.active { border-color: var(--tier-tracker); box-shadow: 0 0 20px rgba(52, 152, 219, 0.2); }
+.tier-tracker .tier-name { color: var(--tier-tracker); }
+
+.tier-mythic.active { 
+    border-color: var(--tier-mythic); 
+    background: linear-gradient(135deg, rgba(20,0,20,0.9), rgba(40,0,40,0.9));
+    box-shadow: 0 0 30px rgba(155, 89, 182, 0.4);
+    animation: runePulse 4s infinite alternate;
 }
+.tier-mythic .tier-name { color: var(--tier-mythic); text-shadow: 0 0 5px var(--tier-mythic); }
 
-.rune-node span { transform: rotate(-45deg); }
-
-.rune-node.unlocked-path {
-    border-color: var(--accent-primary);
-    color: var(--text-main);
-    box-shadow: 0 0 10px rgba(33, 115, 70, 0.2);
-}
-
-.rune-node.unlocked-path:hover {
-    background: var(--accent-primary);
-    box-shadow: 0 0 20px rgba(33, 115, 70, 0.5);
-    z-index: 10;
-    transform: rotate(45deg) scale(1.1);
-}
-
-.rune-node.locked-void {
-    background: #000;
-    border-color: #222;
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* 12. CHALLENGE SCREEN
-   The ritual in progress.
-*/
-.challenge-screen {
-    background: var(--bg-depth);
-    overflow: hidden;
-}
-
-.challenge-field {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    background: radial-gradient(circle at center, #1b221b 0%, #0e110e 100%);
-}
-
-.grid-wrapper {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-}
-
-/* Side Panels */
-.nav-panel, .challenge-panel {
-    width: 280px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border-subtle);
-    display: flex;
-    flex-direction: column;
-    z-index: 30;
-    box-shadow: var(--shadow-lg);
-}
-
-.nav-panel { border-width: 0 1px 0 0; }
-.challenge-panel { border-width: 0 0 0 1px; }
-
-.tier-display {
-    text-align: center;
-    padding: var(--space-lg);
-    background: rgba(0,0,0,0.2);
-    margin: var(--space-md);
-    border-radius: 4px;
-    border: 1px solid var(--border-subtle);
-}
-
-.tier-rune {
-    font-size: 3rem;
-    margin-bottom: var(--space-sm);
-    display: block;
-    line-height: 1;
-}
-
-/* Bottom Bar (Glyphs & Lens) */
+/* 9. BOTTOM BAR (THE TOOLS) */
 .mythic-controls {
-    height: 80px;
-    background: var(--bg-glass);
+    height: 85px;
+    background: var(--bg-glass-strong);
     border-top: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 var(--space-lg);
+    padding: 0 var(--space-xl);
     z-index: 40;
     backdrop-filter: blur(10px);
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
 }
 
 .lens-selector {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: 8px 16px;
-    background: rgba(255,255,255,0.05);
+    gap: var(--space-md);
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.4);
     border: 1px solid var(--border-subtle);
-    border-radius: 20px;
+    border-radius: 30px;
     cursor: pointer;
     transition: all var(--trans-fast);
 }
 
 .lens-selector:hover {
     border-color: var(--accent-bright);
-    background: rgba(33, 115, 70, 0.1);
-}
-
-.glyph-bar {
-    display: flex;
-    gap: var(--space-sm);
+    background: rgba(33, 115, 70, 0.2);
+    box-shadow: 0 0 15px rgba(33, 115, 70, 0.1);
 }
 
 .glyph-button {
-    padding: 8px 12px;
+    padding: 8px 14px;
     border: 1px solid var(--border-subtle);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     color: var(--text-muted);
     transition: all var(--trans-fast);
-    font-size: 0.85rem;
-    text-transform: uppercase;
+    font-size: 0.8rem;
+    background: rgba(255,255,255,0.02);
 }
 
 .glyph-button:hover {
     border-color: var(--text-muted);
     color: var(--text-main);
+    background: rgba(255,255,255,0.05);
 }
 
 .glyph-button.active {
     border-color: var(--accent-bright);
-    background: rgba(46, 204, 113, 0.1);
+    background: rgba(46, 204, 113, 0.15);
     color: var(--accent-bright);
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.1);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.15);
+    text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
 }
 
-/* 13. TIER IDENTITIES
-   Mapping colors to difficulty.
-*/
-
-/* Scout */
-.tier-scout .tier-name, .class-scout { color: var(--tier-scout); }
-.tier-scout.active { border-color: var(--tier-scout); box-shadow: 0 0 15px rgba(218, 165, 32, 0.2); }
-.tier-scout .active-indicator { color: var(--tier-scout); border-color: var(--tier-scout); }
-
-/* Hunter */
-.tier-hunter .tier-name, .class-hunter { color: var(--tier-hunter); }
-.tier-hunter.active { border-color: var(--tier-hunter); box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); }
-.tier-hunter .active-indicator { color: var(--tier-hunter); border-color: var(--tier-hunter); }
-
-/* Tracker */
-.tier-tracker .tier-name, .class-tracker { color: var(--tier-tracker); }
-.tier-tracker.active { border-color: var(--tier-tracker); box-shadow: 0 0 15px rgba(52, 152, 219, 0.2); }
-.tier-tracker .active-indicator { color: var(--tier-tracker); border-color: var(--tier-tracker); }
-
-/* Mythic */
-.tier-mythic .tier-name, .class-mythic { color: var(--tier-mythic); }
-.tier-mythic.active { 
-    border-color: var(--tier-mythic); 
-    background: linear-gradient(135deg, rgba(40,0,40,0.9), rgba(10,0,20,0.9));
-    box-shadow: 0 0 20px rgba(155, 89, 182, 0.3);
+/* 10. ANIMATION PRIMITIVES */
+@keyframes runePulse {
+    0% { filter: brightness(1); opacity: 0.8; }
+    100% { filter: brightness(1.3); opacity: 1; }
 }
-.tier-mythic .active-indicator { color: var(--tier-mythic); border-color: var(--tier-mythic); }
 
-/* 14. UTILITY CLASSES
-*/
+@keyframes runeFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes dashFlow {
+    to { stroke-dashoffset: -100; }
+}
+
+@keyframes hudFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes runeShimmer {
+    0% { opacity: 0.9; }
+    50% { opacity: 1; text-shadow: 0 0 30px rgba(255,255,255,0.5); }
+    100% { opacity: 0.9; }
+}
+
+/* 11. UTILITY & TYPOGRAPHY */
 .text-accent { color: var(--accent-bright); }
 .text-dim { color: var(--text-dim); }
 
 .scroll-content {
-    overflow-y: auto;
     padding: var(--space-lg);
     height: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--space-md);
+    overflow-y: auto;
 }
 
 .panel-header {
@@ -751,10 +627,13 @@ button {
     padding-bottom: var(--space-sm);
     margin-bottom: var(--space-sm);
     font-size: 0.9rem;
+    text-shadow: 0 0 5px rgba(33, 115, 70, 0.5);
 }
 
-.question-container {
-    font-size: 1.1rem;
-    line-height: 1.6;
-    color: var(--text-main);
+.tier-rune {
+    font-size: 3rem;
+    margin-bottom: var(--space-sm);
+    display: block;
+    line-height: 1;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
 }
