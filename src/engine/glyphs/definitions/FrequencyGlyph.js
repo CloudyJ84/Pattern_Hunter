@@ -14,13 +14,19 @@ export const FrequencyGlyph = {
     category: "frequency",
 
     compute(gridData, patternMetadata, datasetRules) {
-        // Safe access to frequency metadata
-        const indices = patternMetadata.frequency && patternMetadata.frequency.repeatedIndices 
-            ? patternMetadata.frequency.repeatedIndices 
-            : [];
+        // New pattern engine structure:
+        // patternMetadata.frequency.repeated = [...]
+        // patternMetadata.frequency.indices = [...]
+        // patternMetadata.frequency.repeatedIndices = [...] (legacy)
+
+        const indices =
+            patternMetadata?.frequency?.repeated ||          // NEW schema
+            patternMetadata?.frequency?.indices ||           // alt schema
+            patternMetadata?.frequency?.repeatedIndices ||   // legacy schema
+            [];
 
         return {
-            indices: indices,
+            indices,
             strength: 1.0,
             category: "frequency"
         };
