@@ -4,6 +4,8 @@ import { UIRouter } from '../UIRouter.js';
 import { GridRenderer } from '../components/GridRenderer.js';
 import { QuestionDisplay } from '../components/QuestionDisplay.js';
 import { FeedbackDisplay } from '../components/FeedbackDisplay.js';
+import { LensController } from '../../engine/lens/LensController.js';
+import { LensRenderer } from '../components/LensRenderer.js';
 
 /**
  * Configuration for the Mythic Vows (Tiers)
@@ -43,8 +45,11 @@ export class ChallengeScreen {
         
         // Visual State
         this.activeGlyphs = new Set();
-        this.lensMode = 0; // 0: Standard, 1: Focus, 2: Structure
+        this.currentLensIndex = 0; // Tracks which lens from the available set is active
         this.analyzedMap = new Map(); // Stores cell indices for glyphs
+
+        // Systems
+        this.lensRenderer = null;
     }
 
     mount() {
@@ -85,8 +90,9 @@ export class ChallengeScreen {
                     <!-- The Grid Component Mount Point -->
                     <div class="dataset-grid" id="grid"></div>
                     
-                    <!-- Dynamic Lens Summary Overlay -->
-                    <div id="lens-summary" class="lens-summary hidden"></div>
+                    <!-- Dynamic Lens Summary Overlay (Legends/Stats) -->
+                    <!-- Removed 'hidden' class to allow LensRenderer to manage content visibility via presence -->
+                    <div id="lens-summary" class="lens-summary"></div>
                 </div>
 
                 <!-- ZONE C: BOTTOM PANEL - GLYPH BAR & LENS -->
@@ -134,6 +140,14 @@ export class ChallengeScreen {
 
         // Component Instances
         this.grid = new GridRenderer(el.querySelector('#grid'));
+        
+        // LensRenderer Integration
+        // Responsible for rendering overlays, annotations, and legends
+        this.lensRenderer = new LensRenderer(
+            el.querySelector('#grid'),
+            el.querySelector('#lens-summary')
+        );
+
         this.question = new QuestionDisplay(
             el.querySelector('#question'),
             (ans) => this.handleSubmit(ans)
@@ -163,11 +177,40 @@ export class ChallengeScreen {
         // Generate Level Data via Engine
         this.data = generateLevel(this.levelId, this.thresholdTier);
 
-        // Render Components
+        // Render Base Components
         this.grid.render(this.data.grid);
         this.question.render(this.data.question);
 
-        // Post-Processing: Analyze grid data to power visual glyphs
+        // Initialize Lens System for this Level
+        // 1. Determine available lenses from threshold config (default to standard if missing)
+        const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
+        
+        // 2. Set Active Lens to the first available (Standard)
+        this.currentLensIndex = 0;
+        LensController.setActiveLens(availableLenses[0]);
+
+        // 3. Apply and Render the initial lens
+        // Ensure to render AFTER the grid so overlays position correctly
+        const lensOutput = LensController.applyLens(
+            this.data.grid,
+            this.data.patternMetadata,
+            this.data.datasetRules, // Assumed to be passed by levelEngine
+            this.data.thresholdConfig
+        );
+        
+        this.lensRenderer.clear();
+        this.lensRenderer.render(lensOutput);
+        
+        // Update Lens UI Label
+        const lensBtn = this.element.querySelector('#lens-toggle');
+        if (lensBtn) {
+            const label = lensBtn.querySelector('.lens-label');
+            if (label && lensOutput) {
+                label.textContent = `Lens: ${lensOutput.name}`;
+            }
+        }
+
+        // Post-Processing: Analyze grid data to power visual glyphs (Glyph Logic - Separate)
         this._analyzeGridForVisuals();
         
         // Add click interaction for scratchpad (Marking cells)
@@ -209,24 +252,37 @@ export class ChallengeScreen {
     }
 
     /**
-     * Cycles through lens modes: Standard -> Focus -> Structure (X-Ray).
+     * Cycles through available lens modes defined by the current Tier.
+     * Integrates with LensController to calculate logic and LensRenderer to display it.
      */
     _cycleLens(btn) {
-        this.lensMode = (this.lensMode + 1) % 3;
-        const gridEl = this.element.querySelector('#grid');
+        const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
+        
+        // 1. Advance to next lens index
+        this.currentLensIndex = (this.currentLensIndex + 1) % availableLenses.length;
+        const nextLensId = availableLenses[this.currentLensIndex];
+        
+        // 2. Update Controller State
+        LensController.setActiveLens(nextLensId);
+        
+        // 3. Calculate Lens Output
+        // Pure calculation based on current grid and rules
+        const lensOutput = LensController.applyLens(
+            this.data.grid,
+            this.data.patternMetadata,
+            this.data.datasetRules,
+            this.data.thresholdConfig
+        );
+        
+        // 4. Render Visuals
+        // We clear first to ensure no artifacts remain from the previous lens
+        this.lensRenderer.clear();
+        this.lensRenderer.render(lensOutput);
+        
+        // 5. Update UI Label
         const label = btn.querySelector('.lens-label');
-
-        // Reset
-        gridEl.classList.remove('lens-focus', 'lens-xray');
-
-        if (this.lensMode === 0) {
-            label.textContent = "Lens: Standard";
-        } else if (this.lensMode === 1) {
-            gridEl.classList.add('lens-focus');
-            label.textContent = "Lens: Focus";
-        } else {
-            gridEl.classList.add('lens-xray');
-            label.textContent = "Lens: Structure";
+        if (label && lensOutput) {
+            label.textContent = `Lens: ${lensOutput.name}`;
         }
     }
 
@@ -355,5 +411,9 @@ export class ChallengeScreen {
 
     destroy() {
         this.element = null;
+        // Clean up lens artifacts explicitly
+        if (this.lensRenderer) {
+            this.lensRenderer.clear();
+        }
     }
 }
