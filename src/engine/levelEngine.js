@@ -50,6 +50,9 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
     const patternResult = injectPattern(dataset, datasetType, patternType, thresholdConfig);
     dataset = patternResult.dataset || dataset;
 
+    // 🔥 NEW: Extract semantic pattern metadata for glyphs, lenses, and UI
+    const patternMetadata = patternResult.meta?.injectionResult || {};
+
     // 8. Apply Formatting
     const formattingResult = applyFormatting(dataset, datasetType, patternType, thresholdConfig);
 
@@ -71,7 +74,10 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
         formatting: formattingResult,
         question,
         thresholdConfig,
-        config
+        config,
+
+        // 🔥 NEW: Pass semantic metadata forward to ChallengeScreen
+        patternMetadata
     };
 }
 
