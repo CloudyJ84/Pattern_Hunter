@@ -1,10 +1,23 @@
 /**
  * LensRenderer.js
- * * A pure UI component responsible for manifesting the "Lens" visualizations
+ * * SYSTEM ARCHITECT: Modular CSS Implementation
+ * CODEX: main.css & lenses.css
+ * * A pure UI component responsible for manifesting "Lens" visualizations
  * onto the Challenge Screen. It renders non-destructive overlays, annotations,
  * and highlights based on the output of the LensController.
  * * "A diviner's lens revealing the skeleton of the world."
  */
+
+// --- MYTHIC TOKEN DEFINITIONS ---
+// Maps engine lens types to the new visual language of lenses.css
+const LENS_TOKEN_MAP = {
+    'heatmap':  ['lens', 'lens--heatmap', 'lens--active', 'lens-anim--reveal'],
+    'timeline': ['lens', 'lens--timeline', 'lens--active', 'lens-anim--shift'],
+    'cluster':  ['lens', 'lens--cluster', 'lens--active', 'lens-anim--reveal'],
+    'anomaly':  ['lens', 'lens--anomaly', 'lens--active', 'lens-anim--pulse'],
+    'flow':     ['lens', 'lens--flow', 'lens--active', 'lens-anim--scanline'],
+    'pivot':    ['lens', 'lens--pivot', 'lens--active', 'lens-anim--reveal']
+};
 
 export class LensRenderer {
   /**
@@ -15,69 +28,169 @@ export class LensRenderer {
     this.gridContainer = gridContainer;
     this.legendContainer = legendContainer;
     
+    // Registry to track active lenses and their artifacts
+    // Map<lensId, { tokens, fxNodes, summaryNode, legacyClass, highlightRefs, svgNodes, annotationNodes }>
+    this.registry = new Map();
+
     // Create or retrieve the specific layers for rendering
     this.layers = {
+      // New modular lens container (z: 20)
+      lensContainer: this._initLensContainer(),
+      // Legacy SVG layer (z: 10)
       svg: this._initSvgLayer(),
+      // Legacy Annotations layer (z: 20)
       annotations: this._initHtmlLayer('lens-annotations-layer'),
     };
-
-    // Store references to highlighted cells to clean up efficiently
-    this.activeHighlights = [];
   }
+
+  /* -------------------------------------------------------------------------- */
+  /* LIFECYCLE METHODS                                                          */
+  /* -------------------------------------------------------------------------- */
 
   /**
    * Main render entry point.
    * Manifests the vision provided by the LensOutput.
+   * Handles both new token-based lenses and legacy behaviors.
    * * @param {Object} lensOutput - The standard data contract from LensController.
    */
   render(lensOutput) {
-    // 1. Clear previous visions
-    this.clear();
+    // 1. Clear previous visions (Legacy behavior requires single active lens usually, 
+    // but we prepare for multi-lens future by clearing specific ID if provided, 
+    // or everything if this is a "set active" call).
+    // For compatibility with existing GameController, we assume one active lens at a time for now.
+    this.clearAll();
 
     if (!lensOutput) return;
 
-    // 2. Render Layers (Order matters for z-index visual stacking)
-    if (lensOutput.highlights) this._renderHighlights(lensOutput.highlights);
-    if (lensOutput.overlays) this._renderOverlays(lensOutput.overlays);
-    if (lensOutput.annotations) this._renderAnnotations(lensOutput.annotations);
-    if (lensOutput.legends) this._renderLegends(lensOutput.legends);
+    this.activate(lensOutput);
+  }
+
+  /**
+   * Activates a specific lens visualization.
+   */
+  activate(lensOutput) {
+    const lensId = lensOutput.id || 'default-lens';
+    const entry = {
+        tokens: [],
+        fxNodes: [],
+        summaryNode: null,
+        legacyClass: null,
+        highlightRefs: [],
+        // We don't strictly track SVG/Annotation nodes individually in registry 
+        // because the layers are cleared globally in clearAll(), but for robust
+        // multi-lens support we could. For now, we follow the current "clear all" pattern.
+    };
+
+    // 1. Resolve Tokens & Apply to Lens Container
+    const type = lensOutput.type || (lensOutput.id.includes('heatmap') ? 'heatmap' : 'cluster'); // Fallback logic
+    const tokens = LENS_TOKEN_MAP[type] || ['lens', 'lens--active'];
+    
+    // Apply tokens to the dedicated lens container
+    this.layers.lensContainer.classList.add(...tokens);
+    entry.tokens = tokens;
+
+    // 2. Render FX Layers (The Mythic Composition)
+    if (lensOutput.fx) {
+        lensOutput.fx.forEach(fxType => {
+            const fxNode = document.createElement('div');
+            fxNode.className = `lens-layer lens-layer--${fxType}`;
+            this.layers.lensContainer.appendChild(fxNode);
+            entry.fxNodes.push(fxNode);
+        });
+    }
+
+    // 3. Render Summary Label (The Title)
+    if (lensOutput.summary || lensOutput.name) {
+        const text = lensOutput.summary || lensOutput.name;
+        const summaryNode = document.createElement('div');
+        summaryNode.className = 'lens-summary fade-in';
+        summaryNode.innerText = text;
+        this.layers.lensContainer.appendChild(summaryNode);
+        entry.summaryNode = summaryNode;
+    }
+
+    // 4. Handle Legacy CSS Classes (The Bridge)
+    if (lensOutput.cssClass) {
+        this.gridContainer.classList.add(lensOutput.cssClass);
+        entry.legacyClass = lensOutput.cssClass;
+    }
+
+    // 5. Render Highlights (Cell-level classes) - Token & Legacy compatible
+    if (lensOutput.highlights) {
+        // We pass the entry.highlightRefs array to populate it
+        this._renderHighlights(lensOutput.highlights, entry.highlightRefs);
+    }
+
+    // 6. Render Overlays (SVG Lines/Regions)
+    if (lensOutput.overlays) {
+        this._renderOverlays(lensOutput.overlays);
+    }
+
+    // 7. Render Annotations (Floating Text)
+    if (lensOutput.annotations) {
+        this._renderAnnotations(lensOutput.annotations);
+    }
+
+    // 8. Render Legends (Side panel)
+    if (lensOutput.legends) {
+        this._renderLegends(lensOutput.legends);
+    }
+
+    this.registry.set(lensId, entry);
   }
 
   /**
    * Clears all visual artifacts.
    * "Dissolving the illusion, returning to the raw grid."
    */
-  clear() {
-    // Clear SVG content (lines, shapes)
+  clearAll() {
+    // 1. Reset Lens Container (Tokens & FX)
+    this.layers.lensContainer.className = 'lens'; // Reset to base class
+    this.layers.lensContainer.innerHTML = ''; // Remove FX layers & summary
+
+    // 2. Clear Legacy Grid Classes
+    this.registry.forEach(entry => {
+        if (entry.legacyClass) {
+            this.gridContainer.classList.remove(entry.legacyClass);
+        }
+        // Clear active highlights
+        entry.highlightRefs.forEach(({ element, className }) => {
+            if (element) element.classList.remove(className);
+        });
+    });
+    this.registry.clear();
+
+    // 3. Clear SVG content (lines, shapes)
     while (this.layers.svg.firstChild) {
       this.layers.svg.removeChild(this.layers.svg.firstChild);
     }
 
-    // Clear Annotation content (labels, runes)
+    // 4. Clear Annotation content (labels, runes)
     this.layers.annotations.innerHTML = '';
 
-    // Remove CSS highlights from cells
-    this.activeHighlights.forEach(({ element, className }) => {
-      if (element) element.classList.remove(className);
-    });
-    this.activeHighlights = [];
-
-    // Clear Legend
+    // 5. Clear Legend
     if (this.legendContainer) {
       this.legendContainer.innerHTML = '';
     }
   }
 
+  // Alias for backward compatibility
+  clear() {
+      this.clearAll();
+  }
+
   /* -------------------------------------------------------------------------- */
-  /* INTERNAL LAYERS                             */
+  /* INTERNAL LAYERS & RENDERING                                                */
   /* -------------------------------------------------------------------------- */
 
   /**
    * Applies direct CSS classes to grid cells.
    * Used for soft emphasis like glows, borders, or dims.
+   * Now pushes references into a provided array for registry tracking.
    * * @param {Array} highlights - [{ row, col, style }]
+   * * @param {Array} refArray - Array to store cleanup references
    */
-  _renderHighlights(highlights) {
+  _renderHighlights(highlights, refArray) {
     highlights.forEach(highlight => {
       const cell = this._getCellElement(highlight.row, highlight.col);
       if (cell) {
@@ -86,7 +199,9 @@ export class LensRenderer {
         cell.classList.add(className);
         
         // Track for cleanup
-        this.activeHighlights.push({ element: cell, className });
+        if (refArray) {
+            refArray.push({ element: cell, className });
+        }
       }
     });
   }
@@ -159,7 +274,7 @@ export class LensRenderer {
   }
 
   /* -------------------------------------------------------------------------- */
-  /* DRAWING PRIMITIVES                             */
+  /* DRAWING PRIMITIVES (PRESERVED)                                             */
   /* -------------------------------------------------------------------------- */
 
   /**
@@ -182,7 +297,7 @@ export class LensRenderer {
     line.setAttribute('class', `lens-line ${this._mapStyleToClass(style, 'line')}`);
     
     // Add arrow marker if directional
-    if (style.includes('arrow')) {
+    if (style && style.includes('arrow')) {
         line.setAttribute('marker-end', 'url(#arrowhead)');
     }
 
@@ -232,8 +347,19 @@ export class LensRenderer {
   }
 
   /* -------------------------------------------------------------------------- */
-  /* HELPERS                                     */
+  /* HELPERS                                                                    */
   /* -------------------------------------------------------------------------- */
+
+  _initLensContainer() {
+      let layer = this.gridContainer.querySelector('.lens');
+      if (!layer) {
+          layer = document.createElement('div');
+          layer.className = 'lens'; // Base class from lenses.css
+          // Note: positioning styles are handled by lenses.css
+          this.gridContainer.appendChild(layer);
+      }
+      return layer;
+  }
 
   _initSvgLayer() {
     let svg = this.gridContainer.querySelector('.lens-svg-layer');
@@ -247,7 +373,7 @@ export class LensRenderer {
       svg.style.width = '100%';
       svg.style.height = '100%';
       svg.style.pointerEvents = 'none';
-      svg.style.zIndex = '10'; // Above grid
+      svg.style.zIndex = '10'; // Above grid, Below lens container (20)
       
       // Define reusable defs like arrowheads
       const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -274,7 +400,7 @@ export class LensRenderer {
       layer.style.width = '100%';
       layer.style.height = '100%';
       layer.style.pointerEvents = 'none';
-      layer.style.zIndex = '20'; // Above SVG
+      layer.style.zIndex = '25'; // Above Lens (20) and SVG (10) for text clarity
       this.gridContainer.appendChild(layer);
     }
     return layer;
@@ -327,7 +453,7 @@ export class LensRenderer {
 }
 
 /* -------------------------------------------------------------------------- */
-/* USAGE EXAMPLE                               */
+/* USAGE EXAMPLE                                                              */
 /* -------------------------------------------------------------------------- */
 /*
   // 1. Initialize
@@ -337,8 +463,11 @@ export class LensRenderer {
 
   // 2. Data from LensController
   const lensOutput = {
-    id: "lens_summary",
-    name: "Summary Lens",
+    id: "heatmap-standard", // Maps to 'heatmap' token
+    type: "heatmap",
+    name: "Conditional Aura",
+    summary: "Format: Active",
+    fx: ['veil', 'mask'], // Adds lens-layer--veil, lens-layer--mask
     overlays: [
       { type: 'line', start: {row:0, col:0}, end: {row:2, col:2}, style: 'flow' }
     ],
@@ -357,6 +486,6 @@ export class LensRenderer {
   // 3. Render
   renderer.render(lensOutput);
 
-  // 4. Clear when lens is deactivated
-  // renderer.clear();
+  // 4. Clear
+  // renderer.clearAll();
 */
