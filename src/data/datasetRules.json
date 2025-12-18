@@ -1,175 +1,269 @@
 {
   "datasetTypes": {
-    "dates": {
-      "generation": {
-        "rangeDaysBefore": 30,
-        "rangeDaysAfter": 30,
-        "ensurePatternPresence": true,
-        "cellValueType": "date"
-      },
-      "patterns": {
-        "weekendHighlight": {
-          "description": "At least one Saturday or Sunday appears in the dataset",
-          "injectionRule": "Force at least one weekend date",
-          "formattingRule": "highlightWeekends",
-          "questions": ["whichDateIsHighlighted", "countWeekendDates", "rowWithEarliestDate", "mostFrequentWeekday"]
-        },
-        "weekdayCluster": {
-          "description": "Multiple dates share the same weekday",
-          "injectionRule": "Inject 2–4 dates with the same weekday",
-          "formattingRule": "highlightSpecificWeekday",
-          "questions": ["whichWeekdayIsMostFrequent", "howManyOfWeekday"]
-        },
-        "earliestOrLatest": {
-          "description": "One date is clearly earliest or latest",
-          "injectionRule": "Inject a min or max date",
-          "formattingRule": "highlightEarliestOrLatest",
-          "questions": ["whichDateIsEarliest", "whichDateIsLatest"]
-        },
-        "dateRange": {
-          "description": "Some dates fall within a specific range",
-          "injectionRule": "Inject dates within a 7-day window",
-          "formattingRule": "highlightDateRange",
-          "questions": ["howManyInRange", "whichDatesInRange"]
-        }
-      },
-      "difficultyScaling": {
-        "levels1to3": "3x3 simple weekend pattern",
-        "levels4to6": "4x4 earliest/latest",
-        "levels7to10": "5x5 weekday clusters",
-        "levels11plus": "6x6 or larger with mixed patterns"
-      }
-    },
     "numbers": {
-      "generation": {
-        "minValue": 1,
-        "maxValue": 100,
-        "ensurePatternPresence": true,
-        "cellValueType": "number"
+      "id": "dataset_numbers",
+      "flavor": {
+        "name": "The Arithmancer's Grid",
+        "description": "A field of raw quantitative data where outliers and clusters hide among the noise."
       },
-      "patterns": {
-        "aboveThreshold": {
-          "description": "Values above a threshold appear",
-          "injectionRule": "Inject at least one value > threshold",
-          "formattingRule": "highlightAboveThreshold",
-          "questions": ["whichValueIsHighlighted", "countAboveThreshold"]
+      "generation": {
+        "cellValueType": "number",
+        "ensurePatternPresence": true,
+        "minValue": 1,
+        "maxValue": 100
+      },
+      "constraints": {
+        "minRows": 3,
+        "minCols": 3,
+        "minUniqueValues": 5,
+        "structural": []
+      },
+      "patterns": [
+        "pattern_num_above_threshold",
+        "pattern_num_below_threshold",
+        "pattern_num_outlier",
+        "pattern_num_cluster",
+        "pattern_num_extremes"
+      ],
+      "patternCompatibility": {
+        "pattern_num_above_threshold": {
+          "allowed": true,
+          "notes": "Standard threshold check."
         },
-        "belowThreshold": {
-          "description": "Values below a threshold appear",
-          "injectionRule": "Inject at least one value < threshold",
-          "formattingRule": "highlightBelowThreshold",
-          "questions": ["whichValueIsHighlighted", "countBelowThreshold"]
+        "pattern_num_below_threshold": {
+          "allowed": true,
+          "notes": "Standard threshold check."
         },
-        "outlier": {
-          "description": "One value is far outside the normal range",
-          "injectionRule": "Inject a value 2–3× larger or smaller",
-          "formattingRule": "highlightOutlier",
-          "questions": ["whichValueIsOutlier", "rowWithOutlier"]
+        "pattern_num_outlier": {
+          "allowed": true,
+          "notes": "Requires significant deviation from mean."
         },
-        "cluster": {
-          "description": "Several values cluster near each other",
-          "injectionRule": "Inject 3–5 values within a narrow band",
-          "formattingRule": "highlightCluster",
-          "questions": ["whichClusterIsLargest", "howManyInCluster"]
+        "pattern_num_cluster": {
+          "allowed": true,
+          "notes": "Requires ensuring background noise is sufficiently random."
         },
-        "maxOrMin": {
-          "description": "One value is clearly highest or lowest",
-          "injectionRule": "Inject a unique max or min",
-          "formattingRule": "highlightMaxOrMin",
-          "questions": ["whichValueIsHighest", "whichValueIsLowest"]
+        "pattern_num_extremes": {
+          "allowed": true,
+          "notes": "Highlights global max or min."
+        },
+        "pattern_date_weekend": {
+          "allowed": false,
+          "notes": "Incompatible: Numeric data lacks calendar context."
+        },
+        "pattern_cat_most_frequent": {
+          "allowed": false,
+          "notes": "Numeric distributions handled via clusters, not strict frequency."
         }
       },
-      "difficultyScaling": {
-        "levels1to3": "3x3 single outlier",
-        "levels4to6": "4x4 threshold patterns",
-        "levels7to10": "5x5 clusters",
-        "levels11plus": "6x6 or larger with mixed patterns"
+      "questionCompatibility": {
+        "question_find_outlier": {
+          "allowed": true,
+          "notes": "Find the value deviating from the set."
+        },
+        "question_count_above_threshold": {
+          "allowed": true,
+          "notes": "Count values > X."
+        },
+        "question_find_extremes": {
+          "allowed": true,
+          "notes": "Find max/min."
+        },
+        "question_date_lookup": {
+          "allowed": false,
+          "notes": "No dates present."
+        }
       }
     },
-    "categories": {
-      "generation": {
-        "categoryListSize": { "min": 3, "max": 6 },
-        "ensurePatternPresence": true,
-        "cellValueType": "category"
+    "dates": {
+      "id": "dataset_dates",
+      "flavor": {
+        "name": "The Chronomancer's Timeline",
+        "description": "A sequence of days where weekends and weekdays form temporal rhythms."
       },
-      "patterns": {
-        "mostFrequent": {
-          "description": "One category appears more often than others",
-          "injectionRule": "Inject category X 3–6 times",
-          "formattingRule": "highlightMostFrequent",
-          "questions": ["whichCategoryIsMostFrequent", "howManyTimesCategoryAppears"]
+      "generation": {
+        "cellValueType": "date",
+        "ensurePatternPresence": true,
+        "rangeDaysBefore": 30,
+        "rangeDaysAfter": 30
+      },
+      "constraints": {
+        "minRows": 3,
+        "minCols": 3,
+        "structural": []
+      },
+      "patterns": [
+        "pattern_date_weekend",
+        "pattern_date_weekday_cluster",
+        "pattern_date_extremes",
+        "pattern_date_range"
+      ],
+      "patternCompatibility": {
+        "pattern_date_weekend": {
+          "allowed": true,
+          "notes": "Injects Saturday/Sunday."
         },
-        "leastFrequent": {
-          "description": "One category appears only once",
-          "injectionRule": "Inject category X exactly once",
-          "formattingRule": "highlightUnique",
-          "questions": ["whichCategoryIsUnique", "rowWithUniqueCategory"]
+        "pattern_date_weekday_cluster": {
+          "allowed": true,
+          "notes": "Injects multiple matching weekdays (e.g., all Fridays)."
         },
-        "uniqueCategory": {
-          "description": "One category appears that no other cell has",
-          "injectionRule": "Inject a category not used elsewhere",
-          "formattingRule": "highlightUnique",
-          "questions": ["whichCategoryIsUnique", "howManyUniqueCategories"]
+        "pattern_date_extremes": {
+          "allowed": true,
+          "notes": "Earliest or latest date in set."
         },
-        "rowOrColumnPattern": {
-          "description": "A row or column shares the same category",
-          "injectionRule": "Fill one row or column with same category",
-          "formattingRule": "highlightRowOrColumnPattern",
-          "questions": ["whichRowHasPattern", "whichColumnHasPattern"]
+        "pattern_date_range": {
+          "allowed": true,
+          "notes": "Cluster of dates within a 7-day window."
+        },
+        "pattern_num_outlier": {
+          "allowed": false,
+          "notes": "Date outliers are handled via extremes pattern."
         }
       },
-      "difficultyScaling": {
-        "levels1to3": "3x3 simple frequency",
-        "levels4to6": "4x4 unique category",
-        "levels7to10": "5x5 row/column patterns",
-        "levels11plus": "6x6 or larger with mixed patterns"
+      "questionCompatibility": {
+        "question_find_weekend": {
+          "allowed": true,
+          "notes": "Identify Sat/Sun."
+        },
+        "question_count_range": {
+          "allowed": true,
+          "notes": "Count dates between X and Y."
+        },
+        "question_most_frequent_weekday": {
+          "allowed": true,
+          "notes": "Identify the day appearing most often."
+        }
       }
     },
     "times": {
-      "generation": {
-        "startTime": "08:00",
-        "endTime": "18:00",
-        "ensurePatternPresence": true,
-        "cellValueType": "time"
+      "id": "dataset_times",
+      "flavor": {
+        "name": "The Clockwork Register",
+        "description": "A precise log of moments, split by the meridian and defined by the hour."
       },
-      "patterns": {
-        "earlyLate": {
-          "description": "Times before or after a threshold",
-          "injectionRule": "Inject times <10:00 or >16:00",
-          "formattingRule": "highlightEarlyLate",
-          "questions": ["whichTimeIsHighlighted", "countEarlyOrLate"]
+      "generation": {
+        "cellValueType": "time",
+        "ensurePatternPresence": true,
+        "startTime": "08:00",
+        "endTime": "18:00"
+      },
+      "constraints": {
+        "minRows": 3,
+        "minCols": 3,
+        "structural": []
+      },
+      "patterns": [
+        "pattern_time_threshold",
+        "pattern_time_ampm",
+        "pattern_time_extremes",
+        "pattern_time_range"
+      ],
+      "patternCompatibility": {
+        "pattern_time_threshold": {
+          "allowed": true,
+          "notes": "Early morning or late evening."
         },
-        "amPm": {
-          "description": "AM vs PM distinction",
-          "injectionRule": "Inject at least one PM time",
-          "formattingRule": "highlightAmPm",
-          "questions": ["howManyPmTimes", "whichTimeIsPm"]
+        "pattern_time_ampm": {
+          "allowed": true,
+          "notes": "Distinction between pre-noon and post-noon."
         },
-        "earliestLatest": {
-          "description": "One time is clearly earliest or latest",
-          "injectionRule": "Inject a min or max time",
-          "formattingRule": "highlightEarliestOrLatest",
-          "questions": ["whichTimeIsEarliest", "whichTimeIsLatest"]
+        "pattern_time_extremes": {
+          "allowed": true,
+          "notes": "Earliest start or latest finish."
         },
-        "timeRange": {
-          "description": "Times fall within a specific range",
-          "injectionRule": "Inject times between 12:00–14:00",
-          "formattingRule": "highlightTimeRange",
-          "questions": ["howManyInTimeRange", "whichTimesInRange"]
+        "pattern_time_range": {
+          "allowed": true,
+          "notes": "Events occurring during lunch (12-14)."
+        },
+        "pattern_cat_unique": {
+          "allowed": false,
+          "notes": "Time uniqueness is handled via extremes or threshold."
         }
       },
-      "difficultyScaling": {
-        "levels1to3": "3x3 earliest/latest",
-        "levels4to6": "4x4 early/late",
-        "levels7to10": "5x5 range patterns",
-        "levels11plus": "6x6 or larger with mixed patterns"
+      "questionCompatibility": {
+        "question_count_pm": {
+          "allowed": true,
+          "notes": "Count times > 12:00."
+        },
+        "question_find_earliest": {
+          "allowed": true,
+          "notes": "Find min time."
+        },
+        "question_in_time_range": {
+          "allowed": true,
+          "notes": "Is time X between A and B?"
+        }
+      }
+    },
+    "categories": {
+      "id": "dataset_categories",
+      "flavor": {
+        "name": "The Archivist's Taxonomy",
+        "description": "A categorical inventory where rarity and frequency define the structure."
+      },
+      "generation": {
+        "cellValueType": "category",
+        "ensurePatternPresence": true,
+        "categoryListSize": {
+          "min": 3,
+          "max": 6
+        }
+      },
+      "constraints": {
+        "minRows": 4,
+        "minCols": 4,
+        "minUniqueValues": 3,
+        "structural": [
+          "rowStructure",
+          "columnStructure"
+        ]
+      },
+      "patterns": [
+        "pattern_cat_most_frequent",
+        "pattern_cat_least_frequent",
+        "pattern_cat_unique",
+        "pattern_structural_rowcol"
+      ],
+      "patternCompatibility": {
+        "pattern_cat_most_frequent": {
+          "allowed": true,
+          "notes": "Requires category pool < cell count."
+        },
+        "pattern_cat_least_frequent": {
+          "allowed": true,
+          "notes": "Single instance injection."
+        },
+        "pattern_cat_unique": {
+          "allowed": true,
+          "notes": "Category X appears exactly once, effectively a 'needle in haystack'."
+        },
+        "pattern_structural_rowcol": {
+          "allowed": true,
+          "notes": "Entire row or column filled with same category."
+        },
+        "pattern_num_threshold_above": {
+          "allowed": false,
+          "notes": "Categories cannot be numerically compared."
+        }
+      },
+      "questionCompatibility": {
+        "question_find_unique": {
+          "allowed": true,
+          "notes": "Which item appears only once?"
+        },
+        "question_count_category": {
+          "allowed": true,
+          "notes": "How many X are there?"
+        },
+        "question_identify_row_pattern": {
+          "allowed": true,
+          "notes": "Which row has all the same value?"
+        }
       }
     }
   },
-  "globalRules": {
-    "patternInjection": "Every dataset must contain at least one instance of the intended pattern and avoid accidental multiple patterns unless explicitly required.",
-    "formattingMapping": "Each pattern type maps to exactly one conditional formatting rule.",
-    "questionMapping": "Each pattern type maps to 2–4 question templates.",
-    "difficultyScaling": "Dataset size increases every 2–3 levels, and pattern complexity increases accordingly."
+  "globalMetadata": {
+    "version": "2.0.0",
+    "compatibilityMode": "strict",
+    "defaultScaling": "linear"
   }
 }
