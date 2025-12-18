@@ -14,8 +14,15 @@ export const BelowGlyph = {
     category: "distribution",
 
     compute(gridData, patternMetadata, datasetRules) {
+        // New pattern engine structure:
+        // patternMetadata.distribution.below = [...]
+        const indices =
+            patternMetadata?.distribution?.below ||   // NEW schema
+            patternMetadata?.belowMean ||             // Legacy fallback
+            [];
+
         return {
-            indices: patternMetadata.belowMean || [],
+            indices,
             strength: 1.0,
             category: "distribution"
         };
