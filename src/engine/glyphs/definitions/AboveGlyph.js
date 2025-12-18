@@ -14,8 +14,15 @@ export const AboveGlyph = {
     category: "distribution",
 
     compute(gridData, patternMetadata, datasetRules) {
+        // New pattern engine structure:
+        // patternMetadata.distribution.above = [...]
+        const indices =
+            patternMetadata?.distribution?.above ||
+            patternMetadata?.aboveMean || // fallback for older levels
+            [];
+
         return {
-            indices: patternMetadata.aboveMean || [],
+            indices,
             strength: 1.0,
             category: "distribution"
         };
