@@ -6,6 +6,8 @@ import { QuestionDisplay } from '../components/QuestionDisplay.js';
 import { FeedbackDisplay } from '../components/FeedbackDisplay.js';
 import { LensController } from '../../engine/lens/LensController.js';
 import { LensRenderer } from '../components/LensRenderer.js';
+import { GlyphRenderer } from '../components/GlyphRenderer.js';
+import { GlyphController } from '../../engine/glyphs/GlyphController.js';
 
 /**
  * Configuration for the Mythic Vows (Tiers)
@@ -44,12 +46,15 @@ export class ChallengeScreen {
         this.element = null;
         
         // Visual State
-        this.activeGlyphs = new Set();
         this.currentLensIndex = 0; // Tracks which lens from the available set is active
-        this.analyzedMap = new Map(); // Stores cell indices for glyphs
+        this.activeGlyphs = new Set(); // Keep track of active buttons for UI state
+        
+        // Storage for computed glyphs from the controller
+        this.computedGlyphs = new Map();
 
         // Systems
         this.lensRenderer = null;
+        this.glyphRenderer = null;
     }
 
     mount() {
@@ -91,7 +96,6 @@ export class ChallengeScreen {
                     <div class="dataset-grid" id="grid"></div>
                     
                     <!-- Dynamic Lens Summary Overlay (Legends/Stats) -->
-                    <!-- Removed 'hidden' class to allow LensRenderer to manage content visibility via presence -->
                     <div id="lens-summary" class="lens-summary"></div>
                 </div>
 
@@ -142,11 +146,14 @@ export class ChallengeScreen {
         this.grid = new GridRenderer(el.querySelector('#grid'));
         
         // LensRenderer Integration
-        // Responsible for rendering overlays, annotations, and legends
         this.lensRenderer = new LensRenderer(
             el.querySelector('#grid'),
             el.querySelector('#lens-summary')
         );
+
+        // GlyphRenderer Integration
+        // Responsible for rendering symbolic overlays and runic highlights
+        this.glyphRenderer = new GlyphRenderer(el.querySelector('#grid'));
 
         this.question = new QuestionDisplay(
             el.querySelector('#question'),
@@ -164,6 +171,7 @@ export class ChallengeScreen {
 
         // Glyph Logic
         el.querySelectorAll('.glyph-button').forEach(btn => {
+            // New Semantic Toggle: Passes ID, retrieves object, calls renderer
             btn.onclick = () => this._toggleGlyph(btn.dataset.glyph, btn);
         });
 
@@ -181,20 +189,15 @@ export class ChallengeScreen {
         this.grid.render(this.data.grid);
         this.question.render(this.data.question);
 
-        // Initialize Lens System for this Level
-        // 1. Determine available lenses from threshold config (default to standard if missing)
+        // --- LENS SYSTEM INIT ---
         const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
-        
-        // 2. Set Active Lens to the first available (Standard)
         this.currentLensIndex = 0;
         LensController.setActiveLens(availableLenses[0]);
 
-        // 3. Apply and Render the initial lens
-        // Ensure to render AFTER the grid so overlays position correctly
         const lensOutput = LensController.applyLens(
             this.data.grid,
             this.data.patternMetadata,
-            this.data.datasetRules, // Assumed to be passed by levelEngine
+            this.data.datasetRules,
             this.data.thresholdConfig
         );
         
@@ -210,8 +213,26 @@ export class ChallengeScreen {
             }
         }
 
-        // Post-Processing: Analyze grid data to power visual glyphs (Glyph Logic - Separate)
-        this._analyzeGridForVisuals();
+        // --- GLYPH SYSTEM INIT ---
+        // Compute all potential glyphs for this dataset using the Engine
+        const glyphOutputs = GlyphController.computeGlyphs(
+            this.data.grid,
+            this.data.patternMetadata,
+            this.data.datasetRules
+        );
+
+        // Map glyphs for easy retrieval by toggle buttons
+        this.computedGlyphs.clear();
+        glyphOutputs.forEach(g => {
+            this.computedGlyphs.set(g.id, g);
+        });
+
+        // Ensure visuals are cleared from previous levels
+        this.glyphRenderer.clearAll();
+        
+        // Note: We compute them here so they are ready, but we do not auto-render them 
+        // via renderAll() unless we want them all visible at start. 
+        // Default behavior is player-toggled.
         
         // Add click interaction for scratchpad (Marking cells)
         this._setupGridInteractions();
@@ -253,20 +274,15 @@ export class ChallengeScreen {
 
     /**
      * Cycles through available lens modes defined by the current Tier.
-     * Integrates with LensController to calculate logic and LensRenderer to display it.
      */
     _cycleLens(btn) {
         const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
         
-        // 1. Advance to next lens index
         this.currentLensIndex = (this.currentLensIndex + 1) % availableLenses.length;
         const nextLensId = availableLenses[this.currentLensIndex];
         
-        // 2. Update Controller State
         LensController.setActiveLens(nextLensId);
         
-        // 3. Calculate Lens Output
-        // Pure calculation based on current grid and rules
         const lensOutput = LensController.applyLens(
             this.data.grid,
             this.data.patternMetadata,
@@ -274,12 +290,9 @@ export class ChallengeScreen {
             this.data.thresholdConfig
         );
         
-        // 4. Render Visuals
-        // We clear first to ensure no artifacts remain from the previous lens
         this.lensRenderer.clear();
         this.lensRenderer.render(lensOutput);
         
-        // 5. Update UI Label
         const label = btn.querySelector('.lens-label');
         if (label && lensOutput) {
             label.textContent = `Lens: ${lensOutput.name}`;
@@ -287,99 +300,21 @@ export class ChallengeScreen {
     }
 
     /**
-     * Toggles a visual glyph overlay on the grid.
+     * Toggles a visual glyph overlay using the GlyphRenderer.
+     * No computation happens here; we simply toggle the visibility of the pre-computed glyph.
      */
     _toggleGlyph(glyphId, btn) {
-        if (this.activeGlyphs.has(glyphId)) {
-            this.activeGlyphs.delete(glyphId);
-            btn.classList.remove('active');
-            this._applyVisuals(glyphId, false);
+        // Retrieve the pre-computed glyph object
+        const glyph = this.computedGlyphs.get(glyphId);
+        
+        // If the engine produced a result for this glyph type, toggle it
+        if (glyph) {
+            this.glyphRenderer.toggle(glyph);
+            btn.classList.toggle('active');
         } else {
-            this.activeGlyphs.add(glyphId);
-            btn.classList.add('active');
-            this._applyVisuals(glyphId, true);
+            // Optional: visual feedback if glyph found nothing (e.g., shake button)
+            console.log(`No glyphs of type ${glyphId} found in this dataset.`);
         }
-    }
-
-    /**
-     * Applies the CSS class associated with a glyph to the pre-calculated indices.
-     */
-    _applyVisuals(glyphId, apply) {
-        const targetIndices = this.analyzedMap.get(glyphId) || [];
-        const cells = this.element.querySelectorAll('.grid-cell');
-        const glyphConfig = GLYPHS.find(g => g.id === glyphId);
-        
-        if (!glyphConfig) return;
-
-        targetIndices.forEach(index => {
-            if (cells[index]) {
-                if (apply) cells[index].classList.add(glyphConfig.css);
-                else cells[index].classList.remove(glyphConfig.css);
-            }
-        });
-    }
-
-    /**
-     * Scans the grid data to calculate visual groups (above mean, outliers, etc.).
-     * This runs on the client side to provide visual feedback without altering game logic.
-     */
-    _analyzeGridForVisuals() {
-        this.analyzedMap.clear();
-        const gridData = this.data.grid;
-        if (!gridData || !gridData.length) return;
-
-        const isNum = (v) => !isNaN(parseFloat(v)) && isFinite(v);
-        
-        // 1. Numerical Analysis
-        const numItems = gridData.map((val, idx) => ({ val: parseFloat(val), idx })).filter(x => isNum(x.val));
-        
-        if (numItems.length > 0) {
-            const sum = numItems.reduce((a, b) => a + b.val, 0);
-            const mean = sum / numItems.length;
-            
-            // Standard Deviation (Simple) for Outliers
-            const variance = numItems.reduce((a, b) => a + Math.pow(b.val - mean, 2), 0) / numItems.length;
-            const stdDev = Math.sqrt(variance);
-
-            const aboveIndices = numItems.filter(v => v.val > mean).map(v => v.idx);
-            const belowIndices = numItems.filter(v => v.val < mean).map(v => v.idx);
-            
-            // Outliers: > 1.5 StdDev from mean (Adjustable visual threshold)
-            const outlierIndices = numItems.filter(v => Math.abs(v.val - mean) > (1.5 * stdDev)).map(v => v.idx);
-
-            this.analyzedMap.set('above', aboveIndices);
-            this.analyzedMap.set('below', belowIndices);
-            this.analyzedMap.set('outlier', outlierIndices);
-        }
-
-        // 2. Frequency / Unique Analysis
-        const counts = {};
-        gridData.forEach(val => {
-            const key = String(val).toLowerCase();
-            counts[key] = (counts[key] || 0) + 1;
-        });
-
-        const uniqueIndices = [];
-        const freqIndices = [];
-
-        gridData.forEach((val, idx) => {
-            const key = String(val).toLowerCase();
-            if (counts[key] === 1) uniqueIndices.push(idx);
-            if (counts[key] > 1) freqIndices.push(idx);
-        });
-
-        this.analyzedMap.set('unique', uniqueIndices);
-        this.analyzedMap.set('frequency', freqIndices);
-
-        // 3. Weekend Analysis (String based)
-        const weekendIndices = [];
-        gridData.forEach((val, idx) => {
-            const s = String(val).toLowerCase();
-            if (s.includes('sat') || s.includes('sun')) {
-                weekendIndices.push(idx);
-            }
-        });
-        this.analyzedMap.set('weekend', weekendIndices);
     }
 
     handleSubmit(ans) {
@@ -393,7 +328,6 @@ export class ChallengeScreen {
 
             this.feedback.showCorrect(
                 () => {
-                    // Navigate to next level but keep the same tier
                     UIRouter.navigateTo('ChallengeScreen', {
                         levelId: this.levelId + 1,
                         thresholdTier: this.thresholdTier
@@ -411,9 +345,11 @@ export class ChallengeScreen {
 
     destroy() {
         this.element = null;
-        // Clean up lens artifacts explicitly
         if (this.lensRenderer) {
             this.lensRenderer.clear();
+        }
+        if (this.glyphRenderer) {
+            this.glyphRenderer.clearAll();
         }
     }
 }
