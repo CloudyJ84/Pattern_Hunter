@@ -1,0 +1,262 @@
+/* ==========================================================================
+   MYTHIC DIGITAL // LENS SYSTEM
+   Codex: main.css
+   Architect: Modular CSS Extraction
+   
+   "Lenses are not filters. They are ways of seeing. 
+    They translate the raw chaos of the grid into the ordered truth of the pattern."
+   
+   This file systematizes the visual transformations of the dataset, 
+   moving from hard-coded classes to a token-based overlay system.
+========================================================================== 
+*/
+
+/* ========================================= */
+/* 1. BASE LENS CONTAINER                    */
+/* ========================================= */
+
+.lens {
+    /* Positioning: Always covers the grid-area */
+    position: absolute;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    
+    /* Layering: Above Glyphs (z:5), Below UI Chrome (z:100) */
+    z-index: 20;
+    
+    /* Interaction: Lenses are ethereal by default */
+    pointer-events: none;
+    
+    /* Mythic Defaults */
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    mix-blend-mode: normal;
+}
+
+/* ========================================= */
+/* 2. LENS STATES                            */
+/* ========================================= */
+
+.lens--active {
+    opacity: 1;
+    pointer-events: none; /* Maintain pass-through unless specified */
+}
+
+.lens--preview {
+    opacity: 0.5;
+}
+
+.lens--transitioning {
+    transition: all 0.8s ease-in-out;
+}
+
+.lens--disabled {
+    opacity: 0;
+    filter: grayscale(100%);
+}
+
+/* ========================================= */
+/* 3. LENS TYPES (SEMANTIC MODES)            */
+/* ========================================= */
+
+/* TYPE: HEATMAP (The Elemental Aura)
+   Context: Conditional Formatting. Hot/Cold logic.
+   Aesthetic: Uses the Success/Error spectrum from main.css */
+.lens--heatmap {
+    /* Subtle color wash to unify the field */
+    background: radial-gradient(circle at center, transparent 20%, rgba(20, 30, 25, 0.4) 100%);
+    mix-blend-mode: overlay;
+}
+
+/* TYPE: TIMELINE (The Temporal Flow)
+   Context: Analyzing trends over time.
+   Aesthetic: Linear gradients, left-to-right flow. */
+.lens--timeline {
+    background: linear-gradient(90deg, 
+        rgba(27, 31, 27, 0.8) 0%, 
+        transparent 20%, 
+        transparent 80%, 
+        rgba(27, 31, 27, 0.8) 100%
+    );
+}
+
+/* TYPE: CLUSTER (The Grouping)
+   Context: K-Means, segmentation. 
+   Aesthetic: Focuses attention, dims the noise (Legacy "Focus" logic). */
+.lens--cluster {
+    /* No base background, relies on layer masking */
+}
+
+/* TYPE: ANOMALY (The Void Scry)
+   Context: Outlier detection.
+   Aesthetic: Void colors, high contrast, flicker potential. */
+.lens--anomaly {
+    background: radial-gradient(circle, transparent 50%, rgba(74, 35, 90, 0.2) 100%); /* --void-purple tint */
+    box-shadow: inset 0 0 50px rgba(13, 17, 13, 0.8); /* --void-dark vignette */
+}
+
+/* TYPE: FLOW (The Gradient)
+   Context: Directional magnitude.
+   Aesthetic: Smooth transitions, accent-heavy. */
+.lens--flow {
+    background: linear-gradient(135deg, rgba(33, 115, 70, 0.1), transparent);
+}
+
+/* TYPE: PIVOT (The Transformation)
+   Context: Rows to Columns. Structural view.
+   Aesthetic: Wireframe, "X-Ray" legacy logic. */
+.lens--pivot {
+    /* X-Ray aesthetic base */
+    background-color: rgba(13, 17, 13, 0.85); /* --void-dark opacity */
+    backdrop-filter: blur(2px);
+}
+
+/* ========================================= */
+/* 4. FX LAYERS (THE COMPOSITION)            */
+/* ========================================= */
+
+.lens-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+}
+
+/* Layer: Veil (Soft Wash) */
+.lens-layer--veil {
+    background: var(--panel);
+    opacity: 0.1;
+    mix-blend-mode: multiply;
+}
+
+/* Layer: Grid (Tactical Lines) */
+.lens-layer--grid {
+    background-image: 
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.5;
+}
+
+/* Layer: Highlight (Cell Emphasis) */
+/* Used for selecting specific regions in the lens */
+.lens-layer--highlight {
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 15px rgba(33, 115, 70, 0.3);
+}
+
+/* Layer: Mask (Dimming non-focus areas) */
+.lens-layer--mask {
+    background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6) 90%);
+}
+
+/* Layer: Contour (Heatmap Borders) */
+.lens-layer--contour {
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ========================================= */
+/* 5. ANIMATIONS (MYTHIC MOTION)             */
+/* ========================================= */
+
+.lens-anim--reveal {
+    animation: lensReveal 0.6s ease-out;
+}
+
+.lens-anim--shift {
+    animation: lensShift 4s ease-in-out infinite;
+}
+
+.lens-anim--pulse {
+    animation: lensPulse 3s infinite;
+}
+
+.lens-anim--scanline {
+    animation: lensScan 2s linear infinite;
+    background: linear-gradient(to bottom, transparent 50%, rgba(33, 115, 70, 0.1) 51%, transparent 52%);
+    background-size: 100% 200%;
+}
+
+@keyframes lensReveal {
+    from { opacity: 0; transform: scale(1.02); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes lensShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes lensPulse {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.4; }
+    100% { opacity: 0.8; }
+}
+
+@keyframes lensScan {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 0% 100%; }
+}
+
+/* ========================================= */
+/* 6. LEGACY BRIDGE                          */
+/* ========================================= */
+/* Direct extraction of logic from main.css.
+   These classes traditionally apply to the .dataset-grid container
+   and modify children .grid-cell elements.
+*/
+
+/* LEGACY MAPPING: .lens-focus (Now maps to Cluster/Focus logic) */
+.dataset-grid.lens-focus .grid-cell:not(:hover) {
+    opacity: 0.6;
+    filter: blur(1px);
+    transition: opacity 0.2s, filter 0.2s;
+}
+
+.dataset-grid.lens-focus .grid-cell:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    /* Uses main.css panel/accent vars */
+    background: var(--panel); 
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+/* LEGACY MAPPING: .lens-xray (Now maps to Pivot/Structure logic) */
+.dataset-grid.lens-xray .grid-cell {
+    background: transparent;
+    border: 1px solid #444;
+    color: #aaa;
+    /* Note: "Hide formatted backgrounds" logic relies on CSS specificity 
+       or JS toggling in the legacy system. */
+}
+
+.dataset-grid.lens-xray .grid-cell:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: #fff;
+    color: #fff;
+}
+
+.dataset-grid.lens-xray .grid-cell.marked {
+    border-color: var(--error);
+    color: var(--error);
+}
+
+/* LEGACY MAPPING: .lens-summary (The floating label) */
+.lens-summary {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    z-index: 20;
+    pointer-events: none;
+    font-size: 0.9rem;
+    font-family: monospace;
+}
