@@ -260,3 +260,184 @@
     font-size: 0.9rem;
     font-family: monospace;
 }
+
+/* ========================================= */
+/* 7. EXTENDED VISUALS (RENDERER V2)         */
+/* ========================================= */
+/* Additions for LensRenderer token compatibility */
+
+/* --- STANDARD LENS (The Baseline) --- */
+.lens--standard {
+    /* Neutral clarity - The Excel default */
+    background: transparent;
+    /* Ensure it doesn't block clicks */
+    pointer-events: none;
+}
+
+/* --- HIGHLIGHT TOKENS (Cell-Level) --- */
+
+/* Focus: The cell is selected or central to the lens */
+.lens-highlight-focus {
+    position: relative;
+    z-index: 5;
+    border-color: var(--accent-light) !important;
+    box-shadow: 0 0 10px rgba(46, 168, 107, 0.4), inset 0 0 0 1px rgba(255,255,255,0.1);
+    background: rgba(46, 168, 107, 0.1) !important;
+    transition: all 0.3s ease;
+}
+
+/* Dim: Recedes into background to let others shine */
+.lens-highlight-dim {
+    opacity: 0.3;
+    filter: grayscale(80%) brightness(0.8);
+    transition: opacity 0.4s ease;
+    border-color: rgba(255,255,255,0.05) !important;
+}
+
+/* Warn: Anomaly or Error state (Void energy) */
+.lens-highlight-warn {
+    border-color: var(--error) !important;
+    color: var(--error) !important;
+    background: rgba(231, 76, 60, 0.15) !important;
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
+    z-index: 6;
+    animation: lensPulseFast 2s infinite;
+}
+
+/* Success: Validation or positive flow */
+.lens-highlight-success {
+    border-color: var(--success) !important;
+    color: var(--success) !important;
+    background: rgba(46, 204, 113, 0.1) !important;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+}
+
+/* --- SVG OVERLAYS (Lines & Regions) --- */
+
+.lens-svg-layer {
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+}
+
+/* Base Line Style */
+.lens-line {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+/* Flow: Timeline arrows, directional energy */
+.lens-line-flow {
+    stroke: var(--accent);
+    stroke-width: 2px;
+    stroke-dasharray: 6 4;
+    animation: dashFlow 1s linear infinite;
+    opacity: 0.8;
+}
+
+/* Ghost: Faint connections, barely visible */
+.lens-line-ghost {
+    stroke: var(--border-subtle);
+    stroke-width: 1px;
+    stroke-dasharray: 2 4;
+    opacity: 0.3;
+}
+
+/* Connection: Standard structural link */
+.lens-line-connection {
+    stroke: #889988;
+    stroke-width: 1.5px;
+    opacity: 0.6;
+}
+
+/* Region: Cluster bounding boxes */
+.lens-region {
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+    transition: all 0.4s ease;
+}
+
+/* Region Focus: The active cluster */
+.lens-region-focus {
+    fill: rgba(33, 115, 70, 0.05); /* very subtle green wash */
+    stroke: var(--accent-light);
+    stroke-dasharray: 4 4;
+    filter: drop-shadow(0 0 5px rgba(33, 115, 70, 0.2));
+}
+
+/* Halo: Anomaly markers */
+.lens-halo-warn {
+    fill: transparent;
+    stroke: var(--error);
+    stroke-width: 2px;
+    opacity: 0.8;
+    transform-origin: center;
+    transform-box: fill-box; /* Ensures rotation is around center of the element */
+    animation: spinSlow 10s linear infinite; /* Subtle rotation for mythic feel */
+}
+
+/* --- ANNOTATIONS (Floating Text) --- */
+
+.lens-annotation {
+    position: absolute;
+    transform: translate(-50%, -120%); /* Center above cell */
+    pointer-events: none;
+    user-select: none;
+    z-index: 30;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    transition: opacity 0.3s ease;
+}
+
+/* Header: Pivot table labels */
+.lens-text-header {
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--text);
+    background: var(--panel);
+    border: 1px solid var(--border-subtle);
+    padding: 2px 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+/* Rune: Mythic symbols */
+.lens-text-rune {
+    font-family: serif;
+    font-weight: bold;
+    font-size: 1.4rem;
+    color: var(--rune-gold);
+    text-shadow: 0 0 8px rgba(218, 165, 32, 0.6);
+    transform: translate(-50%, -150%); /* Lift higher for impact */
+}
+
+/* Subtle: Small metadata */
+.lens-text-subtle {
+    font-family: monospace;
+    font-size: 0.7rem;
+    color: #889988;
+    background: rgba(0,0,0,0.6);
+    padding: 1px 4px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* --- NEW ANIMATIONS --- */
+
+@keyframes dashFlow {
+    to { stroke-dashoffset: -10; }
+}
+
+@keyframes lensPulseFast {
+    0% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.7; transform: scale(1); }
+}
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
