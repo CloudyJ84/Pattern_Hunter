@@ -184,6 +184,10 @@ export class ChallengeScreen {
     loadLevel() {
         // Generate Level Data via Engine
         this.data = generateLevel(this.levelId, this.thresholdTier);
+        console.log("CHALLENGE DATA:", this.data);
+        console.log("PATTERN METADATA (from levelEngine):", this.data.patternMetadata);
+        console.log("DATASET RULES (from levelEngine):", this.data.datasetRules);
+
 
         // Render Base Components
         this.grid.render(this.data.grid);
