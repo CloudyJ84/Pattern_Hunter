@@ -15,8 +15,15 @@ export const XrayLens = {
         return { overlays: [], annotations: [], highlights: [], legends: [], meta: {} };
     }
 
+    // Initialize all return arrays to prevent undefined references
+    const overlays = [];
     const annotations = [];
     const highlights = [];
+    
+    // Debugging/Meta containers
+    const rowSums = [];
+    const colSums = [];
+
     const rowCount = gridData.length;
     const colCount = gridData[0].length;
 
@@ -34,14 +41,24 @@ export const XrayLens = {
       const stats = aggregate(rowValues);
       
       if (stats) {
+        rowSums.push(stats.sum);
+        
+        // Annotate the last cell of the row
         annotations.push({
           row: r,
           col: colCount - 1,
           text: `Σ ${stats.sum}`,
           style: 'subtle'
         });
+        
         // Highlight the edge cell to anchor the annotation
-        highlights.push({ row: r, col: colCount - 1, style: 'dim' });
+        highlights.push({ 
+            row: r, 
+            col: colCount - 1, 
+            style: 'dim' 
+        });
+      } else {
+        rowSums.push(null);
       }
     }
 
@@ -54,13 +71,24 @@ export const XrayLens = {
       const stats = aggregate(colValues);
 
       if (stats) {
+        colSums.push(stats.sum);
+
+        // Annotate the last cell of the column
         annotations.push({
           row: rowCount - 1,
           col: c,
           text: `μ ${stats.avg}`,
           style: 'header'
         });
-        highlights.push({ row: rowCount - 1, col: c, style: 'dim' });
+
+        // Highlight the edge cell
+        highlights.push({ 
+            row: rowCount - 1, 
+            col: c, 
+            style: 'dim' 
+        });
+      } else {
+        colSums.push(null);
       }
     }
 
@@ -74,7 +102,7 @@ export const XrayLens = {
       annotations,
       highlights,
       legends,
-      meta: {}
+      meta: { rowSums, colSums }
     };
   }
 };
