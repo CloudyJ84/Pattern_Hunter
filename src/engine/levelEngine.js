@@ -2,6 +2,7 @@ import { generateRawDataset } from './datasetGenerator.js';
 import { injectPattern } from './patternEngine.js';
 import { applyFormatting } from './formattingEngine.js';
 import { generateQuestion } from './questionEngine.js';
+import { computePatternMetadata } from './analyticsEngine.js';
 
 let progressionRules = null;
 
@@ -37,26 +38,27 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
     if (Array.isArray(config.patternTypes)) {
         patternType = config.patternTypes[Math.floor(Math.random() * config.patternTypes.length)];
     } else if (config.patternTypes === "ALL") {
-        // TODO: pull from patternEngine rules for datasetType
         patternType = "random";
     } else {
         patternType = config.patternTypes;
     }
 
-    // 6. Generate Raw Dataset
-    let dataset = generateRawDataset(datasetType, { rows, cols }, thresholdConfig);
+    // 6. Generate Raw Dataset (now returns { grid, datasetRules })
+    const raw = generateRawDataset(datasetType, { rows, cols }, thresholdConfig);
+    let dataset = raw.grid;
+    const datasetRules = raw.datasetRules;
 
-    // 7. Inject Pattern
+    // 7. Inject Pattern (for question logic)
     const patternResult = injectPattern(dataset, datasetType, patternType, thresholdConfig);
     dataset = patternResult.dataset || dataset;
 
-    // 🔥 NEW: Extract semantic pattern metadata for glyphs, lenses, and UI
-    const patternMetadata = patternResult.meta?.injectionResult || {};
+    // 8. Compute analytic metadata (for glyphs + lenses)
+    const patternMetadata = computePatternMetadata(dataset, datasetRules);
 
-    // 8. Apply Formatting
+    // 9. Apply Formatting
     const formattingResult = applyFormatting(dataset, datasetType, patternType, thresholdConfig);
 
-    // 9. Generate Question
+    // 10. Generate Question
     const question = generateQuestion(
         patternType,
         datasetType,
@@ -65,7 +67,7 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
         thresholdConfig
     );
 
-    // 10. Return Challenge Object
+    // 11. Return Challenge Object
     return {
         level: levelNumber,
         datasetType,
@@ -76,8 +78,9 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
         thresholdConfig,
         config,
 
-        // 🔥 NEW: Pass semantic metadata forward to ChallengeScreen
-        patternMetadata
+        // NEW: analytics + dataset rules
+        patternMetadata,
+        datasetRules
     };
 }
 
