@@ -17,12 +17,17 @@ export class HomeScreen {
         // Bind methods to ensure 'this' context is preserved
         this.handleStart = this.handleStart.bind(this);
         this.toggleLore = this.toggleLore.bind(this);
+        
+        // 🔮 Mythic UI: Theme support hook
+        // Can be swapped for 'theme-scout', 'theme-void', etc.
+        this.theme = 'theme-mythic';
     }
 
     mount() {
         const el = document.createElement('div');
         // Use 'home-screen' for specific background styling hooks
-        el.className = 'screen home-screen fade-in';
+        // Added dynamic theme class for global styling context
+        el.className = `screen home-screen fade-in ${this.theme}`;
 
         // Select a random invocation for this session
         const randomInvocation = INVOCATIONS[Math.floor(Math.random() * INVOCATIONS.length)];
@@ -30,20 +35,26 @@ export class HomeScreen {
         el.innerHTML = `
             <div class="home-content-wrapper centered-layout">
                 
-                <!-- Title Block: The Sigil -->
-                <header class="home-header title-block">
-                    <h1 class="mythic-title">PATTERN HUNTER</h1>
+                <!-- 🔮 Title Block: The Sigil Zone -->
+                <header class="home-header title-block sigil-zone">
+                    <div class="sigil-container sigil-glow">
+                        <h1 class="mythic-title">PATTERN HUNTER</h1>
+                    </div>
                     <div class="title-separator"></div>
                     <p class="mythic-subtitle">Begin the Hunt. Choose your Path.</p>
                 </header>
 
-                <!-- Flavor Panel: The Whisper -->
-                <div class="flavor-panel">
-                    <p class="invocation-text">"${randomInvocation}"</p>
+                <!-- 🔮 Flavor Panel: The Invocation Zone -->
+                <div class="flavor-panel invocation-zone">
+                    <div class="invocation-box invocation-breath">
+                        <span class="rune-decor start"></span>
+                        <p class="invocation-text whisper-text">"${randomInvocation}"</p>
+                        <span class="rune-decor end"></span>
+                    </div>
                 </div>
 
-                <!-- Action Zone: The Threshold -->
-                <div class="button-zone">
+                <!-- 🔮 Action Zone: The Threshold -->
+                <div class="button-zone threshold-zone threshold-pulse">
                     <button id="start-btn" class="control-btn primary home-start-btn">
                         Enter the Temple
                     </button>
@@ -53,24 +64,35 @@ export class HomeScreen {
                 </div>
             </div>
 
-            <!-- Lore Modal: Hidden by default -->
-            <div id="lore-modal" class="lore-modal hidden">
-                <div class="lore-content panel">
-                    <h2>The Infinite Archive</h2>
-                    <p>
-                        For eons, the data has flowed—vast rivers of numbers, dates, and signals. 
-                        Most see only the grid. But you are a <strong>Hunter</strong>.
-                    </p>
-                    <p>
-                        Your eye can spot the <em>Outlier</em>. Your mind knows the <em>Formula</em>. 
-                        We do not wield swords; we wield <strong>Logic</strong>.
-                    </p>
-                    <p class="lore-footer">
-                        Identify the anomaly. Cleanse the record.
-                    </p>
-                    <button id="close-lore-btn" class="control-btn secondary">
-                        Return
-                    </button>
+            <!-- 🔮 Lore Modal: Hidden by default -->
+            <!-- Added modal-reveal hook for CSS entry animations -->
+            <div id="lore-modal" class="lore-modal hidden modal-reveal">
+                
+                <!-- Added scroll-frame for "ancient tablet" styling possibilities -->
+                <div class="lore-content panel scroll-frame">
+                    <div class="lore-inner-content">
+                        <h2 class="rune-header">The Infinite Archive</h2>
+                        
+                        <div class="lore-body">
+                            <p>
+                                For eons, the data has flowed—vast rivers of numbers, dates, and signals. 
+                                Most see only the grid. But you are a <strong>Hunter</strong>.
+                            </p>
+                            <p>
+                                Your eye can spot the <em>Outlier</em>. Your mind knows the <em>Formula</em>. 
+                                We do not wield swords; we wield <strong>Logic</strong>.
+                            </p>
+                        </div>
+
+                        <div class="lore-footer footer-sigil">
+                            <span class="sigil-mark">⟡</span>
+                            <span class="footer-text">Identify the anomaly. Cleanse the record.</span>
+                        </div>
+                        
+                        <button id="close-lore-btn" class="control-btn secondary close-rune-btn">
+                            Return
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
