@@ -7,7 +7,7 @@ import { LensController } from '../LensController.js';
 export const StandardLens = {
   id: 'lens_standard',
   name: 'Standard',
-  type: 'heatmap', // Maps to Renderer 'heatmap' token set
+  type: 'standard', // Maps to default neutral tokens
   description: 'The unadorned truth. Raw data without augmentation.',
   
   compute(gridData) {
