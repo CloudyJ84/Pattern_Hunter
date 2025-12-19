@@ -70,7 +70,7 @@ export const XrayLens = {
     ];
 
     return {
-      overlays: [],
+      overlays,
       annotations,
       highlights,
       legends,
