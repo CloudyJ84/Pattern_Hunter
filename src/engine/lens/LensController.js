@@ -33,6 +33,7 @@ export const LensController = {
      * * @param {Object} lensDef - The lens definition object.
      * @param {string} lensDef.id - Unique identifier (e.g., 'lens_focus').
      * @param {string} lensDef.name - Display name.
+     * @param {string} lensDef.type - Visual archetype (e.g., 'heatmap', 'cluster').
      * @param {Function} lensDef.compute - Function(grid, meta, rules, tier) -> LensOutput.
      * @throws {Error} If the definition is malformed.
      */
@@ -105,6 +106,7 @@ export const LensController = {
             return {
                 id: lens.id,
                 name: lens.name,
+                type: lens.type || 'heatmap', // Pass through type for Renderer CSS tokens
                 description: lens.description || '',
                 overlays: output.overlays || [],
                 annotations: output.annotations || [],
@@ -136,6 +138,7 @@ export const LensController = {
         return {
             id: 'lens_void',
             name: 'Void',
+            type: 'anomaly', // Default type for safety
             description: 'No vision available.',
             overlays: [],
             annotations: [],
@@ -160,6 +163,7 @@ export const LensController = {
 LensController.registerLens({
     id: 'lens_standard',
     name: 'Standard',
+    type: 'heatmap',
     description: 'The unadorned truth. Raw data without augmentation.',
     appliesTo: 'all',
     compute: (gridData) => {
@@ -169,7 +173,8 @@ LensController.registerLens({
             overlays: [],
             annotations: [],
             highlights: [],
-            legends: []
+            legends: [],
+            meta: {}
         };
     }
 });
