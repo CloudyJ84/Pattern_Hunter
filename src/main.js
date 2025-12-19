@@ -11,6 +11,9 @@ import { initQuestionEngine } from './engine/questionEngine.js';
 import { initFormattingEngine } from './engine/formattingEngine.js';
 import { initLevelEngine } from './engine/levelEngine.js';
 
+// Glyph system initializer
+import { registerAllGlyphs } from './engine/glyphs/registerGlyphs.js';
+
 // Router
 import { UIRouter } from './ui/UIRouter.js';
 
@@ -37,6 +40,10 @@ async function init() {
         initQuestionEngine(questionRules);
         initFormattingEngine(patternRules);
         initLevelEngine(levelProgression);
+
+        // 🔥 Initialize glyph system
+        registerAllGlyphs();
+        console.log("Glyphs registered.");
 
         // Initialize GameState
         GameState.init();
