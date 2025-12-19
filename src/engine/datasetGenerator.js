@@ -41,9 +41,6 @@ export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
                 value = randomTime(config.generation);
             }
 
-            // Future: inject distractors here
-            // if (Math.random() < distractorDensity) { ... }
-
             row.push({
                 row: r,
                 col: c,
@@ -55,7 +52,14 @@ export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
         grid.push(row);
     }
 
-    return grid;
+    // NEW: return datasetRules alongside the grid
+    return {
+        grid,
+        datasetRules: {
+            type: datasetType,
+            generation: config.generation
+        }
+    };
 }
 
 function randomInt(min, max) {
