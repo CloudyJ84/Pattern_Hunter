@@ -11,13 +11,15 @@
 // --- MYTHIC TOKEN DEFINITIONS ---
 // Maps engine lens types to the new visual language of lenses.css
 const LENS_TOKEN_MAP = {
-    'heatmap':  ['lens', 'lens--heatmap', 'lens--active', 'lens-anim--reveal'],
+    'standard': ['lens', 'lens--standard', 'lens-anim--reveal'],
     'timeline': ['lens', 'lens--timeline', 'lens--active', 'lens-anim--shift'],
     'cluster':  ['lens', 'lens--cluster', 'lens--active', 'lens-anim--reveal'],
     'anomaly':  ['lens', 'lens--anomaly', 'lens--active', 'lens-anim--pulse'],
-    'flow':     ['lens', 'lens--flow', 'lens--active', 'lens-anim--scanline'],
-    'pivot':    ['lens', 'lens--pivot', 'lens--active', 'lens-anim--reveal']
+    'pivot':    ['lens', 'lens--pivot', 'lens--active', 'lens-anim--reveal'],
+    // Fallback aliases
+    'flow':     ['lens', 'lens--timeline', 'lens--active', 'lens-anim--scanline']
 };
+
 
 export class LensRenderer {
   /**
@@ -54,10 +56,8 @@ export class LensRenderer {
    * * @param {Object} lensOutput - The standard data contract from LensController.
    */
   render(lensOutput) {
-    // 1. Clear previous visions (Legacy behavior requires single active lens usually, 
-    // but we prepare for multi-lens future by clearing specific ID if provided, 
-    // or everything if this is a "set active" call).
-    // For compatibility with existing GameController, we assume one active lens at a time for now.
+    // 1. Clear previous visions to ensure a clean slate.
+    // "The old world must dissolve before the new one is revealed."
     this.clearAll();
 
     if (!lensOutput) return;
@@ -76,14 +76,18 @@ export class LensRenderer {
         summaryNode: null,
         legacyClass: null,
         highlightRefs: [],
-        // We don't strictly track SVG/Annotation nodes individually in registry 
-        // because the layers are cleared globally in clearAll(), but for robust
-        // multi-lens support we could. For now, we follow the current "clear all" pattern.
     };
 
     // 1. Resolve Tokens & Apply to Lens Container
-    const type = lensOutput.type || (lensOutput.id.includes('heatmap') ? 'heatmap' : 'cluster'); // Fallback logic
-    const tokens = LENS_TOKEN_MAP[type] || ['lens', 'lens--active'];
+    // Prefer explicit type, fallback to ID detection, default to 'standard'
+    let type = lensOutput.type;
+    if (!type) {
+        if (lensOutput.id && lensOutput.id.includes('heatmap')) type = 'heatmap';
+        else if (lensOutput.id && lensOutput.id.includes('focus')) type = 'cluster';
+        else type = 'standard';
+    }
+
+    const tokens = LENS_TOKEN_MAP[type] || ['lens', 'lens--standard'];
     
     // Apply tokens to the dedicated lens container
     this.layers.lensContainer.classList.add(...tokens);
@@ -100,7 +104,8 @@ export class LensRenderer {
     }
 
     // 3. Render Summary Label (The Title)
-    if (lensOutput.summary || lensOutput.name) {
+    // Only render if there's actual content to show
+    if ((lensOutput.summary || lensOutput.name) && type !== 'standard') {
         const text = lensOutput.summary || lensOutput.name;
         const summaryNode = document.createElement('div');
         summaryNode.className = 'lens-summary fade-in';
@@ -115,9 +120,8 @@ export class LensRenderer {
         entry.legacyClass = lensOutput.cssClass;
     }
 
-    // 5. Render Highlights (Cell-level classes) - Token & Legacy compatible
+    // 5. Render Highlights (Cell-level classes)
     if (lensOutput.highlights) {
-        // We pass the entry.highlightRefs array to populate it
         this._renderHighlights(lensOutput.highlights, entry.highlightRefs);
     }
 
@@ -148,7 +152,7 @@ export class LensRenderer {
     this.layers.lensContainer.className = 'lens'; // Reset to base class
     this.layers.lensContainer.innerHTML = ''; // Remove FX layers & summary
 
-    // 2. Clear Legacy Grid Classes
+    // 2. Clear Legacy Grid Classes & Highlights
     this.registry.forEach(entry => {
         if (entry.legacyClass) {
             this.gridContainer.classList.remove(entry.legacyClass);
@@ -186,7 +190,6 @@ export class LensRenderer {
   /**
    * Applies direct CSS classes to grid cells.
    * Used for soft emphasis like glows, borders, or dims.
-   * Now pushes references into a provided array for registry tracking.
    * * @param {Array} highlights - [{ row, col, style }]
    * * @param {Array} refArray - Array to store cleanup references
    */
@@ -274,7 +277,7 @@ export class LensRenderer {
   }
 
   /* -------------------------------------------------------------------------- */
-  /* DRAWING PRIMITIVES (PRESERVED)                                             */
+  /* DRAWING PRIMITIVES (SVG)                                                   */
   /* -------------------------------------------------------------------------- */
 
   /**
@@ -297,7 +300,7 @@ export class LensRenderer {
     line.setAttribute('class', `lens-line ${this._mapStyleToClass(style, 'line')}`);
     
     // Add arrow marker if directional
-    if (style && style.includes('arrow')) {
+    if (style && style.includes('flow') || style.includes('arrow')) {
         line.setAttribute('marker-end', 'url(#arrowhead)');
     }
 
@@ -355,7 +358,6 @@ export class LensRenderer {
       if (!layer) {
           layer = document.createElement('div');
           layer.className = 'lens'; // Base class from lenses.css
-          // Note: positioning styles are handled by lenses.css
           this.gridContainer.appendChild(layer);
       }
       return layer;
@@ -366,7 +368,6 @@ export class LensRenderer {
     if (!svg) {
       svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.setAttribute('class', 'lens-svg-layer');
-      // Style logic should be in CSS, but structural styles here for safety
       svg.style.position = 'absolute';
       svg.style.top = '0';
       svg.style.left = '0';
@@ -438,10 +439,11 @@ export class LensRenderer {
       'warn': 'lens-highlight-warn',         // Red tint
       'success': 'lens-highlight-success',   // Green tint
       
-      // Lines
+      // Lines & Regions
       'flow': 'lens-line-flow',              // Solid, primary color
       'ghost': 'lens-line-ghost',            // Dashed, low opacity
       'connection': 'lens-line-connection',  // Simple connector
+      'region-focus': 'lens-region-focus',
       
       // Annotations
       'header': 'lens-text-header',          // Bold, large
@@ -451,41 +453,3 @@ export class LensRenderer {
     return map[styleName] || `lens-${type}-${styleName}`;
   }
 }
-
-/* -------------------------------------------------------------------------- */
-/* USAGE EXAMPLE                                                              */
-/* -------------------------------------------------------------------------- */
-/*
-  // 1. Initialize
-  const gridEl = document.getElementById('game-grid');
-  const legendEl = document.getElementById('lens-legend');
-  const renderer = new LensRenderer(gridEl, legendEl);
-
-  // 2. Data from LensController
-  const lensOutput = {
-    id: "heatmap-standard", // Maps to 'heatmap' token
-    type: "heatmap",
-    name: "Conditional Aura",
-    summary: "Format: Active",
-    fx: ['veil', 'mask'], // Adds lens-layer--veil, lens-layer--mask
-    overlays: [
-      { type: 'line', start: {row:0, col:0}, end: {row:2, col:2}, style: 'flow' }
-    ],
-    highlights: [
-      { row: 0, col: 0, style: 'focus' },
-      { row: 1, col: 1, style: 'dim' }
-    ],
-    annotations: [
-      { row: 0, col: 0, text: "MAX", style: 'header' }
-    ],
-    legends: [
-      { label: "Flow Path", icon: "→", description: "Shows data direction" }
-    ]
-  };
-
-  // 3. Render
-  renderer.render(lensOutput);
-
-  // 4. Clear
-  // renderer.clearAll();
-*/
