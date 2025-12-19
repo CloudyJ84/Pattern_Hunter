@@ -3,6 +3,19 @@ export class Cell {
         this.data = data;
         this.element = document.createElement('div');
         this.element.className = 'grid-cell';
+
+        // Etch coordinates and index onto the physical substrate
+        // Required for GlyphRenderer (index) and LensRenderer (row/col)
+        if (this.data.index !== undefined) {
+            this.element.setAttribute('data-index', this.data.index);
+        }
+        if (this.data.row !== undefined) {
+            this.element.setAttribute('data-row', this.data.row);
+        }
+        if (this.data.col !== undefined) {
+            this.element.setAttribute('data-col', this.data.col);
+        }
+
         this.render();
     }
 
