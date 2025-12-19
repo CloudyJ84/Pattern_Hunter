@@ -22,9 +22,24 @@ export class GridRenderer {
         const cols = gridData[0].length;
         this.container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
-        // Build cells
-        for (const row of gridData) {
-            for (const cellData of row) {
+        // Build cells with coordinate injection
+        let flatIndex = 0;
+
+        for (let r = 0; r < gridData.length; r++) {
+            const rowData = gridData[r];
+            for (let c = 0; c < rowData.length; c++) {
+                const rawCellData = rowData[c];
+
+                // Construct enriched data packet for the ritual
+                // Ensures downstream renderers can locate this entity
+                const cellData = {
+                    ...rawCellData,
+                    value: rawCellData.value, // Ensure value is explicit
+                    row: r,
+                    col: c,
+                    index: flatIndex++
+                };
+
                 const cell = new Cell(cellData);
                 this.cells.push(cell);
                 this.container.appendChild(cell.element);
