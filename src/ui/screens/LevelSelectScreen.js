@@ -48,7 +48,12 @@ export class LevelSelectScreen {
 
     mount() {
         const el = document.createElement('div');
-        el.className = 'screen level-select-ritual fade-in';
+        
+        // 🔮 Mythic UI: Apply initial theme based on selected tier
+        const initialTier = TIER_CONFIG.find(t => t.id === this.currentTierId);
+        const themeClass = initialTier ? `theme-${initialTier.name.toLowerCase()}` : 'theme-hunter';
+        
+        el.className = `screen level-select-ritual fade-in ${themeClass}`;
 
         // 1. The Header
         const header = `
@@ -65,6 +70,7 @@ export class LevelSelectScreen {
         `;
 
         // 2. The Vow (Tier Selection)
+        // Added 'tier-hover' hooks in render function below
         const tierSection = `
             <section class="tier-selection-zone">
                 <h3 class="section-label">1. Make your Vow</h3>
@@ -115,10 +121,12 @@ export class LevelSelectScreen {
      */
     _renderTierCard(tier) {
         const isActive = this.currentTierId === tier.id;
-        const activeClass = isActive ? 'active' : '';
+        // 🔮 Mythic UI: Add glow and pulse hooks for active state
+        const activeClass = isActive ? 'active tier-glow' : '';
+        const hoverClass = 'tier-hover'; // Hook for hover animations
         
         return `
-            <div class="ritual-card ${tier.className} ${activeClass}" data-id="${tier.id}">
+            <div class="ritual-card ${tier.className} ${activeClass} ${hoverClass}" data-id="${tier.id}">
                 <div class="card-inner">
                     <div class="card-header">
                         <span class="tier-name">${tier.name}</span>
@@ -131,7 +139,8 @@ export class LevelSelectScreen {
                             <span class="value">${tier.hints}</span>
                         </div>
                     </div>
-                    ${isActive ? '<div class="active-indicator">VOW TAKEN</div>' : ''}
+                    <!-- 🔮 Mythic UI: Add vow sigil/flare hooks -->
+                    ${isActive ? '<div class="active-indicator vow-sigil vow-flare">VOW TAKEN</div>' : ''}
                 </div>
             </div>
         `;
@@ -143,25 +152,37 @@ export class LevelSelectScreen {
     handleTierClick(tierId) {
         if (this.currentTierId === tierId) return;
 
+        // 🔮 Mythic UI: Remove old theme class
+        const oldTier = TIER_CONFIG.find(t => t.id === this.currentTierId);
+        if (oldTier && this.element) {
+            this.element.classList.remove(`theme-${oldTier.name.toLowerCase()}`);
+        }
+
         this.currentTierId = tierId;
         this._playSound('select_tier');
+
+        // 🔮 Mythic UI: Add new theme class to root element
+        const newTier = TIER_CONFIG.find(t => t.id === this.currentTierId);
+        if (newTier && this.element) {
+            this.element.classList.add(`theme-${newTier.name.toLowerCase()}`);
+        }
 
         // Update UI without full re-render for performance
         const allCards = this.element.querySelectorAll('.ritual-card');
         allCards.forEach(card => {
             const id = parseInt(card.dataset.id);
             if (id === tierId) {
-                card.classList.add('active');
+                // 🔮 Mythic UI: Add glow hooks
+                card.classList.add('active', 'tier-glow');
                 if (!card.querySelector('.active-indicator')) {
-                    // Inject the "VOW TAKEN" text dynamically if you want, 
-                    // or just let CSS handle the border/glow
                     const indicator = document.createElement('div');
-                    indicator.className = 'active-indicator fade-in';
+                    // 🔮 Mythic UI: Add flare/sigil hooks
+                    indicator.className = 'active-indicator fade-in vow-sigil vow-flare';
                     indicator.innerText = 'VOW TAKEN';
                     card.querySelector('.card-inner').appendChild(indicator);
                 }
             } else {
-                card.classList.remove('active');
+                card.classList.remove('active', 'tier-glow');
                 const ind = card.querySelector('.active-indicator');
                 if (ind) ind.remove();
             }
@@ -186,15 +207,20 @@ export class LevelSelectScreen {
             const isLocked = i > unlockedMax;
             
             const node = document.createElement('button');
-            node.className = `rune-node ${isLocked ? 'locked-void' : 'unlocked-path'}`;
+            // 🔮 Mythic UI: Add specific hooks for locked vs unlocked states
+            // rune-pulse, rune-shimmer for unlocked | locked-void for locked
+            node.className = `rune-node ${isLocked ? 'locked-void' : 'unlocked-path rune-pulse rune-hover'}`;
             
             // Inner HTML for specific styling hooks
             if (isLocked) {
                 node.innerHTML = `<span class="lock-icon">🔒</span><span class="level-num">${i}</span>`;
                 node.title = "Complete previous levels to unlock";
+                // 🔮 Mythic UI: Data attribute for CSS-based lore tooltips
+                node.setAttribute('data-lore', 'The Void bars your way.');
                 node.disabled = true;
             } else {
-                node.innerHTML = `<span class="rune-glow"></span><span class="level-num">${i}</span>`;
+                // 🔮 Mythic UI: rune-glow container inside
+                node.innerHTML = `<span class="rune-glow rune-shimmer"></span><span class="level-num">${i}</span>`;
                 node.onclick = () => this._launchLevel(i);
                 
                 // Add hover effect via JS if needed, or stick to CSS
@@ -214,8 +240,11 @@ export class LevelSelectScreen {
         
         this._playSound('confirm_start');
         
-        // Add a small delay for a "entering portal" animation effect if desired
-        this.element.classList.add('ritual-complete');
+        // 🔮 Mythic UI: Add comprehensive transition hooks
+        // ritual-complete: triggers base sequence
+        // portal-active: triggers specific portal visuals
+        // screen-glow: washes out the screen
+        this.element.classList.add('ritual-complete', 'portal-active', 'screen-glow');
         
         setTimeout(() => {
             UIRouter.navigateTo('ChallengeScreen', {
