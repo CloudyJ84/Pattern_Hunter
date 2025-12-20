@@ -59,14 +59,18 @@ export class ChallengeScreen {
 
     mount() {
         const el = document.createElement('div');
-        el.className = 'screen challenge-screen fade-in';
-
-        // Retrieve Tier Info
+        
+        // 🔮 Mythic UI: Theme Propagation
+        // Inject theme class based on Vow (e.g., 'theme-hunter') to style entire screen
         const tier = TIER_CONFIG[this.thresholdTier] || TIER_CONFIG[1];
+        const themeClass = `theme-${tier.name.toLowerCase()}`;
+        
+        el.className = `screen challenge-screen fade-in ${themeClass}`;
 
         el.innerHTML = `
             <!-- ZONE A: LEFT PANEL - THE HUNTER'S ANCHOR -->
-            <aside class="nav-panel">
+            <!-- 🔮 Mythic UI: Added .anchor-zone wrapper -->
+            <aside class="nav-panel anchor-zone">
                 <div class="nav-top">
                     <button id="withdraw-btn" class="control-btn secondary nav-back">
                         <span class="icon">↩</span> Withdraw
@@ -74,7 +78,7 @@ export class ChallengeScreen {
                 </div>
                 
                 <div class="tier-display">
-                    <div class="tier-rune">${tier.rune}</div>
+                    <div class="tier-rune tier-pulse">${tier.rune}</div>
                     <div class="tier-info">
                         <div class="label">Current Vow</div>
                         <div class="value class-${tier.name.toLowerCase()}">${tier.name}</div>
@@ -90,20 +94,25 @@ export class ChallengeScreen {
             </aside>
 
             <!-- ZONE B: CENTER - THE FIELD (Grid + Bottom Bar) -->
-            <main class="challenge-field">
+            <!-- 🔮 Mythic UI: Added .ritual-field wrapper -->
+            <main class="challenge-field ritual-field">
                 <div class="grid-wrapper">
                     <!-- The Grid Component Mount Point -->
                     <div class="dataset-grid" id="grid"></div>
                     
                     <!-- Dynamic Lens Summary Overlay (Legends/Stats) -->
-                    <div id="lens-summary" class="lens-summary"></div>
+                    <!-- 🔮 Mythic UI: Added .legend-entry hook support via CSS -->
+                    <div id="lens-summary" class="lens-summary lens-summary-visible"></div>
                 </div>
 
                 <!-- ZONE C: BOTTOM PANEL - GLYPH BAR & LENS -->
-                <footer class="mythic-controls">
-                    <div class="lens-selector" id="lens-toggle" title="Change Perspective">
-                        <span class="lens-icon">👁️</span>
-                        <span class="lens-label">Lens: Standard</span>
+                <!-- 🔮 Mythic UI: Added .glyph-zone and .lens-zone structure -->
+                <footer class="mythic-controls glyph-zone">
+                    <div class="lens-zone">
+                        <div class="lens-selector" id="lens-toggle" title="Change Perspective">
+                            <span class="lens-icon">👁️</span>
+                            <span class="lens-label">Lens: Standard</span>
+                        </div>
                     </div>
                     
                     <div class="glyph-bar">
@@ -111,6 +120,8 @@ export class ChallengeScreen {
                             <button class="glyph-button" data-glyph="${g.id}" title="${g.desc}">
                                 <span class="glyph-icon">${g.icon}</span>
                                 <span class="glyph-name">${g.name}</span>
+                                <!-- 🔮 Mythic UI: Indicator hook for counts -->
+                                <span class="glyph-indicator"></span>
                             </button>
                         `).join('')}
                     </div>
@@ -118,13 +129,15 @@ export class ChallengeScreen {
             </main>
 
             <!-- ZONE D: RIGHT PANEL - THE CHALLENGE SCROLL -->
-            <aside class="challenge-panel">
+            <!-- 🔮 Mythic UI: Added .scroll-zone wrapper -->
+            <aside class="challenge-panel scroll-zone panel-reveal">
                 <div class="scroll-content">
                     <h3 class="panel-header">The Query</h3>
                     
                     <!-- Question & Feedback Mount Points -->
-                    <div id="question" class="question-container"></div>
-                    <div id="feedback" class="feedback-container hidden"></div>
+                    <!-- 🔮 Mythic UI: Added .question-frame and .feedback-frame -->
+                    <div id="question" class="question-container query-zone question-frame"></div>
+                    <div id="feedback" class="feedback-container feedback-zone feedback-frame hidden"></div>
 
                     <div class="action-area">
                         <button id="hint-btn" class="control-btn secondary hint-btn">
@@ -152,7 +165,6 @@ export class ChallengeScreen {
         );
 
         // GlyphRenderer Integration
-        // Responsible for rendering symbolic overlays and runic highlights
         this.glyphRenderer = new GlyphRenderer(el.querySelector('#grid'));
 
         this.question = new QuestionDisplay(
@@ -171,8 +183,11 @@ export class ChallengeScreen {
 
         // Glyph Logic
         el.querySelectorAll('.glyph-button').forEach(btn => {
-            // New Semantic Toggle: Passes ID, retrieves object, calls renderer
             btn.onclick = () => this._toggleGlyph(btn.dataset.glyph, btn);
+            
+            // 🔮 Mythic UI: Hover hooks
+            btn.onmouseenter = () => btn.classList.add('glyph-hover');
+            btn.onmouseleave = () => btn.classList.remove('glyph-hover');
         });
 
         this.element = el;
@@ -185,9 +200,6 @@ export class ChallengeScreen {
         // Generate Level Data via Engine
         this.data = generateLevel(this.levelId, this.thresholdTier);
         console.log("CHALLENGE DATA:", this.data);
-        console.log("PATTERN METADATA (from levelEngine):", this.data.patternMetadata);
-        console.log("DATASET RULES (from levelEngine):", this.data.datasetRules);
-
 
         // Render Base Components
         this.grid.render(this.data.grid);
@@ -215,28 +227,46 @@ export class ChallengeScreen {
             if (label && lensOutput) {
                 label.textContent = `Lens: ${lensOutput.name}`;
             }
+            // 🔮 Mythic UI: Mark active lens
+            lensBtn.classList.add('lens-active');
         }
 
         // --- GLYPH SYSTEM INIT ---
-        // Compute all potential glyphs for this dataset using the Engine
+        // Compute all potential glyphs
         const glyphOutputs = GlyphController.computeGlyphs(
             this.data.grid,
             this.data.patternMetadata,
             this.data.datasetRules
         );
 
-        // Map glyphs for easy retrieval by toggle buttons
+        // Map glyphs for easy retrieval
         this.computedGlyphs.clear();
         glyphOutputs.forEach(g => {
             this.computedGlyphs.set(g.id, g);
         });
 
+        // 🔮 Mythic UI: Update Glyph Bar Metadata
+        // Visually disable or highlight buttons based on whether they have data
+        const glyphBtns = this.element.querySelectorAll('.glyph-button');
+        glyphBtns.forEach(btn => {
+            const id = btn.dataset.glyph;
+            const glyphData = this.computedGlyphs.get(id);
+            const count = (glyphData && glyphData.cells) ? glyphData.cells.length : 0;
+            
+            // Reset classes
+            btn.classList.remove('glyph-has-data', 'glyph-no-data', 'active');
+            
+            if (count > 0) {
+                btn.classList.add('glyph-has-data');
+                btn.dataset.count = count; // CSS can use content: attr(data-count)
+            } else {
+                btn.classList.add('glyph-no-data');
+                btn.dataset.count = 0;
+            }
+        });
+
         // Ensure visuals are cleared from previous levels
         this.glyphRenderer.clearAll();
-        
-        // Note: We compute them here so they are ready, but we do not auto-render them 
-        // via renderAll() unless we want them all visible at start. 
-        // Default behavior is player-toggled.
         
         // Add click interaction for scratchpad (Marking cells)
         this._setupGridInteractions();
@@ -249,17 +279,17 @@ export class ChallengeScreen {
             this.hintBtn.style.display = 'flex';
             this.hintBtn.innerHTML = `Invoke Hint <span class="hint-badge">${hintLevel}</span>`;
             this.hintBtn.disabled = false;
-            this.hintBtn.classList.remove('used');
+            this.hintBtn.classList.remove('used', 'hint-used');
         }
     }
 
     _handleHint() {
-        // Use the engine's formatting/hint data
         if (this.data.formatting) {
             this.grid.applyFormatting(this.data.formatting);
             this.hintBtn.disabled = true;
             this.hintBtn.innerHTML = `Hint Invoked <span class="check">✓</span>`;
-            this.hintBtn.classList.add('used');
+            // 🔮 Mythic UI: Animation hook
+            this.hintBtn.classList.add('used', 'hint-used');
         }
     }
 
@@ -272,6 +302,12 @@ export class ChallengeScreen {
         gridCells.forEach(cell => {
             cell.onclick = () => {
                 cell.classList.toggle('marked');
+                // 🔮 Mythic UI: Add animation class for marking interaction
+                if (cell.classList.contains('marked')) {
+                    cell.classList.add('marked-animate');
+                } else {
+                    cell.classList.remove('marked-animate');
+                }
             };
         });
     }
@@ -282,6 +318,10 @@ export class ChallengeScreen {
     _cycleLens(btn) {
         const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
         
+        // 🔮 Mythic UI: Animation trigger for transition
+        btn.classList.add('lens-transition');
+        setTimeout(() => btn.classList.remove('lens-transition'), 300);
+
         this.currentLensIndex = (this.currentLensIndex + 1) % availableLenses.length;
         const nextLensId = availableLenses[this.currentLensIndex];
         
@@ -305,19 +345,25 @@ export class ChallengeScreen {
 
     /**
      * Toggles a visual glyph overlay using the GlyphRenderer.
-     * No computation happens here; we simply toggle the visibility of the pre-computed glyph.
      */
     _toggleGlyph(glyphId, btn) {
-        // Retrieve the pre-computed glyph object
         const glyph = this.computedGlyphs.get(glyphId);
         
-        // If the engine produced a result for this glyph type, toggle it
         if (glyph) {
             this.glyphRenderer.toggle(glyph);
             btn.classList.toggle('active');
+            
+            // 🔮 Mythic UI: Explicit activation hook
+            if (btn.classList.contains('active')) {
+                btn.classList.add('glyph-activated');
+            } else {
+                btn.classList.remove('glyph-activated');
+            }
         } else {
-            // Optional: visual feedback if glyph found nothing (e.g., shake button)
             console.log(`No glyphs of type ${glyphId} found in this dataset.`);
+            // 🔮 Mythic UI: Error shake hook
+            btn.classList.add('glyph-empty-shake');
+            setTimeout(() => btn.classList.remove('glyph-empty-shake'), 400);
         }
     }
 
@@ -328,7 +374,8 @@ export class ChallengeScreen {
         if (input === correct) {
             GameState.completeLevel(this.levelId);
             
-            this.element.querySelector('.challenge-panel').classList.add('success-pulse');
+            // 🔮 Mythic UI: Success hooks
+            this.element.querySelector('.challenge-panel').classList.add('success-pulse', 'panel-success');
 
             this.feedback.showCorrect(
                 () => {
@@ -342,8 +389,10 @@ export class ChallengeScreen {
         } else {
             this.feedback.showIncorrect(correct);
             const panel = this.element.querySelector('.challenge-panel');
-            panel.classList.add('shake');
-            setTimeout(() => panel.classList.remove('shake'), 500);
+            
+            // 🔮 Mythic UI: Shake hook
+            panel.classList.add('shake', 'panel-shake');
+            setTimeout(() => panel.classList.remove('shake', 'panel-shake'), 500);
         }
     }
 
