@@ -1,24 +1,34 @@
 /**
  * analyticsEngine.js
- * 
- * Produces analytic metadata for glyphs.
+ * * Produces analytic metadata for glyphs.
  * This is separate from the Pattern Engine (which injects patterns for questions).
- * 
- * The Glyph System expects metadata in this shape:
+ * * The Glyph System expects metadata in this shape:
  * {
- *   distribution: { above: [], below: [] },
- *   outliers: { indices: [] },
- *   frequency: { repeated: [] },
- *   unique: { indices: [] },
- *   weekends: { indices: [] },
- *   clusters: [...],
- *   sequences: [...]
+ * distribution: { above: [], below: [] },
+ * outliers: { indices: [] },
+ * frequency: { repeated: [] },
+ * unique: { indices: [] },
+ * weekends: { indices: [] },
+ * clusters: [...],
+ * sequences: [...],
+ * // New V2 Fields
+ * glyphs: { outlier: bool, frequency: bool, ... },
+ * sigilSupport: { maxValue, minValue, uniqueValue, ... },
+ * lens: { stats, frequency, ... },
+ * dateStats: { earliest, latest },
+ * categoryStats: { mode }
  * }
  */
 
 export function computePatternMetadata(grid, datasetRules = {}) {
     const flat = grid.flat();
     const type = datasetRules.type;
+
+    // --- DATASET PURITY VALIDATION ---
+    // Prevent crashes by warning if mixed types find their way into the engine
+    if (new Set(flat.map(c => typeof c.value)).size > 1) {
+        console.warn("Mixed dataset detected in analyticsEngine. Only the primary type will be analyzed.");
+    }
 
     const metadata = {
         distribution: { above: [], below: [] },
@@ -30,10 +40,15 @@ export function computePatternMetadata(grid, datasetRules = {}) {
         sequences: []
     };
 
+    // Shared state for Lens/Sigil logic later
+    let mean = 0;
+    let std = 0;
+    let nums = [];
+
     // --- NUMERIC ANALYTICS ---
     if (type === 'numbers') {
-        const nums = flat.map(c => Number(c.value));
-        const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+        nums = flat.map(c => Number(c.value));
+        mean = nums.reduce((a, b) => a + b, 0) / nums.length;
 
         // Above / Below Mean
         flat.forEach((cell, idx) => {
@@ -44,7 +59,7 @@ export function computePatternMetadata(grid, datasetRules = {}) {
 
         // Outliers (simple z-score > 2)
         const variance = nums.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / nums.length;
-        const std = Math.sqrt(variance);
+        std = Math.sqrt(variance);
 
         flat.forEach((cell, idx) => {
             const val = Number(cell.value);
@@ -134,8 +149,6 @@ export function computePatternMetadata(grid, datasetRules = {}) {
 
     // --- SEQUENCES (simple increasing/decreasing runs) ---
     if (type === 'numbers') {
-        const nums = flat.map(c => Number(c.value));
-
         let current = [0];
         for (let i = 1; i < nums.length; i++) {
             if (nums[i] > nums[i - 1]) {
@@ -147,6 +160,77 @@ export function computePatternMetadata(grid, datasetRules = {}) {
         }
         if (current.length >= 3) metadata.sequences.push([...current]);
     }
+
+    // =========================================================
+    // V2 UNIFIED ANALYTICS UPGRADE
+    // =========================================================
+
+    // --- DATE STATS ---
+    // Supports earliest/latest detection for future patterns
+    metadata.dateStats = {
+        earliest: null,
+        latest: null
+    };
+    if (type === 'dates') {
+        const stamps = flat.map(c => new Date(c.value).getTime()).filter(t => !isNaN(t));
+        if (stamps.length > 0) {
+            metadata.dateStats.earliest = new Date(Math.min(...stamps));
+            metadata.dateStats.latest = new Date(Math.max(...stamps));
+        }
+    }
+
+    // --- CATEGORY STATS ---
+    // Supports mode detection
+    metadata.categoryStats = {
+        mode: [...valueMap.entries()].reduce((a, b) => 
+            (b[1].length > (a?.count || 0)) ? { value: b[0], count: b[1].length } : a,
+        null)
+    };
+
+    // --- GLYPH METADATA ---
+    // Booleans for UI state toggling (lights up glyphs in the HUD)
+    metadata.glyphs = {
+        outlier: metadata.outliers.indices.length > 0,
+        frequency: metadata.frequency.repeated.length > 0,
+        unique: metadata.unique.indices.length > 0,
+        weekend: metadata.weekends.indices.length > 0,
+        sequence: metadata.sequences.length > 0
+    };
+
+    // --- SIGIL SUPPORT ---
+    // Data required for Sigil highlighting logic
+    metadata.sigilSupport = {
+        maxValue: null,
+        minValue: null,
+        uniqueValue: null,
+        frequencyValues: [],
+        weekendIndices: metadata.weekends.indices
+    };
+
+    if (type === 'numbers' && nums.length > 0) {
+        metadata.sigilSupport.maxValue = Math.max(...nums);
+        metadata.sigilSupport.minValue = Math.min(...nums);
+    } 
+    
+    if (type === 'categories' || type === 'numbers') {
+        metadata.sigilSupport.uniqueValue = metadata.unique.indices.length === 1
+            ? flat[metadata.unique.indices[0]].value
+            : null;
+        
+        metadata.sigilSupport.frequencyValues = [...valueMap.entries()]
+            .filter(([v, idxs]) => idxs.length > 1)
+            .map(([v]) => v);
+    }
+
+    // --- LENS METADATA ---
+    // Summaries for the Lens Bar
+    metadata.lens = {
+        stats: type === 'numbers' ? { mean, std } : null,
+        frequency: metadata.frequency.repeated,
+        unique: metadata.unique.indices,
+        weekend: metadata.weekends.indices,
+        sequence: metadata.sequences
+    };
 
     return metadata;
 }
