@@ -47,6 +47,7 @@ export class ChallengeScreen {
         
         // Visual State
         this.currentLensIndex = 0; // Tracks which lens from the available set is active
+        this.currentLensMode = 'lens_standard'; // Tracks ID for sync
         this.activeGlyphs = new Set(); // Keep track of active buttons for UI state
         
         // Storage for computed glyphs from the controller
@@ -55,6 +56,9 @@ export class ChallengeScreen {
         // Systems
         this.lensRenderer = null;
         this.glyphRenderer = null;
+        
+        // Alias for snippet compatibility
+        this.gridRenderer = null;
     }
 
     mount() {
@@ -114,11 +118,13 @@ export class ChallengeScreen {
                             <span class="lens-icon">👁️</span>
                             <span class="lens-label">Lens: Standard</span>
                         </div>
+                        <!-- New Lens Bar Container -->
+                        <div class="lens-bar"></div>
                     </div>
                     
                     <div class="glyph-bar">
                         ${GLYPHS.map(g => `
-                            <button class="glyph-button" 
+                            <button class="glyph-button glyph" 
                                 data-glyph="${g.id}" 
                                 data-glyph-name="${g.name}"
                                 title="${g.desc}">
@@ -136,7 +142,10 @@ export class ChallengeScreen {
             <!-- 🔮 Mythic UI: Added .scroll-zone wrapper -->
             <aside class="challenge-panel scroll-zone panel-reveal">
                 <div class="scroll-content">
-                    <h3 class="panel-header">The Query</h3>
+                    <h3 class="panel-header">
+                        The Query
+                        <span class="sigil-icon"></span>
+                    </h3>
                     
                     <!-- Question & Feedback Mount Points -->
                     <!-- 🔮 Mythic UI: Added .question-frame, .question-sigil, .feedback-frame, .feedback-sigil -->
@@ -161,6 +170,7 @@ export class ChallengeScreen {
 
         // Component Instances
         this.grid = new GridRenderer(el.querySelector('#grid'));
+        this.gridRenderer = this.grid; // Alias for new methods
         
         // LensRenderer Integration
         this.lensRenderer = new LensRenderer(
@@ -197,6 +207,9 @@ export class ChallengeScreen {
         const lensBtn = el.querySelector('#lens-toggle');
         lensBtn.onclick = () => this._cycleLens(lensBtn);
 
+        // Hide old toggle as per patch instructions
+        if (lensBtn) lensBtn.style.display = 'none';
+
         // Glyph Logic
         el.querySelectorAll('.glyph-button').forEach(btn => {
             btn.onclick = () => this._toggleGlyph(btn.dataset.glyph, btn);
@@ -215,6 +228,8 @@ export class ChallengeScreen {
     loadLevel() {
         // Generate Level Data via Engine
         this.data = generateLevel(this.levelId, this.thresholdTier);
+        // Alias for snippet compatibility
+        this.gridCells = this.data.grid;
         console.log("CHALLENGE DATA:", this.data);
 
         // Render Base Components
@@ -224,6 +239,11 @@ export class ChallengeScreen {
         // --- LENS SYSTEM INIT ---
         const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
         this.currentLensIndex = 0;
+        this.currentLensMode = availableLenses[0];
+        
+        // Render New Lens Bar
+        this._renderLensBar(availableLenses);
+
         LensController.setActiveLens(availableLenses[0]);
 
         const lensOutput = LensController.applyLens(
@@ -236,7 +256,7 @@ export class ChallengeScreen {
         this.lensRenderer.clear();
         this.lensRenderer.render(lensOutput);
         
-        // Update Lens UI Label & Metadata
+        // Update Lens UI Label & Metadata (Legacy + New)
         const lensBtn = this.element.querySelector('#lens-toggle');
         const gridEl = this.element.querySelector('#grid');
         
@@ -306,6 +326,56 @@ export class ChallengeScreen {
             this.hintBtn.disabled = false;
             this.hintBtn.classList.remove('used', 'hint-used');
         }
+
+        // 🔧 INTEGRATION PATCHES: Wire everything into render
+        // Ensure metadata objects exist safely
+        const patternMeta = this.data.patternMetadata || { lens: { type: this.currentLensMode, summaries: [] }, glyphs: { activate: [] } };
+        const analytics = this.data.analytics || { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} };
+
+        this.updateSigil(this.data.question);
+        this.updateLensBar(patternMeta);
+        this.updateGlyphBar(patternMeta, analytics);
+        this.applySigilDrivenHighlighting(this.data.question, analytics);
+    }
+    
+    _renderLensBar(availableLenses) {
+        const bar = this.element.querySelector('.lens-bar');
+        if (!bar) return;
+        
+        bar.innerHTML = availableLenses.map(lens => {
+            // strip 'lens_' prefix for display
+            const label = lens.replace('lens_', '').toUpperCase();
+            return `<button class="lens-button" data-lens="${lens}">${label}</button>`;
+        }).join('');
+        
+        // Wire up new buttons
+        bar.querySelectorAll('.lens-button').forEach(btn => {
+            btn.onclick = () => {
+                const lensId = btn.dataset.lens;
+                
+                this.currentLensMode = lensId;
+                this.currentLensIndex = availableLenses.indexOf(lensId);
+                
+                LensController.setActiveLens(lensId);
+                const lensOutput = LensController.applyLens(
+                    this.data.grid,
+                    this.data.patternMetadata,
+                    this.data.datasetRules,
+                    this.data.thresholdConfig
+                );
+                this.lensRenderer.clear();
+                this.lensRenderer.render(lensOutput);
+                
+                const gridEl = this.element.querySelector('#grid');
+                if (lensOutput) {
+                    const modeClass = lensOutput.id.replace('_', '-');
+                    gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
+                }
+                
+                // Sync UI
+                this.updateLensBar({ lens: { type: lensId, summaries: lensOutput.summaries || [] } });
+            };
+        });
     }
 
     _handleHint() {
@@ -319,6 +389,9 @@ export class ChallengeScreen {
             // 🔮 Mythic UI: Reveal Sigil Hint
             // Triggers the transformation of the cryptic sigil into a readable clue
             this.question.revealSigilHint();
+            
+            // 🔧 INTEGRATION PATCH
+            this.revealSigilHint(this.data.question);
         }
     }
 
@@ -354,6 +427,9 @@ export class ChallengeScreen {
         this.currentLensIndex = (this.currentLensIndex + 1) % availableLenses.length;
         const nextLensId = availableLenses[this.currentLensIndex];
         
+        // 🔧 INTEGRATION PATCH: Sync State
+        this.currentLensMode = nextLensId;
+
         LensController.setActiveLens(nextLensId);
         
         const lensOutput = LensController.applyLens(
@@ -381,6 +457,9 @@ export class ChallengeScreen {
             // Preserve 'dataset-grid' and add new mode + generic 'lens-highlight'
             gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
         }
+        
+        // 🔧 INTEGRATION PATCH: Sync New Lens Bar
+        this.updateLensBar({ lens: { type: this.currentLensMode, summaries: lensOutput?.summaries || [] } });
     }
 
     /**
@@ -455,6 +534,88 @@ export class ChallengeScreen {
             panel.classList.add('shake', 'panel-shake');
             setTimeout(() => panel.classList.remove('shake', 'panel-shake'), 500);
         }
+    }
+    
+    // 🔧 1. Add Sigil Rendering
+    updateSigil(question) {
+        const sigilEl = this.element.querySelector('.sigil-icon');
+        if (!sigilEl) return;
+
+        sigilEl.textContent = question.sigilIcon;
+        sigilEl.dataset.sigilType = question.sigilType;
+    }
+
+    // 🔧 2. Add Sigil Hint Reveal
+    revealSigilHint(question) {
+        const sigilEl = this.element.querySelector('.sigil-icon');
+        if (!sigilEl) return;
+
+        sigilEl.textContent = question.sigilHint;
+        sigilEl.classList.add('sigil-revealed');
+    }
+
+    // 🔧 3. Add Lens Bar Integration
+    updateLensBar(patternMeta) {
+        const lensButtons = this.element.querySelectorAll('.lens-button');
+        lensButtons.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lens === patternMeta.lens.type);
+        });
+
+        const summaryEl = this.element.querySelector('.lens-summary');
+        if (summaryEl && patternMeta.lens.summaries) {
+            summaryEl.textContent = patternMeta.lens.summaries.join(', ');
+        }
+    }
+
+    // 🔧 6. Add Glyph Bar Integration
+    updateGlyphBar(patternMeta, analytics) {
+        const glyphEls = this.element.querySelectorAll('.glyph');
+        glyphEls.forEach(glyph => {
+            const id = glyph.dataset.glyph;
+            // Ensure patternMeta.glyphs.activate exists
+            const activeList = patternMeta.glyphs && patternMeta.glyphs.activate ? patternMeta.glyphs.activate : [];
+            
+            glyph.classList.toggle('active', activeList.includes(id));
+            glyph.classList.toggle('present', analytics.glyphs[id] === true);
+        });
+    }
+
+    // 🔧 7. Add Sigil‑Driven Grid Highlighting
+    applySigilDrivenHighlighting(question, analytics) {
+        if (!this.gridRenderer) return;
+
+        let indices = [];
+        
+        // Safety check for analytics sections
+        if (!analytics || !analytics.distribution) return;
+
+        switch (question.sigilType) {
+            case 'MAX_VALUE':
+                indices = analytics.distribution.above.filter(i =>
+                    Number(this.gridCells[i].value) === analytics.sigilSupport.maxValue
+                );
+                break;
+
+            case 'MIN_VALUE':
+                indices = analytics.distribution.below.filter(i =>
+                    Number(this.gridCells[i].value) === analytics.sigilSupport.minValue
+                );
+                break;
+
+            case 'UNIQUE':
+                indices = analytics.unique.indices;
+                break;
+
+            case 'FREQUENCY':
+                indices = analytics.frequency.repeated;
+                break;
+
+            case 'WEEKEND':
+                indices = analytics.weekends.indices;
+                break;
+        }
+
+        this.gridRenderer.highlightIndices(indices);
     }
 
     destroy() {
