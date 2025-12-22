@@ -13,7 +13,7 @@ export const WeekendGlyph = {
     description: "Reveals the resting days of the temporal cycle.",
     category: "temporal",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // Guard clause: Only applies to date datasets
         const isDateType =
             datasetRules &&
@@ -35,6 +35,7 @@ export const WeekendGlyph = {
         // Legacy: patternMetadata.weekendIndices = [...]
 
         const indices =
+            analyticsMetadata?.weekends?.indices ||
             patternMetadata?.weekends?.indices ||          // NEW schema
             patternMetadata?.weekend?.indices ||           // alt schema
             patternMetadata?.temporal?.weekends ||         // alt schema
