@@ -16,21 +16,36 @@ export function destroyFormattingEngine() {
  * Applies formatting rules to a dataset and returns:
  * - formattingRule
  * - cssClass
- * - highlightedCells (modified by threshold tier)
+ * - highlightedCells (modified by threshold tier and pattern metadata)
+ * - lensType
+ * - lensSummaries
+ * - glyphs
+ * - sigilType
  */
-export function applyFormatting(dataset, datasetType, patternType, thresholdConfig = {}) {
+export function applyFormatting(dataset, datasetType, patternType, thresholdConfig = {}, patternMeta = null) {
     if (!rules) {
         throw new Error("FormattingEngine not initialized");
     }
 
     const patternConfig = rules[datasetType]?.[patternType];
 
-    // Fallback if config missing
+    // Extract metadata with safe defaults for UI consumption
+    const lensType = patternMeta?.lens?.type || "none";
+    const lensSummaries = patternMeta?.lens?.summaries || [];
+    const glyphs = patternMeta?.glyphs?.activate || [];
+    const sigilType = patternMeta?.sigil?.type || "FALLBACK";
+    const uiContext = patternMeta?.uiContext || {};
+
+    // Fallback if config missing, ensuring UI still receives valid metadata
     if (!patternConfig) {
         return {
             formattingRule: "none",
             cssClass: "fmt-default",
-            highlightedCells: []
+            highlightedCells: [],
+            lensType,
+            lensSummaries,
+            glyphs,
+            sigilType
         };
     }
 
@@ -39,16 +54,29 @@ export function applyFormatting(dataset, datasetType, patternType, thresholdConf
     // 1. Determine all matching cells
     const allMatches = applyHighlightLogic(dataset, datasetType, patternType);
 
-    // 2. Apply threshold-tier hint logic
+    // 2. Apply threshold-tier hint logic with metadata overrides
     const hintLevel = thresholdConfig.hintLevel || "medium";
     let highlightedCells = [];
+
+    // Metadata context overrides to prevent hint logic from breaking specific patterns
+    const highlightColumn = uiContext.highlightColumn === true;
+    const minTargetCells = uiContext.targetCellsCount || 1;
 
     if (hintLevel === "none") {
         // Mythic: no hints
         highlightedCells = [];
     } else if (hintLevel === "low") {
-        // Tracker: only one hint
-        highlightedCells = allMatches.slice(0, 1);
+        // Tracker: usually one hint, but respect metadata context
+        if (highlightColumn) {
+            // Column highlights are treated as a single visual unit; show all cells in the match
+            highlightedCells = allMatches;
+        } else if (minTargetCells > 1) {
+            // If the pattern targets a specific count (e.g. "top 3"), ensure they are visible
+            highlightedCells = allMatches.slice(0, minTargetCells);
+        } else {
+            // Default Tracker behavior: single hint
+            highlightedCells = allMatches.slice(0, 1);
+        }
     } else {
         // Scout / Hunter: full hints
         highlightedCells = allMatches;
@@ -60,7 +88,11 @@ export function applyFormatting(dataset, datasetType, patternType, thresholdConf
     return {
         formattingRule,
         cssClass,
-        highlightedCells
+        highlightedCells,
+        lensType,
+        lensSummaries,
+        glyphs,
+        sigilType
     };
 }
 
