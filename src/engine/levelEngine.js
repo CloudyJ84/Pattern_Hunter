@@ -46,15 +46,17 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
     // Stabilize pattern selection: only allow patterns valid for this datasetType
     let patternType = resolveValidPattern(datasetType, requestedPatternType);
 
-    // 6. Generate Raw Dataset (now returns { grid, datasetRules })
+    // 6. Generate Raw Dataset
+    // Expects raw to contain { grid, datasetRules } or { grid, datasetMeta }
     const raw = generateRawDataset(datasetType, { rows, cols }, thresholdConfig);
     let dataset = raw.grid;
-    const datasetRules = raw.datasetRules;
+    // Normalize dataset metadata reference
+    const datasetMeta = raw.datasetMeta || raw.datasetRules || {};
 
     // Purity Check 1: Pre-injection
     // Validate dataset purity to ensure raw generation didn't create mixed types
-    const valueTypes = new Set(raw.grid.flat().map(c => typeof c.value));
-    if (valueTypes.size > 1) {
+    const preTypes = new Set(dataset.flat().map(c => typeof c.value));
+    if (preTypes.size > 1) {
         console.warn("Mixed dataset detected before pattern injection. LevelEngine will enforce purity.");
     }
 
@@ -97,7 +99,7 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
     }
 
     // 8. Compute analytic metadata (for glyphs + lenses)
-    const patternMetadata = computePatternMetadata(dataset, datasetRules);
+    const patternMetadata = computePatternMetadata(dataset, datasetMeta);
 
     // 9. Apply Formatting
     // NOW PASSING patternResult.meta to wire up UI formatting
@@ -133,19 +135,23 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
 
         // NEW: unified metadata for UI and analytics
         patternMeta: patternResult.meta,
-        datasetRules,
         analytics: patternMetadata,
+        datasetMeta: datasetMeta,
+        
         // Preserve legacy field for backward compatibility
-        patternMetadata 
+        datasetRules: datasetMeta, 
+        patternMetadata: patternMetadata
     };
 }
 
 function resolveValidPattern(datasetType, patternType) {
-    // If registry doesn't exist (legacy config), pass through patternType
+    // Gracefully handle legacy config (array) where patternRegistry doesn't exist
     const registry = progressionRules.patternRegistry;
     if (!registry) return patternType;
 
     const group = registry[datasetType];
+    
+    // If we have a registry but no group for this type, fallback to none
     if (!group) return "none";
 
     if (patternType === "random") {
@@ -157,7 +163,10 @@ function resolveValidPattern(datasetType, patternType) {
 }
 
 function getLevelConfig(level) {
-    const match = progressionRules.find(rule => {
+    // Handle both legacy array config and new object config with .levels
+    const levels = Array.isArray(progressionRules) ? progressionRules : (progressionRules.levels || []);
+    
+    const match = levels.find(rule => {
         if (Array.isArray(rule.levels)) {
             return rule.levels.includes(level);
         } else if (typeof rule.levels === 'string' && rule.levels.endsWith('+')) {
@@ -167,7 +176,7 @@ function getLevelConfig(level) {
         return false;
     });
 
-    return match || progressionRules[progressionRules.length - 1];
+    return match || levels[levels.length - 1];
 }
 
 function getThresholdConfig(tier) {
