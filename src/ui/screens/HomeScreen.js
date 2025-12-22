@@ -17,10 +17,6 @@ export class HomeScreen {
         // Bind methods to ensure 'this' context is preserved
         this.handleStart = this.handleStart.bind(this);
         this.toggleLore = this.toggleLore.bind(this);
-        
-        // 🔮 Mythic UI: Theme support hook
-        // Can be swapped for 'theme-scout', 'theme-void', etc.
-        this.theme = 'theme-mythic';
     }
 
     mount() {
