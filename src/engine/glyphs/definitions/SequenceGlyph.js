@@ -13,7 +13,7 @@ export const SequenceGlyph = {
     description: "Traces sequential connections through the data.",
     category: "pattern",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // New pattern engine structure possibilities:
         // patternMetadata.sequences = [{ indices: [...] }, ...]
         // patternMetadata.sequence = [{ indices: [...] }, ...]
@@ -21,6 +21,7 @@ export const SequenceGlyph = {
         // Legacy: patternMetadata.sequences = [...]
 
         const sequences =
+            analyticsMetadata?.sequences ||
             patternMetadata?.sequences ||      // NEW or legacy
             patternMetadata?.sequence ||       // alt schema
             patternMetadata?.paths ||          // alt schema
