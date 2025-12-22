@@ -42,7 +42,14 @@ const PATTERN_REGISTRY = {
             context: {
                 glyphsToActivate: ['frequency'], // "Echo"
                 lensSummaries: ['frequencySummary'],
-                highlightColumn: false
+                highlightColumn: false,
+                lensType: 'frequency'
+            },
+
+            sigil: {
+                icon: '🔁',
+                type: 'FREQUENCY',
+                hint: 'Repeated values (frequency)'
             },
 
             questionHints: {
@@ -82,7 +89,14 @@ const PATTERN_REGISTRY = {
             context: {
                 glyphsToActivate: ['unique'], // "Lone Star"
                 lensSummaries: ['categoryCounts'],
-                highlightColumn: false
+                highlightColumn: false,
+                lensType: 'frequency'
+            },
+
+            sigil: {
+                icon: '⭐',
+                type: 'UNIQUE',
+                hint: 'Unique value (appears once)'
             },
 
             questionHints: {
@@ -125,7 +139,14 @@ const PATTERN_REGISTRY = {
             context: {
                 glyphsToActivate: ['outlier', 'above'], // "Broken Pattern", "Rising Flame"
                 lensSummaries: ['stats'],
-                highlightColumn: false
+                highlightColumn: false,
+                lensType: 'stats'
+            },
+
+            sigil: {
+                icon: '⚡',
+                type: 'OUTLIER',
+                hint: 'Anomaly / Outlier'
             },
 
             questionHints: {
@@ -163,7 +184,14 @@ const PATTERN_REGISTRY = {
             context: {
                 glyphsToActivate: ['below'], // "Falling Stone"
                 lensSummaries: ['stats'],
-                highlightColumn: false
+                highlightColumn: false,
+                lensType: 'stats'
+            },
+
+            sigil: {
+                icon: '🕳️',
+                type: 'MIN_VALUE',
+                hint: 'Smallest number (MIN)'
             },
 
             questionHints: {
@@ -193,16 +221,23 @@ const PATTERN_REGISTRY = {
                 const weekends = ["2023-10-21", "2023-10-22", "2023-10-28", "2023-10-29"]; // Mock samples
 
                 targetCells.forEach((cell, i) => {
-                    cell.value = weekends[i % weekends.length];
+                    // Update: ensure we inject a Date object to maintain purity with the datasetGenerator
+                    cell.value = new Date(weekends[i % weekends.length]);
                 });
 
                 return { targetCells, weekends };
             },
 
             highlight: (val, context) => {
-                // Simple string check for demo purposes
-                // In a real implementation, parse date object
-                return context.weekends && context.weekends.includes(val);
+                // Check if value is one of the weekends
+                if (!context.weekends) return false;
+                
+                // If val is a Date object (expected), convert to string for comparison
+                const valStr = val instanceof Date 
+                    ? val.toISOString().split('T')[0] 
+                    : String(val);
+
+                return context.weekends.includes(valStr);
             },
 
             scoring: { basePoints: 110, difficultyMultiplier: 1.2 },
@@ -210,7 +245,14 @@ const PATTERN_REGISTRY = {
             context: {
                 glyphsToActivate: ['weekend'], // "Twin Suns"
                 lensSummaries: [],
-                highlightColumn: false
+                highlightColumn: false,
+                lensType: 'weekend'
+            },
+
+            sigil: {
+                icon: '☀️☀️',
+                type: 'WEEKEND',
+                hint: 'Weekend dates (Sat/Sun)'
             },
 
             questionHints: {
@@ -251,14 +293,29 @@ export function injectPattern(dataset, datasetType, patternType, thresholdConfig
             dataset, 
             targetCells: [], 
             patternType: 'none', 
-            meta: {} 
+            meta: _createFallbackMeta('none', thresholdConfig)
         }; 
     }
 
     // 3. Inject Logic
     const result = patternObj.inject(dataset, {});
 
-    // 4. Construct Metadata & Context
+    // 4. Validate Injection Purity (Guardrail)
+    // Ensures pattern didn't corrupt the dataset with mixed types
+    if (!_validateInjectedValues(dataset, datasetType, result.targetCells, patternType)) {
+        console.warn("Pattern injection produced invalid value types for datasetType:", datasetType, "patternType:", patternType);
+        
+        // Revert or no-op return to prevent crash downstream
+        return {
+            dataset,
+            targetCells: [],
+            patternType: 'none',
+            params: {},
+            meta: _createFallbackMeta(patternType, thresholdConfig)
+        };
+    }
+
+    // 5. Construct Metadata & Context
     // This feeds the Query Engine and UI
     const meta = {
         id: patternObj.id,
@@ -278,6 +335,25 @@ export function injectPattern(dataset, datasetType, patternType, thresholdConfig
         uiContext: {
             ...patternObj.context,
             targetCellsCount: result.targetCells.length
+        },
+
+        // Sigil Metadata
+        sigil: patternObj.sigil || {
+            icon: '🔮',
+            type: 'FALLBACK',
+            hint: 'Analyze the grid.'
+        },
+
+        // Lens Metadata
+        lens: {
+            type: patternObj.context?.lensType || 'none',
+            summaries: patternObj.context?.lensSummaries || []
+        },
+
+        // Glyph Metadata
+        glyphs: {
+            activate: patternObj.context?.glyphsToActivate || [],
+            metadata: {} // analyticsEngine will populate this later
         },
         
         // Data needed for highlighting later
@@ -349,4 +425,70 @@ function _getTierMultiplier(thresholdConfig) {
     const tier = thresholdConfig.tier !== undefined ? thresholdConfig.tier : 1;
     const mults = { 0: 1.0, 1: 1.5, 2: 2.0, 3: 3.0 };
     return mults[tier] || 1.0;
+}
+
+function _validateInjectedValues(dataset, datasetType, targetCells, patternType) {
+    if (!targetCells || targetCells.length === 0) return true;
+
+    for (const cell of targetCells) {
+        const val = cell.value;
+        if (val === null || val === undefined) return false;
+
+        switch (datasetType) {
+            case 'numbers':
+                if (typeof val !== 'number' || isNaN(val)) return false;
+                break;
+            case 'categories':
+                if (typeof val !== 'string') return false;
+                break;
+            case 'dates':
+                // Check if it's a valid Date object
+                if (!(val instanceof Date) || isNaN(val.getTime())) return false;
+                break;
+            case 'times':
+                // Expect string in HH:MM format
+                if (typeof val !== 'string' || !/^\d{2}:\d{2}$/.test(val)) return false;
+                break;
+            default:
+                // Unknown type, assume safe? No, safe to fail.
+                return false;
+        }
+    }
+    return true;
+}
+
+function _createFallbackMeta(id, thresholdConfig) {
+    return {
+        id: id,
+        label: 'No Pattern',
+        category: 'none',
+        scoring: {
+            basePoints: 0,
+            difficultyMultiplier: 1.0,
+            tierMultiplier: _getTierMultiplier(thresholdConfig)
+        },
+        questionHints: {
+            preferredQuestionTypes: [],
+            avoidQuestionTypes: []
+        },
+        uiContext: {
+            glyphsToActivate: [],
+            lensSummaries: [],
+            highlightColumn: false,
+            targetCellsCount: 0
+        },
+        sigil: {
+            icon: '🔮',
+            type: 'FALLBACK',
+            hint: 'Analyze the grid.'
+        },
+        lens: {
+            type: 'none',
+            summaries: []
+        },
+        glyphs: {
+            activate: [],
+            metadata: {}
+        }
+    };
 }
