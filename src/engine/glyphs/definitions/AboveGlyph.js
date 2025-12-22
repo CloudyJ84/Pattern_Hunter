@@ -13,10 +13,11 @@ export const AboveGlyph = {
     description: "Marks values rising above the dataset’s center.",
     category: "distribution",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // New pattern engine structure:
         // patternMetadata.distribution.above = [...]
         const indices =
+            analyticsMetadata?.distribution?.above ||
             patternMetadata?.distribution?.above ||
             patternMetadata?.aboveMean || // fallback for older levels
             [];
