@@ -13,10 +13,11 @@ export const ClusterGlyph = {
     description: "Highlights tight groupings of data.",
     category: "pattern",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // New pattern engine structure:
         // patternMetadata.clusters = [{ indices: [...] }, ...]
         const clusters =
+            analyticsMetadata?.clusters ||
             patternMetadata?.clusters ||      // NEW schema
             patternMetadata?.clusterGroups || // possible alt schema
             [];
