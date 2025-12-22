@@ -13,7 +13,7 @@ export const UniqueGlyph = {
     description: "Marks values that stand alone in the dataset.",
     category: "uniqueness",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // New pattern engine structure possibilities:
         // patternMetadata.unique.indices = [...]
         // patternMetadata.uniques.indices = [...]
@@ -21,6 +21,7 @@ export const UniqueGlyph = {
         // Legacy: patternMetadata.frequency.uniqueIndices = [...]
 
         const indices =
+            analyticsMetadata?.unique?.indices ||
             patternMetadata?.unique?.indices ||             // NEW schema
             patternMetadata?.uniques?.indices ||            // alt schema
             patternMetadata?.frequency?.unique ||           // alt schema
