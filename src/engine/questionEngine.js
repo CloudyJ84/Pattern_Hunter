@@ -1,11 +1,30 @@
 /**
  * questionEngine.js
- * * A modular Query Engine that generates context-aware, tier-based questions 
+ * A modular Query Engine that generates context-aware, tier-based questions 
  * for the Pattern Hunter "Trial of the Field".
  */
 
 // --- Internal State ---
 let rules = null; // Kept for legacy init compatibility
+
+/**
+ * SIGIL TYPE MAPPING
+ * Maps internal question IDs to generic UI Sigil types.
+ * This ensures the UI receives consistent types for iconography and feedback.
+ */
+const SIGIL_TYPE_MAP = {
+    max_value: "MAX_VALUE",
+    min_value: "MIN_VALUE",
+    value_above_mean: "MAX_VALUE",
+    value_below_mean: "MIN_VALUE",
+    count_weekends: "WEEKEND",
+    identify_date_pattern: "DATE_MATCH",
+    unique_category: "UNIQUE",
+    frequency_count: "FREQUENCY",
+    highlight_value: "FALLBACK",
+    highlight_row: "FALLBACK",
+    fallback: "FALLBACK"
+};
 
 /**
  * The Query Registry
@@ -179,13 +198,14 @@ export function destroyQuestionEngine() {
 
 /**
  * Generates a context-aware question based on the dataset and pattern.
- * * @param {string} patternType - The type of pattern (weekend, outlier, etc.)
+ * @param {string} patternType - The type of pattern (weekend, outlier, etc.)
  * @param {string} datasetType - The data type (numbers, dates, categories)
  * @param {Array} dataset - 2D grid of values
  * @param {Array} highlightedCells - Cells pre-selected by the LevelEngine
  * @param {Object} thresholdConfig - Contains hintLevel, tier, etc.
+ * @param {Object} patternMeta - (New) Metadata from PatternEngine containing sigil, hints, and lens info.
  */
-export function generateQuestion(patternType, datasetType, dataset, highlightedCells, thresholdConfig = {}) {
+export function generateQuestion(patternType, datasetType, dataset, highlightedCells, thresholdConfig = {}, patternMeta = null) {
     
     // 1. Generate Query Context
     const context = _generateQueryContext(dataset, highlightedCells, datasetType, patternType);
@@ -193,28 +213,51 @@ export function generateQuestion(patternType, datasetType, dataset, highlightedC
     // 2. Filter Registry for Valid Questions
     const candidates = QUERY_REGISTRY.filter(q => _checkRequirements(q, context));
 
-    // 3. Select Best Candidate
-    // Prioritize questions that explicitly match the requested patternType
-    const primaryCandidates = candidates.filter(q => 
-        q.requires.patternType && q.requires.patternType.includes(patternType)
-    );
+    // 3. Select Best Candidate (Prioritize via PatternMeta > Internal Logic)
+    let pool = [];
 
-    const pool = primaryCandidates.length > 0 ? primaryCandidates : candidates;
+    // 3a. Check for Pattern Engine Preferences
+    if (patternMeta?.questionHints?.preferredQuestionTypes?.length) {
+        const preferred = candidates.filter(q => 
+            patternMeta.questionHints.preferredQuestionTypes.includes(q.id)
+        );
+        if (preferred.length > 0) pool = preferred;
+    }
+
+    // 3b. Fallback to Internal Type Matching if no pool established yet
+    if (pool.length === 0) {
+        const primaryCandidates = candidates.filter(q => 
+            q.requires.patternType && q.requires.patternType.includes(patternType)
+        );
+        pool = primaryCandidates.length > 0 ? primaryCandidates : candidates;
+    }
+
+    // 3c. Filter out Avoided Types
+    if (patternMeta?.questionHints?.avoidQuestionTypes?.length) {
+        pool = pool.filter(q => 
+            !patternMeta.questionHints.avoidQuestionTypes.includes(q.id)
+        );
+    }
     
-    // Fallback if no valid question found (should be rare)
+    // Fallback if no valid question found (Safe Fallback)
     if (pool.length === 0) {
         return {
             text: "Analyze the grid.",
             answer: "-",
-            type: "fallback"
+            type: "fallback",
+            sigilType: "FALLBACK",
+            sigilIcon: "🔮",
+            sigilHint: "Analyze the grid.",
+            lensType: "none",
+            glyphs: []
         };
     }
 
     const selectedQ = pool[Math.floor(Math.random() * pool.length)];
 
-    // 4. Resolve Phrasing based on Tier
+    // 4. Resolve Phrasing based on Tier and Hints
     const tierId = thresholdConfig.tier !== undefined ? thresholdConfig.tier : 1; // Default Hunter
-    const phrasing = _resolveTemplate(selectedQ.templates, tierId);
+    const phrasing = _resolveTemplate(selectedQ.templates, tierId, thresholdConfig);
 
     // 5. Compute Answer
     let answer;
@@ -225,10 +268,20 @@ export function generateQuestion(patternType, datasetType, dataset, highlightedC
         answer = "Error";
     }
 
+    // 6. Normalize Output with Sigil Metadata
+    const questionType = selectedQ.id;
+    const sigilType = SIGIL_TYPE_MAP[questionType] || "FALLBACK";
+
     return {
         text: phrasing,
         answer: answer,
-        type: selectedQ.id
+        type: questionType,
+        // New Metadata Fields
+        sigilType,
+        sigilIcon: patternMeta?.sigil?.icon || "🔮",
+        sigilHint: patternMeta?.sigil?.hint || "Analyze the grid.",
+        lensType: patternMeta?.lens?.type || "none",
+        glyphs: patternMeta?.glyphs?.activate || []
     };
 }
 
@@ -297,7 +350,12 @@ function _checkRequirements(question, context) {
     return true;
 }
 
-function _resolveTemplate(templates, tierId) {
+function _resolveTemplate(templates, tierId, thresholdConfig) {
+    // Optional: High clarity hints for Scout/Spreadsheet training modes
+    if (thresholdConfig && thresholdConfig.hintLevel === "high" && templates.hint) {
+        return templates.hint;
+    }
+
     // Map numeric tier IDs to keys
     const tierMap = { 0: 'scout', 1: 'hunter', 2: 'tracker', 3: 'mythic' };
     const tierKey = tierMap[tierId] || 'hunter';
