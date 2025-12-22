@@ -21,9 +21,7 @@ export class HomeScreen {
 
     mount() {
         const el = document.createElement('div');
-        // Use 'home-screen' for specific background styling hooks
-        // Added dynamic theme class for global styling context
-        el.className = `screen home-screen fade-in ${this.theme}`;
+        el.className = 'screen home-screen fade-in';
 
         // Select a random invocation for this session
         const randomInvocation = INVOCATIONS[Math.floor(Math.random() * INVOCATIONS.length)];
