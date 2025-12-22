@@ -13,7 +13,7 @@ export const OutlierGlyph = {
     description: "Highlights values that defy the expected structure.",
     category: "anomaly",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // New pattern engine structure:
         // patternMetadata.outliers.indices = [...]
         // patternMetadata.anomaly.indices = [...]
@@ -21,6 +21,7 @@ export const OutlierGlyph = {
         // Legacy: patternMetadata.outliers = [...]
 
         const indices =
+            analyticsMetadata?.outliers?.indices ||
             patternMetadata?.outliers?.indices ||   // NEW schema
             patternMetadata?.anomaly?.indices ||    // alt schema
             patternMetadata?.outlier?.indices ||    // alt schema
