@@ -13,13 +13,14 @@ export const FrequencyGlyph = {
     description: "Highlights values that repeat across the grid.",
     category: "frequency",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // New pattern engine structure:
         // patternMetadata.frequency.repeated = [...]
         // patternMetadata.frequency.indices = [...]
         // patternMetadata.frequency.repeatedIndices = [...] (legacy)
 
         const indices =
+            analyticsMetadata?.frequency?.repeated ||
             patternMetadata?.frequency?.repeated ||          // NEW schema
             patternMetadata?.frequency?.indices ||           // alt schema
             patternMetadata?.frequency?.repeatedIndices ||   // legacy schema
