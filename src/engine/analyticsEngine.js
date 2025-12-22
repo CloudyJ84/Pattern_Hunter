@@ -194,7 +194,9 @@ export function computePatternMetadata(grid, datasetRules = {}) {
         frequency: metadata.frequency.repeated.length > 0,
         unique: metadata.unique.indices.length > 0,
         weekend: metadata.weekends.indices.length > 0,
-        sequence: metadata.sequences.length > 0
+        sequence: metadata.sequences.length > 0,
+        above: metadata.distribution.above.length > 0,
+        below: metadata.distribution.below.length > 0
     };
 
     // --- SIGIL SUPPORT ---
