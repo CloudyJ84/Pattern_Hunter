@@ -315,6 +315,10 @@ export class ChallengeScreen {
             this.hintBtn.innerHTML = `Hint Invoked <span class="check">✓</span>`;
             // 🔮 Mythic UI: Animation hook
             this.hintBtn.classList.add('used', 'hint-used');
+
+            // 🔮 Mythic UI: Reveal Sigil Hint
+            // Triggers the transformation of the cryptic sigil into a readable clue
+            this.question.revealSigilHint();
         }
     }
 
