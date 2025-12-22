@@ -34,54 +34,126 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
         : config.datasetTypes;
 
     // 5. Pattern Type
-    let patternType;
+    let requestedPatternType;
     if (Array.isArray(config.patternTypes)) {
-        patternType = config.patternTypes[Math.floor(Math.random() * config.patternTypes.length)];
+        requestedPatternType = config.patternTypes[Math.floor(Math.random() * config.patternTypes.length)];
     } else if (config.patternTypes === "ALL") {
-        patternType = "random";
+        requestedPatternType = "random";
     } else {
-        patternType = config.patternTypes;
+        requestedPatternType = config.patternTypes;
     }
+
+    // Stabilize pattern selection: only allow patterns valid for this datasetType
+    let patternType = resolveValidPattern(datasetType, requestedPatternType);
 
     // 6. Generate Raw Dataset (now returns { grid, datasetRules })
     const raw = generateRawDataset(datasetType, { rows, cols }, thresholdConfig);
     let dataset = raw.grid;
     const datasetRules = raw.datasetRules;
 
+    // Purity Check 1: Pre-injection
+    // Validate dataset purity to ensure raw generation didn't create mixed types
+    const valueTypes = new Set(raw.grid.flat().map(c => typeof c.value));
+    if (valueTypes.size > 1) {
+        console.warn("Mixed dataset detected before pattern injection. LevelEngine will enforce purity.");
+    }
+
     // 7. Inject Pattern (for question logic)
+    // patternResult is expected to contain { dataset, patternType, meta }
     const patternResult = injectPattern(dataset, datasetType, patternType, thresholdConfig);
     dataset = patternResult.dataset || dataset;
+
+    // Purity Check 2: Post-injection
+    // Validate again after pattern injection to prevent broken grids in UI
+    const postTypes = new Set(dataset.flat().map(c => typeof c.value));
+    if (postTypes.size > 1) {
+        console.error("Pattern injection produced mixed dataset types. Falling back to no-op pattern.");
+        patternResult.patternType = "none";
+        // Force fallback meta logic by clearing any existing meta
+        patternResult.meta = null;
+    }
+
+    // Handle Fallback / Missing Meta
+    // If pattern resolved to "none" or injection failed, provide safe defaults for UI
+    if (patternType === "none" || patternResult.patternType === "none" || !patternResult.meta) {
+        if (patternType !== "none" && patternResult.patternType !== "none") {
+            console.warn("Using fallback pattern for level", levelNumber);
+        }
+
+        patternResult.patternType = "none";
+        patternType = "none";
+
+        patternResult.meta = {
+            id: "none",
+            label: "No Pattern",
+            category: "none",
+            sigil: { icon: "🔮", type: "FALLBACK", hint: "Analyze the grid." },
+            lens: { type: "none", summaries: [] },
+            glyphs: { activate: [], metadata: {} },
+            uiContext: { glyphsToActivate: [], lensSummaries: [], highlightColumn: false, targetCellsCount: 0 },
+            questionHints: { preferredQuestionTypes: [], avoidQuestionTypes: [] },
+            scoring: { basePoints: 0, difficultyMultiplier: 1.0, tierMultiplier: thresholdConfig.rewardMultiplier }
+        };
+    }
 
     // 8. Compute analytic metadata (for glyphs + lenses)
     const patternMetadata = computePatternMetadata(dataset, datasetRules);
 
     // 9. Apply Formatting
-    const formattingResult = applyFormatting(dataset, datasetType, patternType, thresholdConfig);
+    // NOW PASSING patternResult.meta to wire up UI formatting
+    const formattingResult = applyFormatting(
+        dataset, 
+        datasetType, 
+        patternResult.patternType, 
+        thresholdConfig, 
+        patternResult.meta
+    );
 
     // 10. Generate Question
+    // NOW PASSING patternResult.meta to inform question generation
     const question = generateQuestion(
-        patternType,
+        patternResult.patternType,
         datasetType,
         dataset,
         formattingResult.highlightedCells,
-        thresholdConfig
+        thresholdConfig,
+        patternResult.meta
     );
 
     // 11. Return Challenge Object
     return {
         level: levelNumber,
         datasetType,
-        patternType,
+        patternType: patternResult.patternType,
         grid: dataset,
         formatting: formattingResult,
         question,
         thresholdConfig,
         config,
 
-        // NEW: analytics + dataset rules
-        patternMetadata,
-        datasetRules
+        // NEW: unified metadata for UI and analytics
+        patternMeta: patternResult.meta,
+        datasetRules,
+        analytics: patternMetadata,
+        // Preserve legacy field for backward compatibility
+        patternMetadata 
     };
+}
+
+function resolveValidPattern(datasetType, patternType) {
+    // If registry doesn't exist (legacy config), pass through patternType
+    const registry = progressionRules.patternRegistry;
+    if (!registry) return patternType;
+
+    const group = registry[datasetType];
+    if (!group) return "none";
+
+    if (patternType === "random") {
+        const keys = Object.keys(group);
+        return keys[Math.floor(Math.random() * keys.length)];
+    }
+
+    return group[patternType] ? patternType : "none";
 }
 
 function getLevelConfig(level) {
