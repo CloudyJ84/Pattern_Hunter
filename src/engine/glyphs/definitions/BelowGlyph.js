@@ -13,12 +13,13 @@ export const BelowGlyph = {
     description: "Marks values sinking below the dataset’s center.",
     category: "distribution",
 
-    compute(gridData, patternMetadata, datasetRules) {
+    compute(gridData, patternMetadata, analyticsMetadata, datasetRules) {
         // New pattern engine structure:
         // patternMetadata.distribution.below = [...]
         const indices =
-            patternMetadata?.distribution?.below ||   // NEW schema
-            patternMetadata?.belowMean ||             // Legacy fallback
+            analyticsMetadata?.distribution?.below ||
+            patternMetadata?.distribution?.below ||
+            patternMetadata?.belowMean || // Legacy fallback
             [];
 
         return {
