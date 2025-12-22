@@ -85,50 +85,42 @@ export const GlyphController = {
      * pattern metadata or grid structure will return output.
      * * @param {Array} gridData - The raw dataset grid.
      * @param {Object} patternMetadata - Truth about the hidden pattern (from Pattern Engine).
-     * @param {Object} datasetRules - Rules governing the data type.
+     * @param {Object} [analyticsMetadata] - (Optional) Detailed analytics metadata.
+     * @param {Object} [datasetRules] - Rules governing the data type.
      * @returns {Array<Object>} Array of GlyphOutput objects ready for rendering.
      */
-    computeGlyphs(gridData, patternMetadata, datasetRules) {
+    computeGlyphs(gridData, patternMetadata, analyticsMetadata = null, datasetRules = {}) {
         const outputs = [];
+
+        // Fallback: if analyticsMetadata is not provided, alias it to patternMetadata
+        const analytics = analyticsMetadata || patternMetadata;
 
         for (const glyphDef of this._registry.values()) {
             try {
-                // Execute the ritual (Compute the glyph's presence)
-                const result = glyphDef.compute(gridData, patternMetadata, datasetRules);
+                // NOTE: We now pass analytics as the third argument.
+                const result = glyphDef.compute(gridData, patternMetadata, analytics, datasetRules);
 
-                // If the glyph returned valid indices, it has "awakened"
                 if (result && Array.isArray(result.indices) && result.indices.length > 0) {
-
-                    // Determine modular glyph category
                     const category =
                         result.category ||
                         glyphDef.category ||
                         this._categoryMap[glyphDef.id] ||
                         'dataset';
 
-                    // Build the new modular contract
                     outputs.push({
-                        // Static definition data
                         id: glyphDef.id,
                         name: glyphDef.name,
                         icon: glyphDef.icon,
                         cssClass: glyphDef.cssClass,
                         description: glyphDef.description || '',
-
-                        // NEW: modular category for token system
                         category,
-
-                        // Computed instance data
                         indices: result.indices,
                         strength: result.strength || 1.0,
-
-                        // Optional metadata
                         meta: result.meta || {}
                     });
                 }
             } catch (error) {
                 console.error(`GlyphController: The rune "${glyphDef.id}" failed to manifest.`, error);
-                // Continue processing other glyphs
             }
         }
 
