@@ -59,6 +59,7 @@ export class ChallengeScreen {
         
         // Alias for snippet compatibility
         this.gridRenderer = null;
+        this.analytics = null;
     }
 
     mount() {
@@ -207,7 +208,7 @@ export class ChallengeScreen {
         const lensBtn = el.querySelector('#lens-toggle');
         lensBtn.onclick = () => this._cycleLens(lensBtn);
 
-        // Hide old toggle as per patch instructions
+        // 🔧 1. Hide the Old Lens Toggle Button (Non-destructive)
         if (lensBtn) lensBtn.style.display = 'none';
 
         // Glyph Logic
@@ -230,6 +231,9 @@ export class ChallengeScreen {
         this.data = generateLevel(this.levelId, this.thresholdTier);
         // Alias for snippet compatibility
         this.gridCells = this.data.grid;
+        // 🔧 4. Ensure renderChallenge() Wires Lens Metadata
+        this.analytics = this.data.analytics; // store for lens use
+
         console.log("CHALLENGE DATA:", this.data);
 
         // Render Base Components
@@ -330,7 +334,8 @@ export class ChallengeScreen {
         // 🔧 INTEGRATION PATCHES: Wire everything into render
         // Ensure metadata objects exist safely
         const patternMeta = this.data.patternMetadata || { lens: { type: this.currentLensMode, summaries: [] }, glyphs: { activate: [] } };
-        const analytics = this.data.analytics || { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} };
+        // Use stored analytics if available, or fallback
+        const analytics = this.analytics || { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} };
 
         this.updateSigil(this.data.question);
         this.updateLensBar(patternMeta);
@@ -348,14 +353,16 @@ export class ChallengeScreen {
             return `<button class="lens-button" data-lens="${lens}">${label}</button>`;
         }).join('');
         
-        // Wire up new buttons
+        // 🔧 2. Add Lens Button Wiring
         bar.querySelectorAll('.lens-button').forEach(btn => {
-            btn.onclick = () => {
+            btn.addEventListener('click', () => {
                 const lensId = btn.dataset.lens;
                 
+                // Update internal state
                 this.currentLensMode = lensId;
                 this.currentLensIndex = availableLenses.indexOf(lensId);
                 
+                // Keep Legacy Controller Logic for consistency (LensRenderer text)
                 LensController.setActiveLens(lensId);
                 const lensOutput = LensController.applyLens(
                     this.data.grid,
@@ -372,9 +379,14 @@ export class ChallengeScreen {
                     gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
                 }
                 
-                // Sync UI
+                // Update the lens bar UI
                 this.updateLensBar({ lens: { type: lensId, summaries: lensOutput.summaries || [] } });
-            };
+
+                // Apply the lens to the grid (New GridRenderer call)
+                if (this.gridRenderer && this.analytics) {
+                    this.gridRenderer.applyLens(lensId, this.analytics);
+                }
+            });
         });
     }
 
@@ -458,8 +470,12 @@ export class ChallengeScreen {
             gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
         }
         
-        // 🔧 INTEGRATION PATCH: Sync New Lens Bar
+        // 🔧 3. Sync _cycleLens With the Lens Bar
         this.updateLensBar({ lens: { type: this.currentLensMode, summaries: lensOutput?.summaries || [] } });
+        
+        if (this.gridRenderer && this.analytics) {
+            this.gridRenderer.applyLens(this.currentLensMode, this.analytics);
+        }
     }
 
     /**
