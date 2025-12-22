@@ -1295,3 +1295,26 @@ button {
     .level-grid { grid-template-columns: repeat(auto-fill, 40px); }
     .level-node { width: 40px; height: 40px; font-size: 0.9rem; }
 }
+
+/* 🔮 Mythic UI: Sigil & Hint System */
+
+.query-sigil {
+    font-size: 0.75rem;
+    font-family: monospace;
+    color: var(--accent-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    opacity: 0.8;
+    text-shadow: 0 0 5px rgba(46, 168, 107, 0.3);
+    transition: all 0.3s ease;
+    display: inline-block; /* Ensure transforms work */
+}
+
+.query-sigil.sigil-revealed {
+    color: var(--success);
+    font-style: italic;
+    text-shadow: none;
+    transform: scale(1.05); /* Slight pop effect */
+    border-bottom: 1px solid var(--accent);
+}
