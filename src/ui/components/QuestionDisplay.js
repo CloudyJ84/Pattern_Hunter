@@ -1,14 +1,14 @@
 /**
  * Configuration for Sigil Mappings
- * Maps internal question types to Mythic labels and Spreadsheet hints.
+ * Maps internal question types to Mythic Icons and Spreadsheet hints.
  */
 const SIGIL_MAP = {
-    'MAX_VALUE': { label: 'Sigil: Peak Detection', hint: 'Hint: Find the highest value (MAX)' },
-    'MIN_VALUE': { label: 'Sigil: Depth Trace', hint: 'Hint: Look for the smallest value (MIN)' },
-    'FLOOR': { label: 'Sigil: Foundation Map', hint: 'Hint: Identify the lowest floor (FLOOR)' },
-    'OUTLIER': { label: 'Sigil: Anomaly Trace', hint: 'Hint: Spot the outlier (OUTLIER)' },
-    'SEQUENCE': { label: 'Sigil: Pattern Align', hint: 'Hint: Trace the sequence (e.g., A1:A5)' },
-    'UNIQUE': { label: 'Sigil: Lone Signal', hint: 'Hint: Find the unique value' }
+    'MAX_VALUE': { icon: '🗻', hint: 'Max Value / Largest number' },
+    'MIN_VALUE': { icon: '🕳️', hint: 'Min Value / Smallest number' },
+    'FLOOR': { icon: '🧱', hint: 'FLOOR() / Lowest level' },
+    'OUTLIER': { icon: '⚡', hint: 'Outlier / Anomaly' },
+    'SEQUENCE': { icon: '🔗', hint: 'Sequence / Range' },
+    'UNIQUE': { icon: '⭐', hint: 'Unique / One-of-a-kind' }
 };
 
 export class QuestionDisplay {
@@ -26,24 +26,22 @@ export class QuestionDisplay {
             return;
         }
 
-        // 🔮 Mythic UI: Resolve Sigil Metadata
-        // Determine the label based on type, defaulting to a generic sigil if undefined
-        const rawType = question.type || '';
-        const sigilData = SIGIL_MAP[rawType] || { label: `Sigil: ${rawType}`, hint: 'Hint: Analyze the data pattern' };
-
         // 🔮 Mythic UI: Sigil Construction
-        // We use .query-sigil as the target for the hint system
-        const typeHtml = rawType 
-            ? `<span class="meta-rune query-sigil" data-type="${rawType}" title="Pattern Type">${sigilData.label}</span>` 
+        const rawType = question.type || '';
+        const sigilData = this._getSigilData(rawType);
+
+        // We use .query-sigil as the container for the icon/hint
+        const sigilHtml = rawType 
+            ? `<div class="query-sigil" data-type="${rawType}" title="Pattern Type">${sigilData.icon}</div>` 
             : '';
             
-        // Keep existing hint-sigil as a secondary fallback or flavor element if needed
+        // Keep existing hint-sigil as a secondary flavor element if needed (usually hidden by default CSS or unused in this new layout)
         const hintHtml = question.hint 
             ? `<div class="meta-rune hint-sigil" title="Hint: ${question.hint}">? <span class="hint-text">${question.hint}</span></div>` 
             : '';
 
-        const metaSection = (typeHtml || hintHtml) 
-            ? `<div class="rune-metadata">${typeHtml}${hintHtml}</div>` 
+        const metaSection = (sigilHtml || hintHtml) 
+            ? `<div class="rune-metadata">${sigilHtml}${hintHtml}</div>` 
             : '';
 
         // 🔮 Mythic UI: Structure wrapping
@@ -90,31 +88,39 @@ export class QuestionDisplay {
     }
 
     /**
+     * Helper to retrieve icon and hint for a given type.
+     */
+    _getSigilData(type) {
+        return SIGIL_MAP[type] || { icon: '🔮', hint: 'Analyze the data pattern' };
+    }
+
+    /**
      * Reveals the human-readable spreadsheet hint for the current sigil.
-     * Transforms the cryptic label into an actionable clue.
+     * Transforms the cryptic icon into an actionable text clue.
      */
     revealSigilHint() {
         const sigilEl = this.container.querySelector('.query-sigil');
         
         if (sigilEl) {
             const type = sigilEl.getAttribute('data-type');
-            const sigilData = SIGIL_MAP[type];
+            const sigilData = this._getSigilData(type);
 
             if (sigilData && sigilData.hint) {
                 // Apply visual transformation
+                sigilEl.style.transform = 'scale(0.8)';
                 sigilEl.style.opacity = '0';
                 
                 setTimeout(() => {
                     sigilEl.textContent = sigilData.hint;
                     sigilEl.classList.add('sigil-revealed');
                     sigilEl.style.opacity = '1';
-                }, 200); // Short delay for fade effect
+                    sigilEl.style.transform = 'scale(1)';
+                }, 250); 
             }
         }
     }
 
     destroy() {
-        // Lifecycle consistency with other components
         this.container.innerHTML = '';
         this.element = null;
         this.onSubmit = null;
