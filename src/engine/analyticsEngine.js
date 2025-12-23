@@ -22,7 +22,15 @@
 
 export function computePatternMetadata(grid, datasetRules = {}) {
     const flat = grid.flat();
-    const type = datasetRules.type;
+    // Robust dataset type resolution
+    const type =
+        datasetRules.type ||                         // preferred explicit type
+        datasetRules.datasetType ||                  // your actual field
+        (datasetRules.valueType === 'number'  ? 'numbers' :
+         datasetRules.valueType === 'date'    ? 'dates'   :
+         datasetRules.valueType === 'time'    ? 'times'   :
+         datasetRules.valueType === 'category'? 'categories' :
+         undefined);
 
     // --- DATASET PURITY VALIDATION ---
     // Prevent crashes by warning if mixed types find their way into the engine
