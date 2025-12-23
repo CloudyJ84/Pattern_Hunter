@@ -285,7 +285,7 @@ export class ChallengeScreen {
         const glyphOutputs = GlyphController.computeGlyphs(
             this.data.grid,
             this.data.patternMetadata,
-            this.data.analytics,       // NEW: pass analytics metadata
+            this.analytics,       // NEW: pass analytics metadata
             this.data.datasetRules
         );
 
