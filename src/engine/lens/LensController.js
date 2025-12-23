@@ -85,7 +85,7 @@ export const LensController = {
      * @param {Object} tierConfig - Configuration for the current difficulty tier.
      * @returns {Object} LensOutput - The contract for the Renderer.
      */
-    applyLens(gridData, patternMetadata, datasetRules, tierConfig) {
+    applyLens(gridData, analytics, datasetRules, tierConfig) {
         let lens = this._registry.get(this._activeLensId);
 
         // Fallback safety if active lens is missing (e.g. registry cleared)
@@ -100,7 +100,7 @@ export const LensController = {
 
         try {
             // Execute the ritual (Compute the lens output)
-            const output = lens.compute(gridData, patternMetadata, datasetRules, tierConfig);
+            const output = lens.compute(gridData, analytics, datasetRules, tierConfig);
             
             // Ensure the output adheres to the basic contract structure
             return {
