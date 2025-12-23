@@ -8,6 +8,13 @@ import { LensController } from '../../engine/lens/LensController.js';
 import { LensRenderer } from '../components/LensRenderer.js';
 import { GlyphRenderer } from '../components/GlyphRenderer.js';
 import { GlyphController } from '../../engine/glyphs/GlyphController.js';
+// 🔧 Sigil Subsystem Imports
+import { SigilController } from '../../engine/sigils/SigilController.js';
+import { SigilRenderer } from '../components/SigilRenderer.js';
+import * as sigilDefs from '../../engine/sigils/definitions/*.js';
+
+// Register all sigil definitions immediately
+Object.values(sigilDefs).forEach(def => SigilController.registerSigil(def));
 
 /**
  * Configuration for the Mythic Vows (Tiers)
@@ -37,11 +44,11 @@ const GLYPHS = [
  * Mapping of semantic lens types (from PatternEngine) to Lens IDs (in LensController).
  */
 const lensTypeToLensId = {
-  stats: 'lens_xray',
-  frequency: 'lens_summary',
-  unique: 'lens_summary',
-  weekend: 'lens_summary',
-  none: 'lens_standard'
+    stats: 'lens_xray',
+    frequency: 'lens_summary',
+    unique: 'lens_summary',
+    weekend: 'lens_summary',
+    none: 'lens_standard'
 };
 
 export class ChallengeScreen {
@@ -63,10 +70,13 @@ export class ChallengeScreen {
         
         // Storage for computed glyphs from the controller
         this.computedGlyphs = new Map();
+        // Storage for computed sigils
+        this.currentSigils = [];
 
         // Systems
         this.lensRenderer = null;
         this.glyphRenderer = null;
+        this.sigilRenderer = null;
         
         // Alias for snippet compatibility
         this.gridRenderer = null;
@@ -84,8 +94,6 @@ export class ChallengeScreen {
         el.className = `screen challenge-screen fade-in ${themeClass}`;
 
         el.innerHTML = `
-            <!-- ZONE A: LEFT PANEL - THE HUNTER'S ANCHOR -->
-            <!-- 🔮 Mythic UI: Added .anchor-zone wrapper -->
             <aside class="nav-panel anchor-zone">
                 <div class="nav-top">
                     <button id="withdraw-btn" class="control-btn secondary nav-back">
@@ -109,28 +117,19 @@ export class ChallengeScreen {
                 </div>
             </aside>
 
-            <!-- ZONE B: CENTER - THE FIELD (Grid + Bottom Bar) -->
-            <!-- 🔮 Mythic UI: Added .ritual-field wrapper -->
             <main class="challenge-field ritual-field">
                 <div class="grid-wrapper">
-                    <!-- The Grid Component Mount Point -->
-                    <!-- 🔮 Mythic UI: Hooks for lens highlights added via JS -->
                     <div class="dataset-grid" id="grid"></div>
                     
-                    <!-- Dynamic Lens Summary Overlay (Legends/Stats) -->
-                    <!-- 🔮 Mythic UI: Visibility toggled via MutationObserver or JS -->
                     <div id="lens-summary" class="lens-summary"></div>
                 </div>
 
-                <!-- ZONE C: BOTTOM PANEL - GLYPH BAR & LENS -->
-                <!-- 🔮 Mythic UI: Added .glyph-zone and .lens-zone structure -->
                 <footer class="mythic-controls glyph-zone">
                     <div class="lens-zone">
                         <div class="lens-selector" id="lens-toggle" title="Change Perspective">
                             <span class="lens-icon">👁️</span>
                             <span class="lens-label">Lens: Standard</span>
                         </div>
-                        <!-- New Lens Bar Container -->
                         <div class="lens-bar"></div>
                     </div>
                     
@@ -142,7 +141,6 @@ export class ChallengeScreen {
                                 title="${g.desc}">
                                 <span class="glyph-icon">${g.icon}</span>
                                 <span class="glyph-name">${g.name}</span>
-                                <!-- 🔮 Mythic UI: Indicator hook for counts -->
                                 <span class="glyph-indicator"></span>
                             </button>
                         `).join('')}
@@ -150,17 +148,14 @@ export class ChallengeScreen {
                 </footer>
             </main>
 
-            <!-- ZONE D: RIGHT PANEL - THE CHALLENGE SCROLL -->
-            <!-- 🔮 Mythic UI: Added .scroll-zone wrapper -->
             <aside class="challenge-panel scroll-zone panel-reveal">
                 <div class="scroll-content">
                     <h3 class="panel-header">
                         The Query
-                        <span class="sigil-icon"></span>
                     </h3>
                     
-                    <!-- Question & Feedback Mount Points -->
-                    <!-- 🔮 Mythic UI: Added .question-frame, .question-sigil, .feedback-frame, .feedback-sigil -->
+                    <div class="sigil-zone"></div>
+
                     <div id="question" class="question-container query-zone question-frame question-sigil"></div>
                     <div id="feedback" class="feedback-container feedback-zone feedback-frame feedback-sigil hidden"></div>
 
@@ -205,6 +200,17 @@ export class ChallengeScreen {
         // GlyphRenderer Integration
         this.glyphRenderer = new GlyphRenderer(el.querySelector('#grid'));
 
+        // SigilRenderer Integration
+        let sigilZone = el.querySelector('.sigil-zone');
+        if (!sigilZone) {
+            // Fallback creation if HTML structure changes
+            sigilZone = document.createElement('div');
+            sigilZone.className = 'sigil-zone';
+            const qBlock = el.querySelector('.question-container') || el.querySelector('#question');
+            if (qBlock) qBlock.parentElement.insertBefore(sigilZone, qBlock);
+        }
+        this.sigilRenderer = new SigilRenderer(sigilZone);
+
         this.question = new QuestionDisplay(
             el.querySelector('#question'),
             (ans) => this.handleSubmit(ans)
@@ -238,6 +244,9 @@ export class ChallengeScreen {
     }
 
     loadLevel() {
+        // Cleanup previous state
+        if (this.sigilRenderer) this.sigilRenderer.clearAll();
+
         // Generate Level Data via Engine
         this.data = generateLevel(this.levelId, this.thresholdTier);
         // Alias for snippet compatibility
@@ -250,6 +259,14 @@ export class ChallengeScreen {
         // Render Base Components
         this.grid.render(this.data.grid);
         this.question.render(this.data.question);
+
+        // --- SIGIL SYSTEM INIT ---
+        // 1. Compute sigils from analytics
+        const sigils = SigilController.computeSigils(this.analytics);
+        this.currentSigils = sigils;
+
+        // 2. Render sigils near question block
+        this.sigilRenderer.renderAll(sigils);
 
         // --- LENS SYSTEM INIT ---
         const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
@@ -351,10 +368,8 @@ export class ChallengeScreen {
         // Use stored analytics if available, or fallback
         const analytics = this.analytics || { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} };
 
-        this.updateSigil(this.data.question);
         this.updateLensBar(patternMeta);
         this.updateGlyphBar(patternMeta, analytics);
-        this.applySigilDrivenHighlighting(this.data.question, analytics);
     }
     
     _renderLensBar(availableLenses) {
@@ -394,7 +409,7 @@ export class ChallengeScreen {
                 }
                 
                 // Update the lens bar UI
-                this.updateLensBar({ lens: { type: lensId, summaries: lensOutput.summaries || [] } });
+                this.updateLensBar({ lens: { type: lensId, summaries: lensOutput?.summaries || [] } });
 
                 // Apply the lens to the grid (New GridRenderer call)
                 if (this.gridRenderer && this.analytics) {
@@ -414,10 +429,16 @@ export class ChallengeScreen {
 
             // 🔮 Mythic UI: Reveal Sigil Hint
             // Triggers the transformation of the cryptic sigil into a readable clue
-            this.question.revealSigilHint();
-            
-            // 🔧 INTEGRATION PATCH
-            this.revealSigilHint(this.data.question);
+            // 🔧 NEW INTEGRATION: Use SigilRenderer
+            if (this.currentSigils && this.currentSigils.length > 0) {
+                // Determine target: use specific if question asks, otherwise primary
+                const target = this.currentSigils.find(s => s.id === this.data.question.sigilId) 
+                             || this.currentSigils[0];
+                
+                if (target) {
+                    this.sigilRenderer.revealHint(target.id);
+                }
+            }
         }
     }
 
@@ -566,24 +587,6 @@ export class ChallengeScreen {
         }
     }
     
-    // 🔧 1. Add Sigil Rendering
-    updateSigil(question) {
-        const sigilEl = this.element.querySelector('.sigil-icon');
-        if (!sigilEl) return;
-
-        sigilEl.textContent = question.sigilIcon;
-        sigilEl.dataset.sigilType = question.sigilType;
-    }
-
-    // 🔧 2. Add Sigil Hint Reveal
-    revealSigilHint(question) {
-        const sigilEl = this.element.querySelector('.sigil-icon');
-        if (!sigilEl) return;
-
-        sigilEl.textContent = question.sigilHint;
-        sigilEl.classList.add('sigil-revealed');
-    }
-
     // 🔧 3. Add Lens Bar Integration
     updateLensBar(patternMeta) {
         const lensButtons = this.element.querySelectorAll('.lens-button');
@@ -610,48 +613,6 @@ export class ChallengeScreen {
         });
     }
 
-    // 🔧 7. Add Sigil‑Driven Grid Highlighting
-    applySigilDrivenHighlighting(question, analytics) {
-        if (!this.gridRenderer) return;
-
-        let indices = [];
-        
-        // Safety check for analytics sections
-        if (!analytics || !analytics.distribution) return;
-
-        switch (question.sigilType) {
-            case 'MAX_VALUE':
-                indices = analytics.distribution.above.filter(i => {
-                    const cellEl = this.element.querySelector(`[data-index="${i}"]`);
-                    const cellValue = Number(cellEl?.dataset?.value);
-                    return cellValue === analytics.sigilSupport.maxValue;
-                });
-                break;
-
-            case 'MIN_VALUE':
-                indices = analytics.distribution.below.filter(i => {
-                    const cellEl = this.element.querySelector(`[data-index="${i}"]`);
-                    const cellValue = Number(cellEl?.dataset?.value);
-                    return cellValue === analytics.sigilSupport.minValue;
-                });
-                break;
-
-            case 'UNIQUE':
-                indices = analytics.unique.indices;
-                break;
-
-            case 'FREQUENCY':
-                indices = analytics.frequency.repeated;
-                break;
-
-            case 'WEEKEND':
-                indices = analytics.weekends.indices;
-                break;
-        }
-
-        this.gridRenderer.highlightIndices(indices);
-    }
-
     destroy() {
         this.element = null;
         if (this.lensRenderer) {
@@ -659,6 +620,9 @@ export class ChallengeScreen {
         }
         if (this.glyphRenderer) {
             this.glyphRenderer.clearAll();
+        }
+        if (this.sigilRenderer) {
+            this.sigilRenderer.clearAll();
         }
     }
 }
