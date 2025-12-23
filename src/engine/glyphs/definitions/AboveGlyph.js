@@ -5,8 +5,6 @@
  * * "The heat rises, separating the ethereal from the mundane."
  */
 
-console.log("AboveGlyph loaded, compute args:", AboveGlyph.compute.length);
-
 export const AboveGlyph = {
     id: "above",
     name: "Rising Flame",
@@ -31,3 +29,5 @@ export const AboveGlyph = {
         };
     }
 };
+
+console.log("AboveGlyph loaded, compute args:", AboveGlyph.compute.length);
