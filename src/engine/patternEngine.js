@@ -41,7 +41,7 @@ const PATTERN_REGISTRY = {
             
             context: {
                 glyphsToActivate: ['frequency'], // "Echo"
-                lensSummaries: ['frequencySummary'],
+                lensSummaries: ['frequency'],
                 highlightColumn: false,
                 lensType: 'frequency'
             },
@@ -88,7 +88,7 @@ const PATTERN_REGISTRY = {
             
             context: {
                 glyphsToActivate: ['unique'], // "Lone Star"
-                lensSummaries: ['categoryCounts'],
+                lensSummaries: ['unique'],
                 highlightColumn: false,
                 lensType: 'frequency'
             },
