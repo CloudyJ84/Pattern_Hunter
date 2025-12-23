@@ -10,7 +10,7 @@ export const SummaryLens = {
   type: 'timeline', // Maps to Renderer 'timeline' token set
   description: 'Reveals the hidden currents of time and sequential progression.',
   
-  compute(gridData, patternMetadata) {
+  compute(gridData, analytics) {
     if (!gridData || gridData.length === 0) {
         return { overlays: [], annotations: [], highlights: [], legends: [], meta: {} };
     }
@@ -18,7 +18,7 @@ export const SummaryLens = {
     const cols = gridData[0].length;
     const overlays = [];
     const highlights = [];
-    const sequences = patternMetadata.sequences || [];
+    const sequences = analytics.sequences || [];
 
     sequences.forEach((seqIndices) => {
       // Process each step in the sequence
