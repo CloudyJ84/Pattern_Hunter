@@ -37,7 +37,7 @@ export const XrayLens = {
 
     // 1. Row Aggregates (Right edge)
     for (let r = 0; r < rowCount; r++) {
-      const rowValues = gridData[r];
+      const rowValues = gridData[r].map(cell => cell.value);
       const stats = aggregate(rowValues);
       
       if (stats) {
@@ -66,7 +66,7 @@ export const XrayLens = {
     for (let c = 0; c < colCount; c++) {
       const colValues = [];
       for (let r = 0; r < rowCount; r++) {
-        colValues.push(gridData[r][c]);
+        colValues.push(gridData[r][c].value);
       }
       const stats = aggregate(colValues);
 
