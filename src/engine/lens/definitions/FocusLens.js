@@ -10,7 +10,7 @@ export const FocusLens = {
   type: 'cluster', // Maps to Renderer 'cluster' token set
   description: 'Segmentation by cluster groups, revealing hidden bonds between entities.',
   
-  compute(gridData, patternMetadata) {
+  compute(gridData, analytics) {
     if (!gridData || gridData.length === 0) {
         return { overlays: [], annotations: [], highlights: [], legends: [], meta: {} };
     }
@@ -18,7 +18,7 @@ export const FocusLens = {
     const cols = gridData[0].length;
     const highlights = [];
     const overlays = [];
-    const clusters = patternMetadata.clusters || [];
+    const clusters = analytics.clusters || [];
 
     // 1. Process Clusters
     clusters.forEach((clusterIndices) => {
