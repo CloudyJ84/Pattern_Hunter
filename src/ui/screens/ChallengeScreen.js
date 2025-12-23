@@ -608,15 +608,19 @@ export class ChallengeScreen {
 
         switch (question.sigilType) {
             case 'MAX_VALUE':
-                indices = analytics.distribution.above.filter(i =>
-                    Number(this.gridCells[i].value) === analytics.sigilSupport.maxValue
-                );
+                indices = analytics.distribution.above.filter(i => {
+                    const cellEl = this.element.querySelector(`[data-index="${i}"]`);
+                    const cellValue = Number(cellEl?.dataset?.value);
+                    return cellValue === analytics.sigilSupport.maxValue;
+                });
                 break;
 
             case 'MIN_VALUE':
-                indices = analytics.distribution.below.filter(i =>
-                    Number(this.gridCells[i].value) === analytics.sigilSupport.minValue
-                );
+                indices = analytics.distribution.below.filter(i => {
+                    const cellEl = this.element.querySelector(`[data-index="${i}"]`);
+                    const cellValue = Number(cellEl?.dataset?.value);
+                    return cellValue === analytics.sigilSupport.minValue;
+                });
                 break;
 
             case 'UNIQUE':
