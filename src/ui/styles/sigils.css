@@ -1,0 +1,116 @@
+/* -----------------------------------------------------------
+   SIGIL SYSTEM — UI Manifestation Layer
+   "Marks that shimmer with hidden meaning."
+   ----------------------------------------------------------- */
+
+/* Container that holds all sigils */
+.sigil-zone {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0;
+    min-height: 2.5rem;
+}
+
+/* Each sigil token */
+.sigil-unit {
+    position: relative;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.4rem;
+    background: var(--sigil-bg, rgba(255,255,255,0.08));
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    overflow: hidden;
+
+    /* Strength-based glow (0.0–1.0) */
+    box-shadow: 0 0 calc(6px * var(--sigil-strength, 0.4))
+                rgba(255, 255, 255, 0.25);
+}
+
+/* Fade-in animation for new sigils */
+.sigil-unit.fade-in {
+    opacity: 0;
+    transform: scale(0.8);
+    animation: sigilFadeIn 0.35s ease forwards;
+}
+
+@keyframes sigilFadeIn {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Two-layer system: icon + hint */
+.sigil-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Icon is visible by default */
+.sigil-face--icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Hint is hidden by default */
+.sigil-face--hint {
+    opacity: 0;
+    transform: scale(0.8);
+    font-size: 0.9rem;
+    line-height: 1.1rem;
+    color: var(--sigil-hint-color, #eaeaea);
+}
+
+/* When revealed, flip states */
+.sigil-unit.is-revealed .sigil-face--icon {
+    opacity: 0;
+    transform: scale(0.6);
+}
+
+.sigil-unit.is-revealed .sigil-face--hint {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Pulse animation when hint is revealed */
+.sigil-anim--pulse {
+    animation: sigilPulse 0.6s ease;
+}
+
+@keyframes sigilPulse {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* Hover effect (optional, subtle) */
+.sigil-unit:hover:not(.is-revealed) {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(255,255,255,0.25);
+}
+
+/* Accessibility: high contrast mode */
+@media (prefers-contrast: more) {
+    .sigil-unit {
+        background: rgba(255,255,255,0.2);
+        box-shadow: 0 0 8px rgba(255,255,255,0.5);
+    }
+    .sigil-face--hint {
+        color: #fff;
+    }
+}
