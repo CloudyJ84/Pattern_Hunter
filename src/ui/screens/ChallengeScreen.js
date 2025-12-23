@@ -252,7 +252,7 @@ export class ChallengeScreen {
 
         const lensOutput = LensController.applyLens(
             this.data.grid,
-            this.data.patternMetadata,
+            this.analytics,
             this.data.datasetRules,
             this.data.thresholdConfig
         );
@@ -367,7 +367,7 @@ export class ChallengeScreen {
                 LensController.setActiveLens(lensId);
                 const lensOutput = LensController.applyLens(
                     this.data.grid,
-                    this.data.patternMetadata,
+                    this.analytics,
                     this.data.datasetRules,
                     this.data.thresholdConfig
                 );
@@ -447,7 +447,7 @@ export class ChallengeScreen {
         
         const lensOutput = LensController.applyLens(
             this.data.grid,
-            this.data.patternMetadata,
+            this.analytics,
             this.data.datasetRules,
             this.data.thresholdConfig
         );
