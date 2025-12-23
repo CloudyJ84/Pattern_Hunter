@@ -10,7 +10,7 @@ export const VoidLens = {
   type: 'anomaly', // Maps to Renderer 'anomaly' token set
   description: 'A dark lens that suppresses noise to reveal statistical aberrations.',
   
-  compute(gridData, patternMetadata) {
+  compute(gridData, analytics) {
     if (!gridData || gridData.length === 0) {
         return { overlays: [], annotations: [], highlights: [], legends: [], meta: {} };
     }
@@ -21,7 +21,7 @@ export const VoidLens = {
     const annotations = [];
     
     // Check both potential data structures for outliers
-    const outlierIndices = patternMetadata.outliers?.indices || patternMetadata.outliers || [];
+    const outlierIndices = analytics.outliers?.indices || analytics.outliers || [];
 
     outlierIndices.forEach(idx => {
       const row = Math.floor(idx / cols);
