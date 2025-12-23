@@ -11,10 +11,10 @@ import { GlyphController } from '../../engine/glyphs/GlyphController.js';
 // 🔧 Sigil Subsystem Imports
 import { SigilController } from '../../engine/sigils/SigilController.js';
 import { SigilRenderer } from '../components/SigilRenderer.js';
-import * as sigilDefs from '../../engine/sigils/definitions/*.js';
+import { registerAllSigils } from '../../engine/sigils/registerSigils.js';
 
 // Register all sigil definitions immediately
-Object.values(sigilDefs).forEach(def => SigilController.registerSigil(def));
+registerAllSigils();
 
 /**
  * Configuration for the Mythic Vows (Tiers)
