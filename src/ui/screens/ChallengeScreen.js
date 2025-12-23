@@ -33,6 +33,17 @@ const GLYPHS = [
     { id: 'unique', name: 'Lone Star', css: 'fmt-unique', icon: '★', desc: 'Identifies singular values.' }
 ];
 
+/**
+ * Mapping of semantic lens types (from PatternEngine) to Lens IDs (in LensController).
+ */
+const lensTypeToLensId = {
+  stats: 'lens_xray',
+  frequency: 'lens_summary',
+  unique: 'lens_summary',
+  weekend: 'lens_summary',
+  none: 'lens_standard'
+};
+
 export class ChallengeScreen {
 
     constructor(params) {
@@ -248,7 +259,9 @@ export class ChallengeScreen {
         // Render New Lens Bar
         this._renderLensBar(availableLenses);
 
-        LensController.setActiveLens(availableLenses[0]);
+        const lensType = this.data.patternMetadata?.lens?.type || 'none';
+        const lensId = lensTypeToLensId[lensType] || 'lens_standard';
+        LensController.setActiveLens(lensId);
 
         const lensOutput = LensController.applyLens(
             this.data.grid,
