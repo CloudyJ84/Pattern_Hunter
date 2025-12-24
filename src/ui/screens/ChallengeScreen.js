@@ -262,11 +262,15 @@ export class ChallengeScreen {
 
         // --- SIGIL SYSTEM INIT ---
         // 1. Compute sigils from analytics
-        const sigils = SigilController.computeSigils(this.analytics);
-        this.currentSigils = sigils;
+        const allSigils = SigilController.computeSigils(this.analytics);
+        
+        // 🔮 Mythic UI: Select Primary Sigil
+        // Filter to ensure only the most relevant sigil is shown to the user
+        const primary = this._selectPrimarySigil(allSigils);
+        this.currentSigils = primary ? [primary] : [];
 
         // 2. Render sigils near question block
-        this.sigilRenderer.renderAll(sigils);
+        this.sigilRenderer.renderAll(this.currentSigils);
 
         // --- LENS SYSTEM INIT ---
         const availableLenses = this.data.thresholdConfig.lensModes || ['lens_standard'];
@@ -417,6 +421,23 @@ export class ChallengeScreen {
                 }
             });
         });
+    }
+
+    // 🔮 Mythic UI: Helper Method to Isolate Primary Sigil
+    _selectPrimarySigil(sigilList) {
+        if (!Array.isArray(sigilList) || sigilList.length === 0) return null;
+
+        // Prefer question-specified sigil if available
+        const preferredId = this.data?.question?.sigilId;
+        if (preferredId) {
+            const match = sigilList.find(s => s.id === preferredId);
+            if (match) return match;
+        }
+
+        // Otherwise, pick strongest active sigil
+        return sigilList
+            .filter(s => s.active)
+            .sort((a, b) => (b.strength || 0) - (a.strength || 0))[0] || null;
     }
 
     _handleHint() {
