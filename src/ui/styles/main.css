@@ -262,6 +262,8 @@ button {
     height: 100%;
     width: 100%;
     padding: 20px;
+    /* Ensure content is never clipped if it overflows on small screens */
+    overflow-y: auto; 
 }
 
 /* Typography - Adaptive */
@@ -296,6 +298,7 @@ button {
     letter-spacing: 1px;
     opacity: 0.8;
     text-align: center;
+    transition: color 0.5s ease, text-shadow 0.5s ease;
 }
 
 /* Flavor Panel */
@@ -390,7 +393,7 @@ button {
 
 /* --- ADDITIVE: HOME SCREEN RITUAL STATES & MOBILE --- */
 
-/* Objective 1: Ritual States */
+/* Objective 1 & 2: Ritual States & Pacing */
 .home-content-wrapper .mythic-title,
 .home-content-wrapper .mythic-subtitle,
 .home-content-wrapper .flavor-panel,
@@ -412,10 +415,10 @@ button {
     pointer-events: auto;
 }
 
-/* Stagger utilities for JS application */
+/* Stagger utilities - Tightened for Better Pacing (600ms-900ms range) */
 .ritual-delay-1 { transition-delay: 0.2s; }
-.ritual-delay-2 { transition-delay: 0.8s; }
-.ritual-delay-3 { transition-delay: 1.5s; }
+.ritual-delay-2 { transition-delay: 0.6s; }
+.ritual-delay-3 { transition-delay: 0.9s; }
 
 /* Objective 3: Button Hierarchy Refinements */
 .home-start-btn {
@@ -434,9 +437,20 @@ button {
     border-color: rgba(255,255,255,0.2);
 }
 
+/* Subtitle Pulse for Returning Players */
+.mythic-subtitle.returning {
+    color: var(--accent-light);
+    animation: subtitlePulse 4s ease-in-out infinite;
+}
+
 @keyframes inevitablePulse {
     0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); border-color: var(--accent); }
     50% { box-shadow: 0 0 25px rgba(33, 115, 70, 0.25); border-color: var(--accent-light); }
+}
+
+@keyframes subtitlePulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; text-shadow: 0 0 10px rgba(46, 168, 107, 0.4); }
 }
 
 /* Objective 4: Mobile Home Adjustments */
@@ -533,6 +547,18 @@ button {
     opacity: 0.7;
     transition: all 0.4s ease;
     min-width: 80px;
+    /* Animation for Entrance */
+    animation: revealNode 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+/* Stagger Triad Entrance */
+.triad-node:nth-child(1) { animation-delay: 0.1s; }
+.triad-node:nth-child(2) { animation-delay: 0.2s; }
+.triad-node:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes revealNode {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 0.7; transform: translateY(0); }
 }
 
 .triad-node:hover {
