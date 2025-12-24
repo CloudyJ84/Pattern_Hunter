@@ -261,7 +261,7 @@ button {
     align-items: center;
     height: 100%;
     width: 100%;
-    padding: 20px;
+    padding: 20px 20px 40px 20px; /* Added bottom padding to lift content */
     /* Ensure content is never clipped if it overflows on small screens */
     overflow-y: auto; 
 }
@@ -303,7 +303,7 @@ button {
 
 /* Flavor Panel */
 .flavor-panel {
-    margin: 40px 0;
+    margin: 30px 0; /* Reduced from 40px to tighten empty space */
     padding: 20px 40px;
     background: rgba(0, 0, 0, 0.4);
     border-left: 1px solid var(--accent);
@@ -331,6 +331,8 @@ button {
     letter-spacing: 1px;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
     text-align: center;
+    opacity: 0; /* Default hidden */
+    transition: opacity 1.5s ease-in-out;
 }
 
 /* Button Zone */
@@ -345,7 +347,8 @@ button {
 .home-start-btn {
     padding: 18px 45px;
     font-size: 1.1rem;
-    letter-spacing: 2px;
+    font-weight: 700; /* Added for hierarchy */
+    letter-spacing: 2px; /* Increased */
     text-transform: uppercase;
     background: transparent;
     border: 1px solid var(--accent);
@@ -383,12 +386,14 @@ button {
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.9rem;
+    opacity: 0.8; /* Base opacity */
 }
 
 .home-lore-btn:hover {
     border-color: #555;
     color: #aaa;
     background: rgba(255,255,255,0.02);
+    opacity: 1;
 }
 
 /* --- ADDITIVE: HOME SCREEN RITUAL STATES & MOBILE --- */
@@ -428,13 +433,7 @@ button {
 
 .home-lore-btn {
     /* Secondary action quieter by default */
-    opacity: 0.6;
     transition: opacity 0.3s ease, border-color 0.3s ease, background 0.3s ease;
-}
-
-.home-lore-btn:hover {
-    opacity: 1;
-    border-color: rgba(255,255,255,0.2);
 }
 
 /* Subtitle Pulse for Returning Players */
@@ -515,6 +514,7 @@ button {
 
 .lore-content strong { color: white; }
 .lore-content em { color: var(--accent-light); }
+.lore-directive { margin-top: 1.5rem; color: #88a !important; font-style: italic; }
 
 .lore-footer {
     font-family: monospace;
@@ -528,13 +528,13 @@ button {
 /* --- ADDITIVE: CONCEPT TRIAD (Objective 2) --- */
 .concept-triad {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly; /* Even spacing for the triad */
     align-items: flex-start;
     gap: clamp(20px, 4vw, 40px);
     margin: 30px 0;
     padding: 25px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
 }
 
