@@ -23,12 +23,19 @@ export class HomeScreen {
     getSubtitle() {
         try {
             // Check for persistent state to welcome the hunter back
-            const hasHistory = localStorage.getItem('pattern_hunter_level_progress');
-            return hasHistory ? "The Archive awaits your return." : "Begin the Hunt. Choose your Path.";
+            // Correct key: patternHunterState
+            const rawState = localStorage.getItem('patternHunterState');
+            if (rawState) {
+                const state = JSON.parse(rawState);
+                if (state && state.maxLevelReached > 1) {
+                    return "The Archive awaits your return.";
+                }
+            }
         } catch (e) {
-            // Fallback if storage is blocked
-            return "Begin the Hunt. Choose your Path.";
+            // Fallback if storage is blocked or corrupt
+            console.warn("Archive memory inaccessible.");
         }
+        return "Begin the Hunt. Choose your Path.";
     }
 
     mount() {
@@ -57,20 +64,20 @@ export class HomeScreen {
                 <div class="flavor-panel invocation-zone">
                     <div class="invocation-box invocation-breath">
                         <span class="rune-decor start"></span>
-                        <!-- Added opacity and transition for ritual timing -->
-                        <p id="invocation-text" class="invocation-text whisper-text" style="opacity: 0; transition: opacity 2s ease-in-out;">"${randomInvocation}"</p>
+                        <!-- Visual state handled by CSS classes .ritual-hidden / .ritual-revealed -->
+                        <p id="invocation-text" class="invocation-text whisper-text ritual-hidden">"${randomInvocation}"</p>
                         <span class="rune-decor end"></span>
                     </div>
                 </div>
 
                 <!-- ⚜️ Action Zone: The Threshold -->
                 <div class="button-zone threshold-zone threshold-pulse">
-                    <!-- Enhanced hierarchy: Primary is bold/prominent -->
-                    <button id="start-btn" class="control-btn primary home-start-btn" style="font-weight: 700; letter-spacing: 0.05em;">
+                    <!-- Enhanced hierarchy handled in CSS -->
+                    <button id="start-btn" class="control-btn primary home-start-btn">
                         Enter the Temple
                     </button>
-                    <!-- Enhanced hierarchy: Secondary is visually quieter -->
-                    <button id="lore-btn" class="control-btn secondary home-lore-btn" style="opacity: 0.85; font-size: 0.9em;">
+                    <!-- Enhanced hierarchy handled in CSS -->
+                    <button id="lore-btn" class="control-btn secondary home-lore-btn">
                         The Prophecy
                     </button>
                 </div>
@@ -96,23 +103,23 @@ export class HomeScreen {
                             </p>
 
                             <!-- Micro-orientation line: Mythic bridge to mechanics -->
-                            <p style="margin-top: 1.5rem; color: #88a; font-style: italic; text-align: center;">
+                            <p class="lore-directive">
                                 To restore the Archive, you must align the Lens, decipher the Glyph, and forge the Sigil.
                             </p>
 
-                            <!-- Concept Triad: Revealed knowledge -->
-                            <div class="concept-triad" style="display: flex; justify-content: space-evenly; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 1.5em; margin-bottom: 0.2rem;">⟡</div>
-                                    <div style="font-size: 0.8em; letter-spacing: 0.1em; opacity: 0.8;">GLYPH</div>
+                            <!-- Concept Triad: Revealed knowledge with clean CSS classes -->
+                            <div class="concept-triad">
+                                <div class="triad-node">
+                                    <div class="triad-icon">⟡</div>
+                                    <div class="triad-label">GLYPH</div>
                                 </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 1.5em; margin-bottom: 0.2rem;">◎</div>
-                                    <div style="font-size: 0.8em; letter-spacing: 0.1em; opacity: 0.8;">LENS</div>
+                                <div class="triad-node">
+                                    <div class="triad-icon">◎</div>
+                                    <div class="triad-label">LENS</div>
                                 </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 1.5em; margin-bottom: 0.2rem;">꩜</div>
-                                    <div style="font-size: 0.8em; letter-spacing: 0.1em; opacity: 0.8;">SIGIL</div>
+                                <div class="triad-node">
+                                    <div class="triad-icon">꩜</div>
+                                    <div class="triad-label">SIGIL</div>
                                 </div>
                             </div>
                         </div>
@@ -147,13 +154,14 @@ export class HomeScreen {
         };
 
         // Ritual Timing: Fade in invocation text after title stabilizes
-        // This creates a sense of the Archive "waking up" to the user's presence
+        // Reduced delay for better pacing (800ms)
         setTimeout(() => {
             const invocationText = el.querySelector('#invocation-text');
             if (invocationText) {
-                invocationText.style.opacity = '1';
+                invocationText.classList.remove('ritual-hidden');
+                invocationText.classList.add('ritual-revealed');
             }
-        }, 1200);
+        }, 800);
 
         this.element = el;
         return el;
