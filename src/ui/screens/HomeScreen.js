@@ -19,46 +19,64 @@ export class HomeScreen {
         this.toggleLore = this.toggleLore.bind(this);
     }
 
+    // Determine subtitle based on ritual state (player history)
+    getSubtitle() {
+        try {
+            // Check for persistent state to welcome the hunter back
+            const hasHistory = localStorage.getItem('pattern_hunter_level_progress');
+            return hasHistory ? "The Archive awaits your return." : "Begin the Hunt. Choose your Path.";
+        } catch (e) {
+            // Fallback if storage is blocked
+            return "Begin the Hunt. Choose your Path.";
+        }
+    }
+
     mount() {
         const el = document.createElement('div');
         el.className = 'screen home-screen fade-in';
 
         // Select a random invocation for this session
         const randomInvocation = INVOCATIONS[Math.floor(Math.random() * INVOCATIONS.length)];
+        
+        // Resolve subtitle based on state
+        const subtitleText = this.getSubtitle();
 
         el.innerHTML = `
             <div class="home-content-wrapper centered-layout">
                 
-                <!-- 🔮 Title Block: The Sigil Zone -->
+                <!-- ⚜️ Title Block: The Sigil Zone -->
                 <header class="home-header title-block sigil-zone">
                     <div class="sigil-container sigil-glow">
                         <h1 class="mythic-title">PATTERN HUNTER</h1>
                     </div>
                     <div class="title-separator"></div>
-                    <p class="mythic-subtitle">Begin the Hunt. Choose your Path.</p>
+                    <p class="mythic-subtitle">${subtitleText}</p>
                 </header>
 
-                <!-- 🔮 Flavor Panel: The Invocation Zone -->
+                <!-- ⚜️ Flavor Panel: The Invocation Zone -->
                 <div class="flavor-panel invocation-zone">
                     <div class="invocation-box invocation-breath">
                         <span class="rune-decor start"></span>
-                        <p class="invocation-text whisper-text">"${randomInvocation}"</p>
+                        <!-- Added opacity and transition for ritual timing -->
+                        <p id="invocation-text" class="invocation-text whisper-text" style="opacity: 0; transition: opacity 2s ease-in-out;">"${randomInvocation}"</p>
                         <span class="rune-decor end"></span>
                     </div>
                 </div>
 
-                <!-- 🔮 Action Zone: The Threshold -->
+                <!-- ⚜️ Action Zone: The Threshold -->
                 <div class="button-zone threshold-zone threshold-pulse">
-                    <button id="start-btn" class="control-btn primary home-start-btn">
+                    <!-- Enhanced hierarchy: Primary is bold/prominent -->
+                    <button id="start-btn" class="control-btn primary home-start-btn" style="font-weight: 700; letter-spacing: 0.05em;">
                         Enter the Temple
                     </button>
-                    <button id="lore-btn" class="control-btn secondary home-lore-btn">
+                    <!-- Enhanced hierarchy: Secondary is visually quieter -->
+                    <button id="lore-btn" class="control-btn secondary home-lore-btn" style="opacity: 0.85; font-size: 0.9em;">
                         The Prophecy
                     </button>
                 </div>
             </div>
 
-            <!-- 🔮 Lore Modal: Hidden by default -->
+            <!-- ⚜️ Lore Modal: Hidden by default -->
             <!-- Added modal-reveal hook for CSS entry animations -->
             <div id="lore-modal" class="lore-modal hidden modal-reveal">
                 
@@ -76,10 +94,31 @@ export class HomeScreen {
                                 Your eye can spot the <em>Outlier</em>. Your mind knows the <em>Formula</em>. 
                                 We do not wield swords; we wield <strong>Logic</strong>.
                             </p>
+
+                            <!-- Micro-orientation line: Mythic bridge to mechanics -->
+                            <p style="margin-top: 1.5rem; color: #88a; font-style: italic; text-align: center;">
+                                To restore the Archive, you must align the Lens, decipher the Glyph, and forge the Sigil.
+                            </p>
+
+                            <!-- Concept Triad: Revealed knowledge -->
+                            <div class="concept-triad" style="display: flex; justify-content: space-evenly; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5em; margin-bottom: 0.2rem;">⟡</div>
+                                    <div style="font-size: 0.8em; letter-spacing: 0.1em; opacity: 0.8;">GLYPH</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5em; margin-bottom: 0.2rem;">◎</div>
+                                    <div style="font-size: 0.8em; letter-spacing: 0.1em; opacity: 0.8;">LENS</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.5em; margin-bottom: 0.2rem;">꩜</div>
+                                    <div style="font-size: 0.8em; letter-spacing: 0.1em; opacity: 0.8;">SIGIL</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="lore-footer footer-sigil">
-                            <span class="sigil-mark">⟡</span>
+                            <span class="sigil-mark">📜</span>
                             <span class="footer-text">Identify the anomaly. Cleanse the record.</span>
                         </div>
                         
@@ -106,6 +145,15 @@ export class HomeScreen {
                 this.toggleLore();
             }
         };
+
+        // Ritual Timing: Fade in invocation text after title stabilizes
+        // This creates a sense of the Archive "waking up" to the user's presence
+        setTimeout(() => {
+            const invocationText = el.querySelector('#invocation-text');
+            if (invocationText) {
+                invocationText.style.opacity = '1';
+            }
+        }, 1200);
 
         this.element = el;
         return el;
