@@ -388,6 +388,73 @@ button {
     background: rgba(255,255,255,0.02);
 }
 
+/* --- ADDITIVE: HOME SCREEN RITUAL STATES & MOBILE --- */
+
+/* Objective 1: Ritual States */
+.home-content-wrapper .mythic-title,
+.home-content-wrapper .mythic-subtitle,
+.home-content-wrapper .flavor-panel,
+.home-content-wrapper .button-zone {
+    transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hidden state for initial load */
+.ritual-hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+/* Revealed state */
+.ritual-revealed {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Stagger utilities for JS application */
+.ritual-delay-1 { transition-delay: 0.2s; }
+.ritual-delay-2 { transition-delay: 0.8s; }
+.ritual-delay-3 { transition-delay: 1.5s; }
+
+/* Objective 3: Button Hierarchy Refinements */
+.home-start-btn {
+    /* Make the primary action inevitable but not loud */
+    animation: inevitablePulse 6s ease-in-out infinite;
+}
+
+.home-lore-btn {
+    /* Secondary action quieter by default */
+    opacity: 0.6;
+    transition: opacity 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.home-lore-btn:hover {
+    opacity: 1;
+    border-color: rgba(255,255,255,0.2);
+}
+
+@keyframes inevitablePulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); border-color: var(--accent); }
+    50% { box-shadow: 0 0 25px rgba(33, 115, 70, 0.25); border-color: var(--accent-light); }
+}
+
+/* Objective 4: Mobile Home Adjustments */
+@media (max-width: 480px) {
+    .home-start-btn, .home-lore-btn {
+        width: 100%;
+        max-width: 320px;
+        padding: 16px 20px;
+    }
+    
+    .button-zone {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+}
+
 /* Lore Modal */
 .lore-modal {
     position: fixed;
@@ -442,6 +509,76 @@ button {
     margin-top: 30px;
     border-top: 1px solid #333;
     padding-top: 10px;
+}
+
+/* --- ADDITIVE: CONCEPT TRIAD (Objective 2) --- */
+.concept-triad {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: clamp(20px, 4vw, 40px);
+    margin: 30px 0;
+    padding: 25px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+}
+
+.triad-node {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.7;
+    transition: all 0.4s ease;
+    min-width: 80px;
+}
+
+.triad-node:hover {
+    opacity: 1;
+    transform: translateY(-5px);
+}
+
+.triad-icon {
+    font-size: 1.8rem;
+    color: var(--accent);
+    margin-bottom: 5px;
+    filter: drop-shadow(0 0 8px rgba(33, 115, 70, 0.3));
+}
+
+.triad-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #889988;
+    font-weight: 600;
+}
+
+/* Mobile tweak for Triad */
+@media (max-width: 450px) {
+    .concept-triad {
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+    }
+    
+    .triad-node {
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+        gap: 15px;
+        text-align: left;
+    }
+    
+    .triad-icon {
+        margin-bottom: 0;
+        font-size: 1.5rem;
+    }
+    
+    .triad-label {
+        font-size: 0.85rem;
+    }
 }
 
 /* ========================================= */
