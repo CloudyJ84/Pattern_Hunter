@@ -1,3 +1,9 @@
+const scout_threshold_01 = {
+  // ... entire object unchanged
+};
+
+export default scout_threshold_01;
+
 {
   // --- Identity ---
   id: "scout_threshold_01",
@@ -86,3 +92,4 @@
     pointsAwarded: 25
   }
 }
+
