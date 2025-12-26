@@ -66,7 +66,9 @@ export const LevelController = {
             feedback: {
                 message: this._level.narrative.intro,
                 type: 'neutral'
-            }
+            },
+            // Explicitly tell the UI what kind of input we expect
+            inputType: this._level.successCriteria ? this._level.successCriteria.type : 'text_input'
         };
     },
 
