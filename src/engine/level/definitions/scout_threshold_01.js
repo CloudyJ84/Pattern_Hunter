@@ -1,11 +1,4 @@
 const scout_threshold_01 = {
-  // ... entire object unchanged
-};
-
-export default scout_threshold_01;
-
-{
-  // --- Identity ---
   id: "scout_threshold_01",
   tier: "SCOUT",
   band: "initiate",
@@ -24,7 +17,6 @@ export default scout_threshold_01;
     failure: "Noise overwhelms perception."
   },
 
-  // --- Teaching Intent ---
   teachingFocus: {
     concept: "threshold_detection",
     description: "Identify values exceeding a defined threshold.",
@@ -32,7 +24,6 @@ export default scout_threshold_01;
     reinforces: []
   },
 
-  // --- Grid Definition ---
   grid: {
     rows: 3,
     cols: 3,
@@ -47,28 +38,24 @@ export default scout_threshold_01;
     }
   },
 
-  // --- Allowed Systems ---
   systems: {
     glyphs: ["glyph_reveal_above_threshold"],
     lenses: ["lens_focus"],
     sigils: []
   },
 
-  // --- Player Guidance ---
   guidance: {
     showHints: true,
     hintText: ["Some values exceed expectation."],
     highlightOnFailure: true
   },
 
-  // --- Success Conditions ---
   successCriteria: {
     type: "cell_selection",
     correctCells: [{ row: 1, col: 1 }],
     allowMultipleAttempts: true
   },
 
-  // --- Scoring ---
   scoring: {
     enabled: true,
     baseScore: 100,
@@ -77,7 +64,6 @@ export default scout_threshold_01;
     }
   },
 
-  // --- Progression Hooks ---
   progression: {
     unlocks: {
       glyphs: ["glyph_reveal_above_threshold"],
@@ -87,9 +73,9 @@ export default scout_threshold_01;
     marksComplete: true
   },
 
-  // --- Tier Progression ---
   tierProgression: {
     pointsAwarded: 25
   }
-}
+};
 
+export default scout_threshold_01;
