@@ -56,14 +56,16 @@ export class ChallengeScreen {
 
     constructor(params) {
         this.levelId = params.levelId || 1;
+        
+        // 🔧 Level Controller Integration
+        // Support 'levelDefinition' per requirements, fall back to 'levelDef' for compatibility
+        this.levelDefinition = params.levelDefinition || params.levelDef || null;
+        this.isScripted = !!this.levelDefinition;
+
         // Fallback to GameState if param is missing, default to Hunter (1)
         this.thresholdTier = (params.thresholdTier !== undefined) 
             ? params.thresholdTier 
             : (GameState.selectedTier !== undefined ? GameState.selectedTier : 1);
-        
-        // 🔧 Level Controller Integration
-        this.levelDef = params.levelDef || null;
-        this.isScripted = !!this.levelDef;
 
         this.data = null;
         this.element = null;
@@ -271,7 +273,7 @@ export class ChallengeScreen {
 
     // 🔧 New Method: Handle Scripted Level Loading via LevelController
     _loadScriptedLevel() {
-        const config = LevelController.init(this.levelDef);
+        const config = LevelController.init(this.levelDefinition);
         
         // Map Config to minimal 'data' structure for existing Renderers
         this.data = {
@@ -290,8 +292,6 @@ export class ChallengeScreen {
             // Mock analytics for now as LevelController doesn't export them yet
             analytics: { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} }
         };
-
-        console.log("CHALLENGE CONFIG (Scripted):", config);
 
         // Render Base Components
         this.grid.render(config.grid);
