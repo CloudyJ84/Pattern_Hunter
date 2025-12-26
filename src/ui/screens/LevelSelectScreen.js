@@ -1,5 +1,7 @@
 import { UIRouter } from '../UIRouter.js';
 import { GameState } from '../../state/gameState.js';
+// 🔧 New System Import: Authored Level Definitions
+import scoutLevel from '../../engine/level/definitions/scout_threshold_01.js';
 
 // Configuration for the "Vows" (Tiers)
 const TIER_CONFIG = [
@@ -36,6 +38,13 @@ const TIER_CONFIG = [
         className: 'tier-mythic'
     }
 ];
+
+// Map of Authored Levels: Tier ID -> { Sequence Order -> Level Definition }
+const AUTHORED_LEVELS = {
+    0: { // Scout
+        1: scoutLevel
+    }
+};
 
 export class LevelSelectScreen {
 
@@ -85,8 +94,7 @@ export class LevelSelectScreen {
             <section class="level-grid-zone">
                 <h3 class="section-label">2. Select the Path</h3>
                 <div class="runic-grid" id="level-grid-container">
-                    <!-- Levels injected via JS -->
-                </div>
+                    </div>
             </section>
         `;
 
@@ -139,7 +147,6 @@ export class LevelSelectScreen {
                             <span class="value">${tier.hints}</span>
                         </div>
                     </div>
-                    <!-- 🔮 Mythic UI: Add vow sigil/flare hooks -->
                     ${isActive ? '<div class="active-indicator vow-sigil vow-flare">VOW TAKEN</div>' : ''}
                 </div>
             </div>
@@ -203,6 +210,9 @@ export class LevelSelectScreen {
         // Ensure we default to 1 if state is undefined
         const unlockedMax = GameState.state.maxLevelReached || 1; 
 
+        // Check if current tier has authored levels
+        const tierAuthoredLevels = AUTHORED_LEVELS[this.currentTierId] || {};
+
         for (let i = 1; i <= maxLevel; i++) {
             const isLocked = i > unlockedMax;
             
@@ -211,6 +221,9 @@ export class LevelSelectScreen {
             // rune-pulse, rune-shimmer for unlocked | locked-void for locked
             node.className = `rune-node ${isLocked ? 'locked-void' : 'unlocked-path rune-pulse rune-hover'}`;
             
+            // Check if this specific level is authored
+            const authoredLevel = tierAuthoredLevels[i];
+
             // Inner HTML for specific styling hooks
             if (isLocked) {
                 node.innerHTML = `<span class="lock-icon">🔒</span><span class="level-num">${i}</span>`;
@@ -225,6 +238,14 @@ export class LevelSelectScreen {
                 
                 // Add hover effect via JS if needed, or stick to CSS
                 node.onmouseenter = () => this._playSound('hover');
+
+                // 🔧 Display metadata for Authored Levels
+                if (authoredLevel) {
+                    node.title = authoredLevel.name;
+                    if (authoredLevel.subtitle) {
+                        node.setAttribute('data-lore', authoredLevel.subtitle);
+                    }
+                }
             }
 
             gridContainer.appendChild(node);
@@ -247,10 +268,21 @@ export class LevelSelectScreen {
         this.element.classList.add('ritual-complete', 'portal-active', 'screen-glow');
         
         setTimeout(() => {
-            UIRouter.navigateTo('ChallengeScreen', {
-                levelNumber: levelNum,
-                tier: this.currentTierId // Passing param explicitly as backup
-            });
+            // 🔧 Route Logic: Authored vs Legacy
+            const authoredLevel = AUTHORED_LEVELS[this.currentTierId]?.[levelNum];
+
+            if (authoredLevel) {
+                // Route to Scripted Level
+                UIRouter.navigateTo('ChallengeScreen', {
+                    levelDefinition: authoredLevel
+                });
+            } else {
+                // Route to Legacy Level System
+                UIRouter.navigateTo('ChallengeScreen', {
+                    levelNumber: levelNum,
+                    tier: this.currentTierId // Passing param explicitly as backup
+                });
+            }
         }, 300);
     }
 
