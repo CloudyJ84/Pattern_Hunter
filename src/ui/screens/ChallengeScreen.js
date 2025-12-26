@@ -1,5 +1,5 @@
 import { generateLevel } from '../../engine/levelEngine.js';
-import { LevelController } from '../../engine/LevelController.js'; // 🔧 New System Import
+import { LevelController } from '../../engine/level/LevelController.js'; // 🔧 New System Import
 import { GameState } from '../../state/gameState.js';
 import { UIRouter } from '../UIRouter.js';
 import { GridRenderer } from '../components/GridRenderer.js';
