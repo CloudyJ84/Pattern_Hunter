@@ -2,7 +2,7 @@ import { HomeScreen } from './screens/HomeScreen.js';
 import { LevelSelectScreen } from './screens/LevelSelectScreen.js';
 import { ChallengeScreen } from './screens/ChallengeScreen.js';
 // 🔧 Import the Scout Level for hard-wired navigation
-import scoutLevel from './engine/level/definitions/scout_threshold_01.js';
+import scoutLevel from '../engine/level/definitions/scout_threshold_01.js';
 
 const ROUTES = {
     'HomeScreen': HomeScreen,
