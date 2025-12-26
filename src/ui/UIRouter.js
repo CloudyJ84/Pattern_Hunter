@@ -2,14 +2,12 @@ import { HomeScreen } from './screens/HomeScreen.js';
 import { LevelSelectScreen } from './screens/LevelSelectScreen.js';
 import { ChallengeScreen } from './screens/ChallengeScreen.js';
 // 🔧 Import the Scout Level for hard-wired navigation
-import scoutLevel from '../engine/level/definitions/scout_threshold_01.js';
+import scoutLevel from './engine/level/definitions/scout_threshold_01.js';
 
 const ROUTES = {
     'HomeScreen': HomeScreen,
     'LevelSelectScreen': LevelSelectScreen,
-    'ChallengeScreen': ChallengeScreen,
-    // 🔧 Route alias for Scout Demo
-    'ScoutMission': ChallengeScreen
+    'ChallengeScreen': ChallengeScreen
 };
 
 export const UIRouter = {
@@ -48,13 +46,6 @@ export const UIRouter = {
             return;
         }
 
-        // 🔧 Hard-wired injection for ScoutMission route
-        if (screenName === 'ScoutMission') {
-            params.levelDef = scoutLevel;
-            params.levelId = 'SCOUT-01';
-            params.thresholdTier = 0; // Scout Tier
-        }
-
         // Instantiate and mount
         const instance = new ScreenClass(params);
         this.currentScreen = instance;
@@ -69,6 +60,10 @@ export const UIRouter = {
 
     // 🔧 Convenience method to launch the scripted scout level
     playScoutLevel() {
-        this.navigateTo('ScoutMission');
+        this.navigateTo('ChallengeScreen', {
+            levelDefinition: scoutLevel,
+            levelId: 'SCOUT-01',
+            thresholdTier: 0 // Scout Tier
+        });
     }
 };
