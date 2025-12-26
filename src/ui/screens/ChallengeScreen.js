@@ -1,4 +1,5 @@
 import { generateLevel } from '../../engine/levelEngine.js';
+import { LevelController } from '../../engine/LevelController.js'; // 🔧 New System Import
 import { GameState } from '../../state/gameState.js';
 import { UIRouter } from '../UIRouter.js';
 import { GridRenderer } from '../components/GridRenderer.js';
@@ -59,7 +60,11 @@ export class ChallengeScreen {
         this.thresholdTier = (params.thresholdTier !== undefined) 
             ? params.thresholdTier 
             : (GameState.selectedTier !== undefined ? GameState.selectedTier : 1);
-            
+        
+        // 🔧 Level Controller Integration
+        this.levelDef = params.levelDef || null;
+        this.isScripted = !!this.levelDef;
+
         this.data = null;
         this.element = null;
         
@@ -163,6 +168,10 @@ export class ChallengeScreen {
                         <button id="hint-btn" class="control-btn secondary hint-btn">
                             Invoke Hint
                         </button>
+                        <!-- 🔧 Injected Button for Grid Selections -->
+                        <button id="submit-btn" class="control-btn primary hidden">
+                            Confirm Signal
+                        </button>
                     </div>
                 </div>
             </aside>
@@ -172,6 +181,7 @@ export class ChallengeScreen {
 
         // Navigation
         el.querySelector('#withdraw-btn').onclick = () => {
+            if (this.isScripted) LevelController.teardown();
             UIRouter.navigateTo('LevelSelectScreen');
         };
 
@@ -189,13 +199,14 @@ export class ChallengeScreen {
         // Automatically toggles .lens-summary-visible when content exists
         const summaryObserver = new MutationObserver((mutations) => {
             const summary = el.querySelector('#lens-summary');
-            if (summary.innerHTML.trim() !== '') {
+            if (summary && summary.innerHTML.trim() !== '') {
                 summary.classList.add('lens-summary-visible');
-            } else {
+            } else if (summary) {
                 summary.classList.remove('lens-summary-visible');
             }
         });
-        summaryObserver.observe(el.querySelector('#lens-summary'), { childList: true, subtree: true });
+        const summaryEl = el.querySelector('#lens-summary');
+        if(summaryEl) summaryObserver.observe(summaryEl, { childList: true, subtree: true });
 
         // GlyphRenderer Integration
         this.glyphRenderer = new GlyphRenderer(el.querySelector('#grid'));
@@ -220,6 +231,10 @@ export class ChallengeScreen {
         // Hint Logic
         this.hintBtn = el.querySelector('#hint-btn');
         this.hintBtn.onclick = () => this._handleHint();
+        
+        // 🔧 Submit Logic (Scripted Levels)
+        this.submitBtn = el.querySelector('#submit-btn');
+        this.submitBtn.onclick = () => this._handleScriptedSubmit();
 
         // Lens Logic
         const lensBtn = el.querySelector('#lens-toggle');
@@ -247,6 +262,56 @@ export class ChallengeScreen {
         // Cleanup previous state
         if (this.sigilRenderer) this.sigilRenderer.clearAll();
 
+        if (this.isScripted) {
+            this._loadScriptedLevel();
+        } else {
+            this._loadLegacyLevel();
+        }
+    }
+
+    // 🔧 New Method: Handle Scripted Level Loading via LevelController
+    _loadScriptedLevel() {
+        const config = LevelController.init(this.levelDef);
+        
+        // Map Config to minimal 'data' structure for existing Renderers
+        this.data = {
+            grid: config.grid,
+            question: { text: config.narrative.intro, sigilId: null }, // Scripted uses intro as question
+            thresholdConfig: {
+                lensModes: config.systems.lenses || [],
+                hintLevel: config.guidance.showHints ? 'standard' : 'none',
+                rewardMultiplier: 1 // Baseline for scout
+            },
+            patternMetadata: {
+                lens: { type: 'none', summaries: [] },
+                glyphs: { activate: config.systems.glyphs || [] }
+            },
+            datasetRules: {}, // Not needed for static render
+            // Mock analytics for now as LevelController doesn't export them yet
+            analytics: { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} }
+        };
+
+        console.log("CHALLENGE CONFIG (Scripted):", config);
+
+        // Render Base Components
+        this.grid.render(config.grid);
+        this.question.render({ text: config.narrative.intro, noInput: config.inputType === 'cell_selection' });
+
+        // Handle Input Mode UI
+        if (config.inputType === 'cell_selection') {
+            this.submitBtn.classList.remove('hidden');
+        }
+
+        // Setup UI State from Config
+        const availableLenses = config.systems.lenses || ['lens_standard'];
+        this._renderLensBar(availableLenses);
+        this.updateGlyphBar(this.data.patternMetadata, this.data.analytics);
+        
+        // Interactions
+        this._setupGridInteractions();
+    }
+
+    _loadLegacyLevel() {
         // Generate Level Data via Engine
         this.data = generateLevel(this.levelId, this.thresholdTier);
         // Alias for snippet compatibility
@@ -397,21 +462,26 @@ export class ChallengeScreen {
                 
                 // Keep Legacy Controller Logic for consistency (LensRenderer text)
                 LensController.setActiveLens(lensId);
-                const lensOutput = LensController.applyLens(
-                    this.data.grid,
-                    this.analytics,
-                    this.data.datasetRules,
-                    this.data.thresholdConfig
-                );
-                this.lensRenderer.clear();
-                this.lensRenderer.render(lensOutput);
                 
-                const gridEl = this.element.querySelector('#grid');
-                if (lensOutput) {
-                    const modeClass = lensOutput.id.replace('_', '-');
-                    gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
+                // 🔧 Patch: Check if we have dynamic analytics (Legacy) or Static (Scripted)
+                let lensOutput = null;
+                if (!this.isScripted) {
+                   lensOutput = LensController.applyLens(
+                        this.data.grid,
+                        this.analytics,
+                        this.data.datasetRules,
+                        this.data.thresholdConfig
+                    );
+                    this.lensRenderer.clear();
+                    this.lensRenderer.render(lensOutput);
                 }
                 
+                const gridEl = this.element.querySelector('#grid');
+                // For scripted, we just apply class changes for now since LensController depends on analytics
+                const modeClass = lensId.replace('_', '-');
+                // Preserve 'dataset-grid' but update mode
+                gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
+
                 // Update the lens bar UI
                 this.updateLensBar({ lens: { type: lensId, summaries: lensOutput?.summaries || [] } });
 
@@ -500,15 +570,18 @@ export class ChallengeScreen {
 
         LensController.setActiveLens(nextLensId);
         
-        const lensOutput = LensController.applyLens(
-            this.data.grid,
-            this.analytics,
-            this.data.datasetRules,
-            this.data.thresholdConfig
-        );
-        
-        this.lensRenderer.clear();
-        this.lensRenderer.render(lensOutput);
+        // Only run full lens calculation if not scripted (or until scripted supports it)
+        let lensOutput = null;
+        if (!this.isScripted) {
+             lensOutput = LensController.applyLens(
+                this.data.grid,
+                this.analytics,
+                this.data.datasetRules,
+                this.data.thresholdConfig
+            );
+            this.lensRenderer.clear();
+            this.lensRenderer.render(lensOutput);
+        }
         
         const gridEl = this.element.querySelector('#grid');
         const label = btn.querySelector('.lens-label');
@@ -519,12 +592,12 @@ export class ChallengeScreen {
             // 🔮 Mythic UI: Update hooks
             btn.setAttribute('data-lens-id', lensOutput.id);
             btn.setAttribute('data-lens-name', lensOutput.name);
-            
-            // Update grid classes for lens mode hooks
-            const modeClass = lensOutput.id.replace('_', '-');
-            // Preserve 'dataset-grid' and add new mode + generic 'lens-highlight'
-            gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
         }
+
+        // Update grid classes for lens mode hooks
+        const modeClass = nextLensId.replace('_', '-');
+        // Preserve 'dataset-grid' and add new mode + generic 'lens-highlight'
+        gridEl.className = `dataset-grid ${modeClass} lens-highlight`;
         
         // 🔧 3. Sync _cycleLens With the Lens Bar
         this.updateLensBar({ lens: { type: this.currentLensMode, summaries: lensOutput?.summaries || [] } });
@@ -571,33 +644,91 @@ export class ChallengeScreen {
         }
     }
 
-    handleSubmit(ans) {
-        const correct = String(this.data.question.answer).toLowerCase().trim();
-        const input = String(ans).toLowerCase().trim();
-        const feedbackContainer = this.element.querySelector('#feedback');
+    // 🔧 Handle Grid Selection Submit for Scripted Levels
+    _handleScriptedSubmit() {
+        if (!this.isScripted) return;
 
-        if (input === correct) {
-            GameState.completeLevel(this.levelId);
-            
+        // Gather selection from DOM (GridRenderer stores state in DOM classes)
+        const selectedElements = this.element.querySelectorAll('.grid-cell.marked');
+        const selection = Array.from(selectedElements).map(el => ({
+            row: parseInt(el.dataset.row),
+            col: parseInt(el.dataset.col)
+        }));
+
+        const result = LevelController.evaluatePlayerAction({
+            type: 'cell_selection',
+            value: selection
+        });
+
+        this._handleFeedback(result);
+    }
+
+    handleSubmit(ans) {
+        if (this.isScripted) {
+             const result = LevelController.evaluatePlayerAction({
+                type: 'text_input',
+                value: ans
+            });
+            this._handleFeedback(result);
+        } else {
+            // Legacy Logic
+            const correct = String(this.data.question.answer).toLowerCase().trim();
+            const input = String(ans).toLowerCase().trim();
+
+            if (input === correct) {
+                this._handleFeedback({ success: true, feedback: "Correct" }); // Simulate result obj
+            } else {
+                this._handleFeedback({ success: false, feedback: correct }); // Pass correct ans as feedback for incorrect
+            }
+        }
+    }
+
+    // Unified Feedback Handler
+    _handleFeedback(result) {
+        const feedbackContainer = this.element.querySelector('#feedback');
+        const panel = this.element.querySelector('.challenge-panel');
+
+        if (result.success) {
+            // GameState.completeLevel(this.levelId); // Update global state if needed
+
             // 🔮 Mythic UI: Success hooks
-            this.element.querySelector('.challenge-panel').classList.add('success-pulse', 'panel-success');
-            
-            // Add specific feedback hooks
+            panel.classList.add('success-pulse', 'panel-success');
             feedbackContainer.classList.remove('feedback-incorrect');
             feedbackContainer.classList.add('feedback-correct');
 
+            if (this.isScripted && result.lore) {
+                // 🔧 Display Lore Payload
+                this.question.element.innerHTML = `
+                    <div class="lore-payload fade-in">
+                        <h4 class="lore-title">ARCHIVE UNLOCKED</h4>
+                        <p class="mythic-text">${result.lore.mythicText}</p>
+                        <hr class="lore-divider">
+                        <p class="pedagogy-text">${result.lore.pedagogyText}</p>
+                    </div>
+                `;
+                this.submitBtn.style.display = 'none'; // Hide submit
+            }
+
             this.feedback.showCorrect(
                 () => {
-                    UIRouter.navigateTo('ChallengeScreen', {
-                        levelId: this.levelId + 1,
-                        thresholdTier: this.thresholdTier
-                    });
+                    // Navigate next
+                    if (this.isScripted && result.progression) {
+                        // Handle scripted progression or return to menu
+                         UIRouter.navigateTo('LevelSelectScreen');
+                    } else {
+                        UIRouter.navigateTo('ChallengeScreen', {
+                            levelId: this.levelId + 1,
+                            thresholdTier: this.thresholdTier
+                        });
+                    }
                 },
-                this.data.thresholdConfig.rewardMultiplier
+                this.isScripted ? 1 : this.data.thresholdConfig.rewardMultiplier,
+                result.feedback // Pass custom feedback text
             );
+
         } else {
-            this.feedback.showIncorrect(correct);
-            const panel = this.element.querySelector('.challenge-panel');
+            // Failure / Try Again
+            this.feedback.showIncorrect(result.feedback || "Incorrect");
             
             // 🔮 Mythic UI: Shake hook and incorrect state
             feedbackContainer.classList.remove('feedback-correct');
@@ -605,6 +736,11 @@ export class ChallengeScreen {
             
             panel.classList.add('shake', 'panel-shake');
             setTimeout(() => panel.classList.remove('shake', 'panel-shake'), 500);
+
+            if (result.hint) {
+                 // Update hint text if LevelController provides one
+                 // This is a minimal intrusion
+            }
         }
     }
     
@@ -635,6 +771,9 @@ export class ChallengeScreen {
     }
 
     destroy() {
+        if (this.isScripted) {
+            LevelController.teardown();
+        }
         this.element = null;
         if (this.lensRenderer) {
             this.lensRenderer.clear();
