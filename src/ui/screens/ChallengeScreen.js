@@ -293,6 +293,21 @@ export class ChallengeScreen {
             analytics: { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} }
         };
 
+        const glyphOutputs = GlyphController.computeGlyphs(
+            this.data.grid,
+            this.data.patternMetadata,
+            this.data.analytics,
+            this.data.datasetRules
+        );
+
+        this.computedGlyphs.clear();
+        glyphOutputs.forEach(g => {
+            this.computedGlyphs.set(g.id, g);
+        });
+
+        // Optional: update glyph bar visuals
+        this.updateGlyphBar(this.data.patternMetadata, this.data.analytics);
+
         // Render Base Components
         this.grid.render(config.grid);
         this.question.render({ text: config.narrative.intro, noInput: config.inputType === 'cell_selection' });
