@@ -13,6 +13,7 @@ import { GlyphController } from '../../engine/glyphs/GlyphController.js';
 import { SigilController } from '../../engine/sigils/SigilController.js';
 import { SigilRenderer } from '../components/SigilRenderer.js';
 import { registerAllSigils } from '../../engine/sigils/registerSigils.js';
+import { analyticsEngine } from '../../engine/analyticsEngine.js';
 
 // Register all sigil definitions immediately
 registerAllSigils();
@@ -292,6 +293,15 @@ export class ChallengeScreen {
             // Mock analytics for now as LevelController doesn't export them yet
             analytics: { glyphs: {}, distribution: { above: [], below: [] }, unique: { indices: [] }, frequency: { repeated: [] }, weekends: { indices: [] }, sigilSupport: {} }
         };
+
+        // Compute analytics for scripted mode
+        const analytics = analyticsEngine.computeAnalytics(
+            this.data.grid,
+            this.data.datasetRules
+        );
+
+        this.data.analytics = analytics;
+        this.analytics = analytics;
 
         const glyphOutputs = GlyphController.computeGlyphs(
             this.data.grid,
