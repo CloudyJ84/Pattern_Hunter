@@ -260,14 +260,16 @@ export const LevelController = {
         const normalized = [];
 
         for (let r = 0; r < rows; r++) {
+            const rowArr = [];
             for (let c = 0; c < cols; c++) {
-                normalized.push({
+                rowArr.push({
                     row: r,
                     col: c,
                     value: dataset[r][c],
                     type: datasetType
                 });
             }
+            normalized.push(rowArr);
         }
 
         return normalized;
