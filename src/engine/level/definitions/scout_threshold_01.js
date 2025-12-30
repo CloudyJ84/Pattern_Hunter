@@ -2,6 +2,7 @@ const scout_threshold_01 = {
   id: "scout_threshold_01",
   tier: "SCOUT",
   band: "initiate",
+  inputType: "cell_selection",
 
   name: "The Rising Signal",
   subtitle: "Not all values speak equally.",
@@ -40,7 +41,7 @@ const scout_threshold_01 = {
 
   systems: {
     glyphs: ["glyph_reveal_above_threshold"],
-    lenses: ["lens_focus"],
+    lenses: ["lens_standard"],
     sigils: []
   },
 
