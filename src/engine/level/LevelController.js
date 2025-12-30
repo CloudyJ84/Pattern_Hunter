@@ -59,7 +59,7 @@ export const LevelController = {
             narrative: {
                 intro: this._level.narrative.intro
             },
-            grid: this._level.grid,
+            grid: this._normalizeGrid(this._level.grid),
             systems: this._level.systems || { glyphs: [], lenses: [], sigils: [] },
             guidance: this._level.guidance || { showHints: false },
             // Provide initial feedback state
@@ -254,6 +254,24 @@ export const LevelController = {
     },
 
     // --- Helpers ---
+
+    _normalizeGrid(gridDef) {
+        const { dataset, rows, cols, datasetType } = gridDef;
+        const normalized = [];
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                normalized.push({
+                    row: r,
+                    col: c,
+                    value: dataset[r][c],
+                    type: datasetType
+                });
+            }
+        }
+
+        return normalized;
+    },
 
     _getTierRune(tierName) {
         const MAP = {
