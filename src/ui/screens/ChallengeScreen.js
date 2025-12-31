@@ -234,7 +234,7 @@ export class ChallengeScreen {
                     tier: 1, // Default to Hunter-equivalent
                     rune: '📜',
                     flavor: config.narrative.title || 'A scripted trial.',
-                    hintLevel: config.guidance.showHints ? 'standard' : 'none',
+                    hintLevel: config.guidance.showHints ? 'medium' : 'none',
                     rewardMultiplier: 1
                 },
                 formatting: {
