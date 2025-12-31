@@ -14,7 +14,7 @@
         "location": "scattered",
         "visibility": "highlighted_values",
         "playerGoal": "identify values ascending above the mean",
-        "questionFocus": ["value_above_mean", "count_above_mean"]
+        "questionFocus": ["countAboveThreshold", "whichValueIsHighlighted"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -25,8 +25,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["value_above_mean"],
-        "avoidQuestionTypes": ["value_below_mean", "min_value"]
+        "preferredQuestionTypes": ["countAboveThreshold"],
+        "avoidQuestionTypes": ["countBelowThreshold", "whichValueIsLowest"]
       },
       "scoring": {
         "basePoints": 100,
@@ -48,7 +48,7 @@
         "location": "scattered",
         "visibility": "highlighted_values",
         "playerGoal": "identify values sinking below the mean",
-        "questionFocus": ["value_below_mean", "count_below_mean"]
+        "questionFocus": ["countBelowThreshold", "whichValueIsHighlighted"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -59,8 +59,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["value_below_mean"],
-        "avoidQuestionTypes": ["value_above_mean", "max_value"]
+        "preferredQuestionTypes": ["countBelowThreshold"],
+        "avoidQuestionTypes": ["countAboveThreshold", "whichValueIsHighest"]
       },
       "scoring": {
         "basePoints": 100,
@@ -82,19 +82,19 @@
         "location": "single_point",
         "visibility": "highlighted_value",
         "playerGoal": "find the statistical anomaly",
-        "questionFocus": ["outlier_value", "row_of_outlier"]
+        "questionFocus": ["whichValueIsOutlier", "rowWithOutlier"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
         "glyphsToActivate": ["outlier"],
-        "lensSummaries": ["stats", "outlier_density"],
+        "lensSummaries": ["stats"],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["value_above_mean", "max_value", "min_value"],
-        "avoidQuestionTypes": ["frequency_count"]
+        "preferredQuestionTypes": ["whichValueIsOutlier", "whichValueIsHighest", "whichValueIsLowest"],
+        "avoidQuestionTypes": ["whichClusterIsLargest"]
       },
       "scoring": {
         "basePoints": 150,
@@ -116,20 +116,20 @@
         "location": "value_band",
         "visibility": "highlighted_cluster",
         "playerGoal": "identify the dense grouping of values",
-        "questionFocus": ["cluster_size", "cluster_range"]
+        "questionFocus": ["howManyInCluster", "whichClusterIsLargest"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
         "requiresRange": true
       },
       "context": {
-        "glyphsToActivate": ["frequency"],
+        "glyphsToActivate": ["cluster"],
         "lensSummaries": ["stats"],
         "highlightRange": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["highlight_value"],
-        "avoidQuestionTypes": ["outlier_value"]
+        "preferredQuestionTypes": ["whichValueIsHighlighted"],
+        "avoidQuestionTypes": ["whichValueIsOutlier"]
       },
       "scoring": {
         "basePoints": 120,
@@ -149,7 +149,7 @@
         "location": "extremities",
         "visibility": "highlighted_min_max",
         "playerGoal": "find the absolute limits of the dataset",
-        "questionFocus": ["min_value", "max_value"]
+        "questionFocus": ["whichValueIsLowest", "whichValueIsHighest"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -160,8 +160,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["min_value", "max_value"],
-        "avoidQuestionTypes": ["frequency_count"]
+        "preferredQuestionTypes": ["whichValueIsLowest", "whichValueIsHighest"],
+        "avoidQuestionTypes": ["whichClusterIsLargest"]
       },
       "scoring": {
         "basePoints": 80,
@@ -184,7 +184,7 @@
         "location": "scattered",
         "visibility": "highlighted_weekends",
         "playerGoal": "identify the days of rest",
-        "questionFocus": ["count_weekends", "identify_date_pattern"]
+        "questionFocus": ["countWeekendDates", "whichDateIsHighlighted"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -195,8 +195,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["count_weekends"],
-        "avoidQuestionTypes": ["min_value", "max_value"]
+        "preferredQuestionTypes": ["countWeekendDates"],
+        "avoidQuestionTypes": ["whichDateIsEarliest", "whichDateIsLatest"]
       },
       "scoring": {
         "basePoints": 110,
@@ -217,7 +217,7 @@
         "location": "scattered",
         "visibility": "highlighted_weekday",
         "playerGoal": "spot the repeating day of the week",
-        "questionFocus": ["most_frequent_weekday", "count_specific_weekday"]
+        "questionFocus": ["mostFrequentWeekday", "countWeekendDates"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -228,8 +228,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["frequency_count"],
-        "avoidQuestionTypes": ["unique_category"]
+        "preferredQuestionTypes": ["mostFrequentWeekday"],
+        "avoidQuestionTypes": ["whichCategoryIsUnique"]
       },
       "scoring": {
         "basePoints": 120,
@@ -249,7 +249,7 @@
         "location": "extremities",
         "visibility": "highlighted_earliest_latest",
         "playerGoal": "find the beginning or the end",
-        "questionFocus": ["earliest_date", "latest_date"]
+        "questionFocus": ["rowWithEarliestDate", "whichDateIsLatest"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -260,8 +260,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["identify_date_pattern"],
-        "avoidQuestionTypes": ["count_weekends"]
+        "preferredQuestionTypes": ["rowWithEarliestDate"],
+        "avoidQuestionTypes": ["countWeekendDates"]
       },
       "scoring": {
         "basePoints": 90,
@@ -282,7 +282,7 @@
         "location": "range",
         "visibility": "highlighted_range",
         "playerGoal": "identify a continuous block of time",
-        "questionFocus": ["dates_in_range", "count_range"]
+        "questionFocus": ["whichDatesInRange", "howManyInRange"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
@@ -294,8 +294,8 @@
         "highlightRange": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["highlight_value"],
-        "avoidQuestionTypes": ["outlier_value"]
+        "preferredQuestionTypes": ["whichDateIsHighlighted"],
+        "avoidQuestionTypes": ["whichValueIsOutlier"]
       },
       "scoring": {
         "basePoints": 130,
@@ -317,7 +317,7 @@
         "location": "scattered",
         "visibility": "highlighted_extremes",
         "playerGoal": "identify times outside standard business hours",
-        "questionFocus": ["count_early_late", "identify_time"]
+        "questionFocus": ["countEarlyOrLate", "whichTimeIsHighlighted"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -328,8 +328,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["highlight_value"],
-        "avoidQuestionTypes": ["frequency_count"]
+        "preferredQuestionTypes": ["whichTimeIsHighlighted"],
+        "avoidQuestionTypes": ["mostFrequentWeekday"]
       },
       "scoring": {
         "basePoints": 100,
@@ -349,7 +349,7 @@
         "location": "scattered",
         "visibility": "highlighted_pm",
         "playerGoal": "distinguish post-meridian times",
-        "questionFocus": ["count_pm", "identify_pm"]
+        "questionFocus": ["howManyPmTimes", "whichTimeIsPm"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -360,8 +360,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["frequency_count"],
-        "avoidQuestionTypes": ["unique_category"]
+        "preferredQuestionTypes": ["howManyPmTimes"],
+        "avoidQuestionTypes": ["whichCategoryIsUnique"]
       },
       "scoring": {
         "basePoints": 90,
@@ -381,7 +381,7 @@
         "location": "extremities",
         "visibility": "highlighted_min_max",
         "playerGoal": "find the earliest or latest timestamp",
-        "questionFocus": ["earliest_time", "latest_time"]
+        "questionFocus": ["whichTimeIsEarliest", "whichTimeIsLatest"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -392,8 +392,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["highlight_value"],
-        "avoidQuestionTypes": ["frequency_count"]
+        "preferredQuestionTypes": ["whichTimeIsEarliest"],
+        "avoidQuestionTypes": ["mostFrequentWeekday"]
       },
       "scoring": {
         "basePoints": 80,
@@ -413,7 +413,7 @@
         "location": "range",
         "visibility": "highlighted_window",
         "playerGoal": "identify times within a specific window",
-        "questionFocus": ["count_in_range", "times_in_range"]
+        "questionFocus": ["howManyInTimeRange", "whichTimesInRange"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
@@ -425,8 +425,8 @@
         "highlightRange": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["frequency_count"],
-        "avoidQuestionTypes": ["outlier_value"]
+        "preferredQuestionTypes": ["howManyInTimeRange"],
+        "avoidQuestionTypes": ["whichValueIsOutlier"]
       },
       "scoring": {
         "basePoints": 120,
@@ -449,7 +449,7 @@
         "location": "scattered",
         "visibility": "highlighted_frequency",
         "playerGoal": "identify the most frequent category",
-        "questionFocus": ["frequency_count", "most_frequent"]
+        "questionFocus": ["howManyTimesCategoryAppears", "whichCategoryIsMostFrequent"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -460,8 +460,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["frequency_count"],
-        "avoidQuestionTypes": ["unique_category"]
+        "preferredQuestionTypes": ["howManyTimesCategoryAppears"],
+        "avoidQuestionTypes": ["whichCategoryIsUnique"]
       },
       "scoring": {
         "basePoints": 100,
@@ -482,7 +482,7 @@
         "location": "single_point",
         "visibility": "highlighted_unique",
         "playerGoal": "find the category that appears exactly once",
-        "questionFocus": ["unique_category", "row_of_unique"]
+        "questionFocus": ["whichCategoryIsUnique", "rowWithUniqueCategory"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -493,8 +493,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["unique_category"],
-        "avoidQuestionTypes": ["frequency_count", "most_frequent"]
+        "preferredQuestionTypes": ["whichCategoryIsUnique"],
+        "avoidQuestionTypes": ["howManyTimesCategoryAppears", "whichCategoryIsMostFrequent"]
       },
       "scoring": {
         "basePoints": 150,
@@ -515,7 +515,7 @@
         "location": "single_point",
         "visibility": "highlighted_unique",
         "playerGoal": "identify the anomaly in the pattern",
-        "questionFocus": ["unique_category", "count_unique"]
+        "questionFocus": ["whichCategoryIsUnique", "howManyUniqueCategories"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
@@ -526,8 +526,8 @@
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["unique_category"],
-        "avoidQuestionTypes": ["frequency_count"]
+        "preferredQuestionTypes": ["whichCategoryIsUnique"],
+        "avoidQuestionTypes": ["howManyTimesCategoryAppears"]
       },
       "scoring": {
         "basePoints": 150,
@@ -549,20 +549,20 @@
         "location": "row_or_column",
         "visibility": "highlighted_vector",
         "playerGoal": "find the row or column filled with a single category",
-        "questionFocus": ["highlight_row", "highlight_column"]
+        "questionFocus": ["whichRowHasPattern", "whichColumnHasPattern"]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
         "requiresColumnStructure": true
       },
       "context": {
-        "glyphsToActivate": ["frequency"],
+        "glyphsToActivate": ["sequence"],
         "lensSummaries": ["categoryCounts"],
         "highlightColumn": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["highlight_row", "highlight_column"],
-        "avoidQuestionTypes": ["unique_category"]
+        "preferredQuestionTypes": ["whichRowHasPattern", "whichColumnHasPattern"],
+        "avoidQuestionTypes": ["whichCategoryIsUnique"]
       },
       "scoring": {
         "basePoints": 130,
