@@ -1,4 +1,4 @@
-{
+export default {
   "datasetTypes": {
     "numbers": {
       "id": "numbers",
@@ -270,4 +270,4 @@
     "compatibilityMode": "strict",
     "defaultScaling": "linear"
   }
-}
+};
