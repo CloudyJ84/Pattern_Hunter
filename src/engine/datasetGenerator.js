@@ -1,19 +1,8 @@
-let rules = null;
+import datasetRules from '../data/datasetRulesData.js';
+import { injectPattern } from './patternEngine.js';
 
-export function initDatasetGenerator(config) {
-    rules = config;
-}
-
-export function destroyDatasetGenerator() {
-    rules = null;
-}
-
-export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
-    if (!rules) {
-        throw new Error("DatasetGenerator not initialized");
-    }
-
-    const config = rules.datasetTypes?.[datasetType];
+export function generateDataset(datasetType, patternType, size, thresholdConfig = {}) {
+    const config = datasetRules.datasetTypes?.[datasetType];
     if (!config) {
         throw new Error(`Unknown dataset type: ${datasetType}`);
     }
@@ -49,7 +38,6 @@ export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
             } else if (datasetType === 'categories') {
                 value = randomCategory(config.generation);
                 // Hook: Future distractor injection logic would go here
-                // if (Math.random() < distractorDensity) value = generateDistractor(...)
             } else if (datasetType === 'times') {
                 value = randomTime(config.generation);
             }
@@ -80,6 +68,10 @@ export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
     // --- Final Dataset Validation ---
     validateDataset(grid, datasetType);
 
+    // --- Pattern Injection ---
+    // Delegated entirely to patternEngine as per Mythic-First architecture
+    const injectionResult = injectPattern(grid, datasetType, patternType, thresholdConfig);
+
     // --- Return Unified Schema ---
     return {
         grid,
@@ -91,7 +83,8 @@ export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
             valueType,
             generationRules: config.generation,
             datasetId
-        }
+        },
+        injectionResult
     };
 }
 
