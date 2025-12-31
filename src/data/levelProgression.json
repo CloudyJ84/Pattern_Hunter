@@ -6,13 +6,13 @@
     "datasetTypes": ["numbers"],
     "patternTypes": {
       "numbers": [
-        "pattern_num_above_threshold",
-        "pattern_num_below_threshold"
+        "rising_flame",
+        "falling_stone"
       ]
     },
     "questionTypes": {
       "numbers": [
-        "question_count_above_threshold"
+        "countAboveThreshold"
       ]
     },
     "difficulty": {
@@ -21,12 +21,12 @@
       "formattingComplexity": 1
     },
     "tierScaling": {
-      "minTier": 1,
-      "maxTier": 1,
-      "recommendedTier": 1
+      "minTier": "SCOUT",
+      "maxTier": "SCOUT",
+      "recommendedTier": "SCOUT"
     },
     "unlocks": {
-      "glyphs": ["glyph_reveal_basic"],
+      "glyphs": ["above"],
       "datasetTypes": ["numbers"]
     },
     "notes": "The Initiate's Path. Simple numeric thresholds to teach the mechanics of the Lens."
@@ -39,30 +39,31 @@
     "datasetTypes": ["numbers", "dates", "times"],
     "patternTypes": {
       "numbers": [
-        "pattern_num_extremes",
-        "pattern_num_above_threshold"
+        "peak_valley",
+        "rising_flame"
       ],
       "dates": [
-        "pattern_date_weekend",
-        "pattern_date_extremes"
+        "twin_suns",
+        "time_anchor"
       ],
       "times": [
-        "pattern_time_ampm",
-        "pattern_time_extremes"
+        "meridian_shift",
+        "chrono_limit"
       ]
     },
     "questionTypes": {
       "numbers": [
-        "question_find_extremes",
-        "question_count_above_threshold"
+        "whichValueIsHighest",
+        "whichValueIsLowest",
+        "countAboveThreshold"
       ],
       "dates": [
-        "question_find_weekend",
-        "question_count_range"
+        "countWeekendDates",
+        "howManyInRange"
       ],
       "times": [
-        "question_count_pm",
-        "question_find_earliest"
+        "howManyPmTimes",
+        "whichTimeIsEarliest"
       ]
     },
     "difficulty": {
@@ -71,12 +72,12 @@
       "formattingComplexity": 2
     },
     "tierScaling": {
-      "minTier": 1,
-      "maxTier": 2,
-      "recommendedTier": 2
+      "minTier": "SCOUT",
+      "maxTier": "HUNTER",
+      "recommendedTier": "HUNTER"
     },
     "unlocks": {
-      "lensModes": ["lens_chrono_filter"],
+      "lensModes": ["lens_focus"],
       "datasetTypes": ["dates", "times"]
     },
     "notes": "The Apprentice's Trials. Introduction of temporal data and extreme value logic."
@@ -89,40 +90,41 @@
     "datasetTypes": ["numbers", "dates", "times", "categories"],
     "patternTypes": {
       "numbers": [
-        "pattern_num_cluster",
-        "pattern_num_outlier",
-        "pattern_num_extremes"
+        "convergence",
+        "broken_pattern",
+        "peak_valley"
       ],
       "dates": [
-        "pattern_date_weekday_cluster",
-        "pattern_date_range"
+        "day_alignment",
+        "temporal_rift"
       ],
       "times": [
-        "pattern_time_range",
-        "pattern_time_threshold"
+        "hour_glass",
+        "dawn_dusk"
       ],
       "categories": [
-        "pattern_cat_most_frequent",
-        "pattern_cat_least_frequent",
-        "pattern_cat_unique"
+        "echo",
+        "silent_note",
+        "lone_star"
       ]
     },
     "questionTypes": {
       "numbers": [
-        "question_find_outlier",
-        "question_find_extremes"
+        "whichValueIsOutlier",
+        "whichValueIsHighest",
+        "whichValueIsLowest"
       ],
       "dates": [
-        "question_most_frequent_weekday",
-        "question_count_range"
+        "mostFrequentWeekday",
+        "howManyInRange"
       ],
       "times": [
-        "question_in_time_range",
-        "question_count_pm"
+        "whichTimesInRange",
+        "howManyPmTimes"
       ],
       "categories": [
-        "question_find_unique",
-        "question_count_category"
+        "whichCategoryIsUnique",
+        "howManyTimesCategoryAppears"
       ]
     },
     "difficulty": {
@@ -131,9 +133,9 @@
       "formattingComplexity": 3
     },
     "tierScaling": {
-      "minTier": 2,
-      "maxTier": 3,
-      "recommendedTier": 3
+      "minTier": "HUNTER",
+      "maxTier": "TRACKER",
+      "recommendedTier": "TRACKER"
     },
     "unlocks": {
       "datasetTypes": ["categories"],
@@ -165,9 +167,9 @@
       "formattingComplexity": 5
     },
     "tierScaling": {
-      "minTier": 3,
-      "maxTier": 5,
-      "recommendedTier": 4
+      "minTier": "TRACKER",
+      "maxTier": "MYTHIC",
+      "recommendedTier": "SEER"
     },
     "notes": "The Void. Endless scaling with dynamic grid sizes and all safe patterns enabled."
   }
