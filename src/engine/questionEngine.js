@@ -232,7 +232,11 @@ function _generateQueryContext(dataset, highlightedCells, datasetType, patternTy
         dataset, // Full grid needed for row/col lookups
         stats,
         lens: patternMeta?.lens || {},
-        hasHighlights: highlightedCells && highlightedCells.length > 0
+        hasHighlights: highlightedCells && highlightedCells.length > 0,
+        // Context extensions for requirements
+        patternMeta,
+        rowStructure: dataset.length > 1,
+        columnStructure: dataset[0] && dataset[0].length > 1
     };
 }
 
@@ -258,6 +262,24 @@ function _checkRequirements(question, context) {
     if (req.requiresRange && context.highlightedCells.length < 2) {
         return false;
     }
+
+    // 5. Check Glyphs
+    if (req.requiresGlyphs) {
+        const activeGlyphs = context.lens?.glyphs || context.patternMeta?.glyphs?.activate || [];
+        if (!req.requiresGlyphs.every(g => activeGlyphs.includes(g))) return false;
+    }
+
+    // 6. Check Lens Summary
+    if (req.requiresLensSummary) {
+        const summaries = context.lens?.summaries || context.patternMeta?.lens?.summaries || [];
+        if (!req.requiresLensSummary.every(s => summaries.includes(s))) return false;
+    }
+
+    // 7. Check Row Structure
+    if (req.requiresRowStructure && !context.rowStructure) return false;
+
+    // 8. Check Column Structure
+    if (req.requiresColumnStructure && !context.columnStructure) return false;
 
     return true;
 }
