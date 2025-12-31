@@ -40,9 +40,6 @@ export class ChallengeScreen {
         this.data = null; // Will hold the new Challenge Object
         this.element = null;
         
-        // Visual State
-        this.activeGlyphs = new Set(); 
-        
         // Systems
         this.lensRenderer = null;
         this.glyphRenderer = null;
