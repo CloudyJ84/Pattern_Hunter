@@ -211,6 +211,8 @@ export function injectPattern(dataset, datasetType, patternType, thresholdConfig
     id: patternObj.id,
     label: patternObj.label,
     category: patternObj.category,
+    semantics: patternObj.semantics || {},
+    requirements: patternObj.requires || {},
     
     // Scoring: Merge JSON scoring with Tier Multiplier
     scoring: {
@@ -238,13 +240,14 @@ export function injectPattern(dataset, datasetType, patternType, thresholdConfig
     // Lens Metadata: From JSON context
     lens: {
       type: patternObj.context?.lensType || 'none',
-      summaries: patternObj.context?.lensSummaries || []
+      summaries: patternObj.context?.lensSummaries || [],
+      mode: patternObj.context?.lensMode || null
     },
 
     // Glyph Metadata: From JSON context
     glyphs: {
       activate: patternObj.context?.glyphsToActivate || [],
-      metadata: {} 
+      metadata: patternObj.context?.glyphMetadata || {}
     },
     
     // Data needed for highlighting later
@@ -316,9 +319,7 @@ function _injectUniqueCategory(dataset, params) {
 }
 
 function _getTierMultiplier(thresholdConfig) {
-  const tier = thresholdConfig.tier !== undefined ? thresholdConfig.tier : 1;
-  const mults = { 0: 1.0, 1: 1.5, 2: 2.0, 3: 3.0 };
-  return mults[tier] || 1.0;
+  return thresholdConfig.rewardMultiplier || 1.0;
 }
 
 function _validateInjectedValues(dataset, datasetType, targetCells, patternType) {
@@ -374,5 +375,3 @@ function _createFallbackMeta(id, thresholdConfig) {
     glyphs: { activate: [], metadata: {} }
   };
 }
-
-
