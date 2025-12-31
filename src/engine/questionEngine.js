@@ -5,7 +5,7 @@
  * * Refactored to be fully data-driven via questionGenerator.json.
  */
 
-import questionDefinitions from '../data/questionGenerator.json';
+import questionDefinitions from '../data/questionGeneratorData.js';
 
 // --- Registry Initialization ---
 
@@ -326,3 +326,4 @@ function _createFallbackResponse(patternMeta) {
         glyphs: []
     };
 }
+
