@@ -2,7 +2,7 @@
  * questionEngine.js
  * A modular Query Engine that generates context-aware, tier-based questions 
  * for the Pattern Hunter "Trial of the Field".
- * * Refactored to be fully data-driven via questionGenerator.json.
+ * * Refactored to be fully data-driven via questionGeneratorData.js.
  */
 
 import questionDefinitions from '../data/questionGeneratorData.js';
@@ -11,7 +11,7 @@ import questionDefinitions from '../data/questionGeneratorData.js';
 
 /**
  * Builds the runtime registry by flattening the categorized JSON structure.
- * This ensures questionGenerator.json is the single source of truth.
+ * This ensures questionGeneratorData.js is the single source of truth.
  */
 const buildRegistry = () => {
     const generator = questionDefinitions.questionGenerator || {};
@@ -326,4 +326,5 @@ function _createFallbackResponse(patternMeta) {
         glyphs: []
     };
 }
+
 
