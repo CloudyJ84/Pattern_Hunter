@@ -1,5 +1,4 @@
 import { generateLevel } from '../../engine/levelEngine.js';
-import { computePatternMetadata } from '../../engine/analyticsEngine.js';
 import { LevelController } from '../../engine/level/LevelController.js'; 
 import { GameState } from '../../state/gameState.js';
 import { UIRouter } from '../UIRouter.js';
