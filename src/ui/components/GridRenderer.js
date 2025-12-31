@@ -6,7 +6,6 @@ export class GridRenderer {
         this.container = container;
         this.element = container;
         this.cells = [];
-        this.gridCells = []; // Internal registry for fast lookups
         this.cols = 0;       // Track column count for index math
     }
 
@@ -19,7 +18,6 @@ export class GridRenderer {
 
         this.container.innerHTML = '';
         this.cells = [];
-        this.gridCells = []; // Clear flat registry
 
         // Set column count based on first row
         this.cols = gridData[0].length;
@@ -46,14 +44,6 @@ export class GridRenderer {
                 const cell = new Cell(cellData);
                 this.cells.push(cell);
                 this.container.appendChild(cell.element);
-
-                // Populate internal registry for ChallengeScreen and Sigil access
-                this.gridCells.push({
-                    element: cell.element,
-                    value: cellData.value,
-                    row: r,
-                    col: c
-                });
             }
         }
 
@@ -68,17 +58,15 @@ export class GridRenderer {
      */
     highlightCells(cells) {
         this.clearHighlights();
-
         if (!cells || !Array.isArray(cells)) return;
 
-        cells.forEach(cell => {
-            // Calculate flat index based on row/col
-            const idx = cell.row * this.cols + cell.col;
-            const entry = this.gridCells[idx];
-            if (entry) {
-                entry.element.classList.add('highlighted');
+        for (const target of cells) {
+            for (const cell of this.cells) {
+                if (cell.data.row === target.row && cell.data.col === target.col) {
+                    cell.element.classList.add('highlighted');
+                }
             }
-        });
+        }
     }
 
     /**
@@ -89,27 +77,29 @@ export class GridRenderer {
     highlightIndices(indices) {
         if (!indices || !Array.isArray(indices)) return;
 
-        indices.forEach(i => {
-            const entry = this.gridCells[i];
-            if (entry) {
-                entry.element.classList.add('highlighted');
+        for (const i of indices) {
+            const cell = this.cells.find(c => c.data.index === i);
+            if (cell) {
+                cell.element.classList.add('highlighted');
             }
-        });
+        }
     }
 
     /**
      * Clears the 'highlighted' class from all registered cells.
      */
     clearHighlights() {
-        this.gridCells.forEach(entry => {
-            entry.element.classList.remove('highlighted');
+        this.cells.forEach(cell => {
+            cell.element.classList.remove('highlighted');
         });
     }
 
     /**
-     * Future-proof hook for lens overlays.
-     * @param {string} lensType 
-     * @param {object} analytics 
+     * Reserved for future lens overlays.
+     * Expected input:
+     * lensType: string
+     * analytics: object
+     * Will apply visual overlays based on lensType and analytics metadata.
      */
     applyLens(lensType, analytics) {
         // Future expansion: color overlays, column/row shading, etc.
@@ -117,17 +107,16 @@ export class GridRenderer {
     }
 
     applyFormatting(formattingResult) {
-        // Preserved for backward compatibility / existing flows
         if (!formattingResult || !formattingResult.highlightedCells) return;
 
-        const highlighted = new Set(
-            formattingResult.highlightedCells.map(c => `${c.row},${c.col}`)
-        );
+        const cssClass = formattingResult.cssClass || 'highlighted';
 
         for (const cell of this.cells) {
-            const key = `${cell.data.row},${cell.data.col}`;
-            if (highlighted.has(key)) {
-                cell.highlight(formattingResult.cssClass);
+            const match = formattingResult.highlightedCells.some(
+                c => c.row === cell.data.row && c.col === cell.data.col
+            );
+            if (match) {
+                cell.element.classList.add(cssClass);
             }
         }
     }
@@ -135,7 +124,6 @@ export class GridRenderer {
     destroy() {
         // No persistent listeners, but lifecycle consistency matters
         this.cells = [];
-        this.gridCells = [];
         this.container.innerHTML = '';
     }
 }
