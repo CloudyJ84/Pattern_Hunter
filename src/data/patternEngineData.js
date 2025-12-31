@@ -1,4 +1,4 @@
-{
+export default {
   "numbers": {
     "rising_flame": {
       "id": "rising_flame",
@@ -14,24 +14,38 @@
         "location": "scattered",
         "visibility": "highlighted_values",
         "playerGoal": "identify values ascending above the mean",
-        "questionFocus": ["countAboveThreshold", "whichValueIsHighlighted"]
+        "questionFocus": [
+          "countAboveThreshold",
+          "whichValueIsHighlighted"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["above"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "above"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["countAboveThreshold"],
-        "avoidQuestionTypes": ["countBelowThreshold", "whichValueIsLowest"]
+        "preferredQuestionTypes": [
+          "countAboveThreshold"
+        ],
+        "avoidQuestionTypes": [
+          "countBelowThreshold",
+          "whichValueIsLowest"
+        ]
       },
       "scoring": {
         "basePoints": 100,
         "difficultyMultiplier": 1.0,
-        "bonusConditions": ["noHints"]
+        "bonusConditions": [
+          "noHints"
+        ]
       }
     },
     "falling_stone": {
@@ -48,24 +62,38 @@
         "location": "scattered",
         "visibility": "highlighted_values",
         "playerGoal": "identify values sinking below the mean",
-        "questionFocus": ["countBelowThreshold", "whichValueIsHighlighted"]
+        "questionFocus": [
+          "countBelowThreshold",
+          "whichValueIsHighlighted"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["below"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "below"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["countBelowThreshold"],
-        "avoidQuestionTypes": ["countAboveThreshold", "whichValueIsHighest"]
+        "preferredQuestionTypes": [
+          "countBelowThreshold"
+        ],
+        "avoidQuestionTypes": [
+          "countAboveThreshold",
+          "whichValueIsHighest"
+        ]
       },
       "scoring": {
         "basePoints": 100,
         "difficultyMultiplier": 1.0,
-        "bonusConditions": ["noHints"]
+        "bonusConditions": [
+          "noHints"
+        ]
       }
     },
     "broken_pattern": {
@@ -82,24 +110,39 @@
         "location": "single_point",
         "visibility": "highlighted_value",
         "playerGoal": "find the statistical anomaly",
-        "questionFocus": ["whichValueIsOutlier", "rowWithOutlier"]
+        "questionFocus": [
+          "whichValueIsOutlier",
+          "rowWithOutlier"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["outlier"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "outlier"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichValueIsOutlier", "whichValueIsHighest", "whichValueIsLowest"],
-        "avoidQuestionTypes": ["whichClusterIsLargest"]
+        "preferredQuestionTypes": [
+          "whichValueIsOutlier",
+          "whichValueIsHighest",
+          "whichValueIsLowest"
+        ],
+        "avoidQuestionTypes": [
+          "whichClusterIsLargest"
+        ]
       },
       "scoring": {
         "basePoints": 150,
         "difficultyMultiplier": 1.5,
-        "bonusConditions": ["firstTry"]
+        "bonusConditions": [
+          "firstTry"
+        ]
       }
     },
     "convergence": {
@@ -116,20 +159,31 @@
         "location": "value_band",
         "visibility": "highlighted_cluster",
         "playerGoal": "identify the dense grouping of values",
-        "questionFocus": ["howManyInCluster", "whichClusterIsLargest"]
+        "questionFocus": [
+          "howManyInCluster",
+          "whichClusterIsLargest"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
         "requiresRange": true
       },
       "context": {
-        "glyphsToActivate": ["cluster"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "cluster"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightRange": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichValueIsHighlighted"],
-        "avoidQuestionTypes": ["whichValueIsOutlier"]
+        "preferredQuestionTypes": [
+          "whichValueIsHighlighted"
+        ],
+        "avoidQuestionTypes": [
+          "whichValueIsOutlier"
+        ]
       },
       "scoring": {
         "basePoints": 120,
@@ -149,19 +203,31 @@
         "location": "extremities",
         "visibility": "highlighted_min_max",
         "playerGoal": "find the absolute limits of the dataset",
-        "questionFocus": ["whichValueIsLowest", "whichValueIsHighest"]
+        "questionFocus": [
+          "whichValueIsLowest",
+          "whichValueIsHighest"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["unique"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "unique"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichValueIsLowest", "whichValueIsHighest"],
-        "avoidQuestionTypes": ["whichClusterIsLargest"]
+        "preferredQuestionTypes": [
+          "whichValueIsLowest",
+          "whichValueIsHighest"
+        ],
+        "avoidQuestionTypes": [
+          "whichClusterIsLargest"
+        ]
       },
       "scoring": {
         "basePoints": 80,
@@ -184,19 +250,31 @@
         "location": "scattered",
         "visibility": "highlighted_weekends",
         "playerGoal": "identify the days of rest",
-        "questionFocus": ["countWeekendDates", "whichDateIsHighlighted"]
+        "questionFocus": [
+          "countWeekendDates",
+          "whichDateIsHighlighted"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["weekend"],
-        "lensSummaries": ["frequencySummary"],
+        "glyphsToActivate": [
+          "weekend"
+        ],
+        "lensSummaries": [
+          "frequencySummary"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["countWeekendDates"],
-        "avoidQuestionTypes": ["whichDateIsEarliest", "whichDateIsLatest"]
+        "preferredQuestionTypes": [
+          "countWeekendDates"
+        ],
+        "avoidQuestionTypes": [
+          "whichDateIsEarliest",
+          "whichDateIsLatest"
+        ]
       },
       "scoring": {
         "basePoints": 110,
@@ -217,19 +295,30 @@
         "location": "scattered",
         "visibility": "highlighted_weekday",
         "playerGoal": "spot the repeating day of the week",
-        "questionFocus": ["mostFrequentWeekday", "countWeekendDates"]
+        "questionFocus": [
+          "mostFrequentWeekday",
+          "countWeekendDates"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["frequency"],
-        "lensSummaries": ["frequencySummary"],
+        "glyphsToActivate": [
+          "frequency"
+        ],
+        "lensSummaries": [
+          "frequencySummary"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["mostFrequentWeekday"],
-        "avoidQuestionTypes": ["whichCategoryIsUnique"]
+        "preferredQuestionTypes": [
+          "mostFrequentWeekday"
+        ],
+        "avoidQuestionTypes": [
+          "whichCategoryIsUnique"
+        ]
       },
       "scoring": {
         "basePoints": 120,
@@ -249,19 +338,30 @@
         "location": "extremities",
         "visibility": "highlighted_earliest_latest",
         "playerGoal": "find the beginning or the end",
-        "questionFocus": ["rowWithEarliestDate", "whichDateIsLatest"]
+        "questionFocus": [
+          "rowWithEarliestDate",
+          "whichDateIsLatest"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["unique"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "unique"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["rowWithEarliestDate"],
-        "avoidQuestionTypes": ["countWeekendDates"]
+        "preferredQuestionTypes": [
+          "rowWithEarliestDate"
+        ],
+        "avoidQuestionTypes": [
+          "countWeekendDates"
+        ]
       },
       "scoring": {
         "basePoints": 90,
@@ -282,20 +382,31 @@
         "location": "range",
         "visibility": "highlighted_range",
         "playerGoal": "identify a continuous block of time",
-        "questionFocus": ["whichDatesInRange", "howManyInRange"]
+        "questionFocus": [
+          "whichDatesInRange",
+          "howManyInRange"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
         "requiresRange": true
       },
       "context": {
-        "glyphsToActivate": ["frequency"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "frequency"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightRange": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichDateIsHighlighted"],
-        "avoidQuestionTypes": ["whichValueIsOutlier"]
+        "preferredQuestionTypes": [
+          "whichDateIsHighlighted"
+        ],
+        "avoidQuestionTypes": [
+          "whichValueIsOutlier"
+        ]
       },
       "scoring": {
         "basePoints": 130,
@@ -317,19 +428,30 @@
         "location": "scattered",
         "visibility": "highlighted_extremes",
         "playerGoal": "identify times outside standard business hours",
-        "questionFocus": ["countEarlyOrLate", "whichTimeIsHighlighted"]
+        "questionFocus": [
+          "countEarlyOrLate",
+          "whichTimeIsHighlighted"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["outlier"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "outlier"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichTimeIsHighlighted"],
-        "avoidQuestionTypes": ["mostFrequentWeekday"]
+        "preferredQuestionTypes": [
+          "whichTimeIsHighlighted"
+        ],
+        "avoidQuestionTypes": [
+          "mostFrequentWeekday"
+        ]
       },
       "scoring": {
         "basePoints": 100,
@@ -349,19 +471,30 @@
         "location": "scattered",
         "visibility": "highlighted_pm",
         "playerGoal": "distinguish post-meridian times",
-        "questionFocus": ["howManyPmTimes", "whichTimeIsPm"]
+        "questionFocus": [
+          "howManyPmTimes",
+          "whichTimeIsPm"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["above"],
-        "lensSummaries": ["categoryCounts"],
+        "glyphsToActivate": [
+          "above"
+        ],
+        "lensSummaries": [
+          "categoryCounts"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["howManyPmTimes"],
-        "avoidQuestionTypes": ["whichCategoryIsUnique"]
+        "preferredQuestionTypes": [
+          "howManyPmTimes"
+        ],
+        "avoidQuestionTypes": [
+          "whichCategoryIsUnique"
+        ]
       },
       "scoring": {
         "basePoints": 90,
@@ -381,19 +514,30 @@
         "location": "extremities",
         "visibility": "highlighted_min_max",
         "playerGoal": "find the earliest or latest timestamp",
-        "questionFocus": ["whichTimeIsEarliest", "whichTimeIsLatest"]
+        "questionFocus": [
+          "whichTimeIsEarliest",
+          "whichTimeIsLatest"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["unique"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "unique"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichTimeIsEarliest"],
-        "avoidQuestionTypes": ["mostFrequentWeekday"]
+        "preferredQuestionTypes": [
+          "whichTimeIsEarliest"
+        ],
+        "avoidQuestionTypes": [
+          "mostFrequentWeekday"
+        ]
       },
       "scoring": {
         "basePoints": 80,
@@ -413,20 +557,31 @@
         "location": "range",
         "visibility": "highlighted_window",
         "playerGoal": "identify times within a specific window",
-        "questionFocus": ["howManyInTimeRange", "whichTimesInRange"]
+        "questionFocus": [
+          "howManyInTimeRange",
+          "whichTimesInRange"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
         "requiresRange": true
       },
       "context": {
-        "glyphsToActivate": ["frequency"],
-        "lensSummaries": ["stats"],
+        "glyphsToActivate": [
+          "frequency"
+        ],
+        "lensSummaries": [
+          "stats"
+        ],
         "highlightRange": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["howManyInTimeRange"],
-        "avoidQuestionTypes": ["whichValueIsOutlier"]
+        "preferredQuestionTypes": [
+          "howManyInTimeRange"
+        ],
+        "avoidQuestionTypes": [
+          "whichValueIsOutlier"
+        ]
       },
       "scoring": {
         "basePoints": 120,
@@ -449,19 +604,30 @@
         "location": "scattered",
         "visibility": "highlighted_frequency",
         "playerGoal": "identify the most frequent category",
-        "questionFocus": ["howManyTimesCategoryAppears", "whichCategoryIsMostFrequent"]
+        "questionFocus": [
+          "howManyTimesCategoryAppears",
+          "whichCategoryIsMostFrequent"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["frequency"],
-        "lensSummaries": ["frequencySummary"],
+        "glyphsToActivate": [
+          "frequency"
+        ],
+        "lensSummaries": [
+          "frequencySummary"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["howManyTimesCategoryAppears"],
-        "avoidQuestionTypes": ["whichCategoryIsUnique"]
+        "preferredQuestionTypes": [
+          "howManyTimesCategoryAppears"
+        ],
+        "avoidQuestionTypes": [
+          "whichCategoryIsUnique"
+        ]
       },
       "scoring": {
         "basePoints": 100,
@@ -482,19 +648,31 @@
         "location": "single_point",
         "visibility": "highlighted_unique",
         "playerGoal": "find the category that appears exactly once",
-        "questionFocus": ["whichCategoryIsUnique", "rowWithUniqueCategory"]
+        "questionFocus": [
+          "whichCategoryIsUnique",
+          "rowWithUniqueCategory"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["unique"],
-        "lensSummaries": ["categoryCounts"],
+        "glyphsToActivate": [
+          "unique"
+        ],
+        "lensSummaries": [
+          "categoryCounts"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichCategoryIsUnique"],
-        "avoidQuestionTypes": ["howManyTimesCategoryAppears", "whichCategoryIsMostFrequent"]
+        "preferredQuestionTypes": [
+          "whichCategoryIsUnique"
+        ],
+        "avoidQuestionTypes": [
+          "howManyTimesCategoryAppears",
+          "whichCategoryIsMostFrequent"
+        ]
       },
       "scoring": {
         "basePoints": 150,
@@ -515,19 +693,30 @@
         "location": "single_point",
         "visibility": "highlighted_unique",
         "playerGoal": "identify the anomaly in the pattern",
-        "questionFocus": ["whichCategoryIsUnique", "howManyUniqueCategories"]
+        "questionFocus": [
+          "whichCategoryIsUnique",
+          "howManyUniqueCategories"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true
       },
       "context": {
-        "glyphsToActivate": ["unique"],
-        "lensSummaries": ["categoryCounts"],
+        "glyphsToActivate": [
+          "unique"
+        ],
+        "lensSummaries": [
+          "categoryCounts"
+        ],
         "highlightColumn": false
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichCategoryIsUnique"],
-        "avoidQuestionTypes": ["howManyTimesCategoryAppears"]
+        "preferredQuestionTypes": [
+          "whichCategoryIsUnique"
+        ],
+        "avoidQuestionTypes": [
+          "howManyTimesCategoryAppears"
+        ]
       },
       "scoring": {
         "basePoints": 150,
@@ -549,20 +738,32 @@
         "location": "row_or_column",
         "visibility": "highlighted_vector",
         "playerGoal": "find the row or column filled with a single category",
-        "questionFocus": ["whichRowHasPattern", "whichColumnHasPattern"]
+        "questionFocus": [
+          "whichRowHasPattern",
+          "whichColumnHasPattern"
+        ]
       },
       "contextRequirements": {
         "requiresHighlightedCells": true,
         "requiresColumnStructure": true
       },
       "context": {
-        "glyphsToActivate": ["sequence"],
-        "lensSummaries": ["categoryCounts"],
+        "glyphsToActivate": [
+          "sequence"
+        ],
+        "lensSummaries": [
+          "categoryCounts"
+        ],
         "highlightColumn": true
       },
       "questionHints": {
-        "preferredQuestionTypes": ["whichRowHasPattern", "whichColumnHasPattern"],
-        "avoidQuestionTypes": ["whichCategoryIsUnique"]
+        "preferredQuestionTypes": [
+          "whichRowHasPattern",
+          "whichColumnHasPattern"
+        ],
+        "avoidQuestionTypes": [
+          "whichCategoryIsUnique"
+        ]
       },
       "scoring": {
         "basePoints": 130,
@@ -570,4 +771,4 @@
       }
     }
   }
-}
+};
