@@ -1,66 +1,32 @@
 // Responsible for mapping pattern types to visual styles
 
-import { applyHighlightLogic } from './patternEngine.js';
-
-let rules = null;
-
-export function initFormattingEngine(patternEngineConfig) {
-    rules = patternEngineConfig;
-}
-
-export function destroyFormattingEngine() {
-    rules = null;
-}
-
 /**
- * Applies formatting rules to a dataset and returns:
- * - formattingRule
- * - cssClass
- * - highlightedCells (modified by threshold tier and pattern metadata)
- * - lensType
- * - lensSummaries
- * - glyphs
- * - sigilType
+ * Applies formatting rules to a dataset and returns unified formatting result.
+ * aligned with Mythic-First architecture.
  */
-export function applyFormatting(dataset, datasetType, patternType, thresholdConfig = {}, patternMeta = null) {
-    if (!rules) {
-        throw new Error("FormattingEngine not initialized");
-    }
-
-    const patternConfig = rules[datasetType]?.[patternType];
-
-    // Extract metadata with safe defaults for UI consumption
-    const lensType = patternMeta?.lens?.type || "none";
+export function applyFormatting(
+    grid,
+    datasetType,
+    patternType,
+    thresholdConfig = {},
+    patternMeta = {}
+) {
+    // 1. Extract Metadata
+    const activeGlyphs = patternMeta?.glyphs?.activate || [];
     const lensSummaries = patternMeta?.lens?.summaries || [];
-    const glyphs = patternMeta?.glyphs?.activate || [];
-    const sigilType = patternMeta?.sigil?.type || "FALLBACK";
     const uiContext = patternMeta?.uiContext || {};
+    
+    // 2. Identify Matches
+    // In Mythic architecture, patternEngine has already computed matches.
+    // We expect them in patternMeta.matches.
+    const allMatches = patternMeta?.matches || [];
 
-    // Fallback if config missing, ensuring UI still receives valid metadata
-    if (!patternConfig) {
-        return {
-            formattingRule: "none",
-            cssClass: "fmt-default",
-            highlightedCells: [],
-            lensType,
-            lensSummaries,
-            glyphs,
-            sigilType
-        };
-    }
-
-    const formattingRule = patternConfig.formattingRule;
-
-    // 1. Determine all matching cells
-    const allMatches = applyHighlightLogic(dataset, datasetType, patternType);
-
-    // 2. Apply threshold-tier hint logic with metadata overrides
+    // 3. Apply Highlight Logic (Threshold/Hinting)
     const hintLevel = thresholdConfig.hintLevel || "medium";
-    let highlightedCells = [];
-
-    // Metadata context overrides to prevent hint logic from breaking specific patterns
     const highlightColumn = uiContext.highlightColumn === true;
     const minTargetCells = uiContext.targetCellsCount || 1;
+
+    let highlightedCells = [];
 
     if (hintLevel === "none") {
         // Mythic: no hints
@@ -69,7 +35,7 @@ export function applyFormatting(dataset, datasetType, patternType, thresholdConf
         // Tracker: usually one hint, but respect metadata context
         if (highlightColumn) {
             // Column highlights are treated as a single visual unit; show all cells in the match
-            highlightedCells = allMatches;
+            highlightedCells = [...allMatches];
         } else if (minTargetCells > 1) {
             // If the pattern targets a specific count (e.g. "top 3"), ensure they are visible
             highlightedCells = allMatches.slice(0, minTargetCells);
@@ -79,20 +45,16 @@ export function applyFormatting(dataset, datasetType, patternType, thresholdConf
         }
     } else {
         // Scout / Hunter: full hints
-        highlightedCells = allMatches;
+        highlightedCells = [...allMatches];
     }
 
-    // 3. Map formatting rule to CSS class
-    const cssClass = getCssClassForRule(formattingRule);
-
+    // 4. Unified Return
     return {
-        formattingRule,
-        cssClass,
-        highlightedCells,
-        lensType,
-        lensSummaries,
-        glyphs,
-        sigilType
+        grid,                    // The formatted grid
+        highlightedCells,        // Array of { row, col }
+        activeGlyphs,            // From patternMeta
+        lensSummaries,           // From patternMeta
+        uiContext                // Passed through
     };
 }
 
