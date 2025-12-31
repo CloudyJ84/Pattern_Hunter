@@ -19,6 +19,12 @@ export class Cell {
         this.render();
     }
 
+    /**
+     * Renders the cell's visible value.
+     * Currently limited to text-only output.
+     * Future extensions (lens overlays, glyph overlays, animations,
+     * or type-based formatting) should hook in here or wrap this.element.
+     */
     render() {
         let val = this.data.value;
 
@@ -35,17 +41,32 @@ export class Cell {
         this.element.textContent = val;
     }
 
+    /**
+     * Applies a formatting CSS class to this cell.
+     * This method is no longer used by GridRenderer, which applies classes
+     * directly to the DOM, but remains available for scripted levels,
+     * hint resets, and future lens/glyph overlay systems.
+     */
     highlight(cssClass) {
         if (!cssClass || cssClass === 'fmt-default') return;
         this.element.classList.add(cssClass);
     }
 
+    /**
+     * Removes all fmt-* classes from the cell.
+     * Useful for resetting state during scripted interactions or
+     * future dynamic lens/glyph toggles.
+     */
     clearFormatting() {
         // Remove all fmt-* classes if needed
         const classes = [...this.element.classList].filter(c => c.startsWith('fmt-'));
         classes.forEach(c => this.element.classList.remove(c));
     }
 
+    /**
+     * Lifecycle cleanup.
+     * Ensures no lingering references remain when screens unmount.
+     */
     destroy() {
         // Lifecycle consistency with other components
         this.element = null;
