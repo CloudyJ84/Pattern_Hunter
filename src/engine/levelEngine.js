@@ -4,6 +4,7 @@ import { applyFormatting } from './formattingEngine.js';
 import { generateQuestion } from './questionEngine.js';
 import { computePatternMetadata } from './analyticsEngine.js';
 import patternDefinitions from '../data/patternEngineData.js';
+import thresholds from '../data/thresholdsData.js';
 
 // --- Dynamic Pattern Registry ---
 // Builds a canonical map of datasetType → [patternIds]
@@ -190,12 +191,14 @@ function getLevelConfig(level) {
 }
 
 function getThresholdConfig(tier) {
-    const tiers = [
-        { tier: 0, name: "Scout", hintLevel: "high", rewardMultiplier: 1.0 },
-        { tier: 1, name: "Hunter", hintLevel: "medium", rewardMultiplier: 1.5 },
-        { tier: 2, name: "Tracker", hintLevel: "low", rewardMultiplier: 2.0 },
-        { tier: 3, name: "Mythic", hintLevel: "none", rewardMultiplier: 3.0 }
-    ];
+    if (!Array.isArray(thresholds)) {
+        console.warn("Thresholds data missing or invalid. Falling back to Tier 1.");
+        return { tier: 1, name: "Hunter", hintLevel: "medium", rewardMultiplier: 1.5 };
+    }
 
-    return tiers[tier] || tiers[1];
+    // Find exact tier match
+    const match = thresholds.find(t => t.id === tier || t.tier === tier);
+
+    // Fallback to Tier 1 or first tier
+    return match || thresholds[1] || thresholds[0];
 }
