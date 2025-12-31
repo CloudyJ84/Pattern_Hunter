@@ -1,7 +1,6 @@
 import datasetRules from '../data/datasetRulesData.js';
-import { injectPattern } from './patternEngine.js';
 
-export function generateDataset(datasetType, patternType, size, thresholdConfig = {}) {
+export function generateRawDataset(datasetType, size, thresholdConfig = {}) {
     const config = datasetRules.datasetTypes?.[datasetType];
     if (!config) {
         throw new Error(`Unknown dataset type: ${datasetType}`);
@@ -68,10 +67,6 @@ export function generateDataset(datasetType, patternType, size, thresholdConfig 
     // --- Final Dataset Validation ---
     validateDataset(grid, datasetType);
 
-    // --- Pattern Injection ---
-    // Delegated entirely to patternEngine as per Mythic-First architecture
-    const injectionResult = injectPattern(grid, datasetType, patternType, thresholdConfig);
-
     // --- Return Unified Schema ---
     return {
         grid,
@@ -83,8 +78,7 @@ export function generateDataset(datasetType, patternType, size, thresholdConfig 
             valueType,
             generationRules: config.generation,
             datasetId
-        },
-        injectionResult
+        }
     };
 }
 
