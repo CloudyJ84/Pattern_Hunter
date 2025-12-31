@@ -1,9 +1,18 @@
-[
+export default [
   {
     "id": "band_initiate",
-    "levels": [1, 2, 3],
-    "datasetSize": { "rows": 3, "cols": 3 },
-    "datasetTypes": ["numbers"],
+    "levels": [
+      1,
+      2,
+      3
+    ],
+    "datasetSize": {
+      "rows": 3,
+      "cols": 3
+    },
+    "datasetTypes": [
+      "numbers"
+    ],
     "patternTypes": {
       "numbers": [
         "rising_flame",
@@ -26,17 +35,31 @@
       "recommendedTier": "SCOUT"
     },
     "unlocks": {
-      "glyphs": ["above"],
-      "datasetTypes": ["numbers"]
+      "glyphs": [
+        "above"
+      ],
+      "datasetTypes": [
+        "numbers"
+      ]
     },
     "notes": "The Initiate's Path. Simple numeric thresholds to teach the mechanics of the Lens."
   },
-
   {
     "id": "band_apprentice",
-    "levels": [4, 5, 6],
-    "datasetSize": { "rows": 4, "cols": 4 },
-    "datasetTypes": ["numbers", "dates", "times"],
+    "levels": [
+      4,
+      5,
+      6
+    ],
+    "datasetSize": {
+      "rows": 4,
+      "cols": 4
+    },
+    "datasetTypes": [
+      "numbers",
+      "dates",
+      "times"
+    ],
     "patternTypes": {
       "numbers": [
         "peak_valley",
@@ -77,17 +100,34 @@
       "recommendedTier": "HUNTER"
     },
     "unlocks": {
-      "lensModes": ["lens_focus"],
-      "datasetTypes": ["dates", "times"]
+      "lensModes": [
+        "lens_focus"
+      ],
+      "datasetTypes": [
+        "dates",
+        "times"
+      ]
     },
     "notes": "The Apprentice's Trials. Introduction of temporal data and extreme value logic."
   },
-
   {
     "id": "band_adept",
-    "levels": [7, 8, 9, 10],
-    "datasetSize": { "rows": 5, "cols": 5 },
-    "datasetTypes": ["numbers", "dates", "times", "categories"],
+    "levels": [
+      7,
+      8,
+      9,
+      10
+    ],
+    "datasetSize": {
+      "rows": 5,
+      "cols": 5
+    },
+    "datasetTypes": [
+      "numbers",
+      "dates",
+      "times",
+      "categories"
+    ],
     "patternTypes": {
       "numbers": [
         "convergence",
@@ -138,17 +178,29 @@
       "recommendedTier": "TRACKER"
     },
     "unlocks": {
-      "datasetTypes": ["categories"],
-      "patternFamilies": ["clustering", "uniqueness"]
+      "datasetTypes": [
+        "categories"
+      ],
+      "patternFamilies": [
+        "clustering",
+        "uniqueness"
+      ]
     },
     "notes": "The Adept's Challenge. Complex clustering and categorical taxonomy. Full variety."
   },
-
   {
     "id": "band_mastery_endless",
     "levels": "endless",
-    "datasetSize": { "rows": 6, "cols": 6 },
-    "datasetTypes": ["numbers", "dates", "times", "categories"],
+    "datasetSize": {
+      "rows": 6,
+      "cols": 6
+    },
+    "datasetTypes": [
+      "numbers",
+      "dates",
+      "times",
+      "categories"
+    ],
     "patternTypes": {
       "numbers": "ALL_SAFE",
       "dates": "ALL_SAFE",
@@ -173,4 +225,4 @@
     },
     "notes": "The Void. Endless scaling with dynamic grid sizes and all safe patterns enabled."
   }
-]
+];
