@@ -3,7 +3,7 @@
  * A semantic, metadata-driven engine that constructs meaningful data patterns
  * for the Pattern Hunter "Trial of the Field".
  *
- * Refactored to use patternEngine.json as the single source of truth.
+ * Refactored to use patternEngineData.js as the single source of truth.
  */
 
 import patternDefinitions from '../data/patternEngineData.js';
@@ -374,4 +374,5 @@ function _createFallbackMeta(id, thresholdConfig) {
     glyphs: { activate: [], metadata: {} }
   };
 }
+
 
