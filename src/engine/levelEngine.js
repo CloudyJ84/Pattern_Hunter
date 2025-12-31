@@ -191,14 +191,18 @@ function getLevelConfig(level) {
 }
 
 function getThresholdConfig(tier) {
-    if (!Array.isArray(thresholds)) {
+    if (!thresholds || !Array.isArray(thresholds.tiers)) {
         console.warn("Thresholds data missing or invalid. Falling back to Tier 1.");
-        return { tier: 1, name: "Hunter", hintLevel: "medium", rewardMultiplier: 1.5 };
+        return {
+    tier: 1,
+    name: "Hunter",
+    hintLevel: "medium",
+    rewardMultiplier: 1.25};
     }
 
     // Find exact tier match
-    const match = thresholds.find(t => t.id === tier || t.tier === tier);
+    const tiers = thresholds.tiers;const match = tiers.find(t => t.tier === tier);
 
     // Fallback to Tier 1 or first tier
-    return match || thresholds[1] || thresholds[0];
+    return match || tiers[1] || tiers[0];
 }
