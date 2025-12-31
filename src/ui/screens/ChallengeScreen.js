@@ -260,7 +260,6 @@ export class ChallengeScreen {
     _renderLevelContent() {
         // Clear previous state
         if (this.sigilRenderer) this.sigilRenderer.clearAll();
-        this.activeGlyphs.clear();
 
         const { grid, formatting, question, patternMeta, analytics, thresholdConfig } = this.data;
 
