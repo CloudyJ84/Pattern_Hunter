@@ -6,7 +6,7 @@
  * Refactored to use patternEngine.json as the single source of truth.
  */
 
-import patternDefinitions from '../data/patternEngine.json';
+import patternDefinitions from '../data/patternEngineData.js';
 
 // --- Pattern Logic Registry (Behavioral Implementation) ---
 /**
@@ -374,3 +374,4 @@ function _createFallbackMeta(id, thresholdConfig) {
     glyphs: { activate: [], metadata: {} }
   };
 }
+
