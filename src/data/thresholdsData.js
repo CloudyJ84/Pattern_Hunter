@@ -3,12 +3,10 @@ export default {
     {
       "id": "SCOUT",
       "name": "Scout",
-      "flavor": {
-        "title": "The Initiate's Eye",
-        "description": "The world is literal and clear. Use your tools to learn the patterns."
-      },
-      "multiplier": 1.0,
-      "hintLevel": "full",
+      "tier": 0,
+      "flavor": "The world is literal and clear. Use your tools to learn the patterns.",
+      "rewardMultiplier": 1.0,
+      "hintLevel": "high",
       "phrasing": "explicit",
       "lensModes": [
         "lens_standard"
@@ -36,11 +34,9 @@ export default {
     {
       "id": "HUNTER",
       "name": "Hunter",
-      "flavor": {
-        "title": "The Hunter's Focus",
-        "description": "Patterns begin to hide. Focus your lens to isolate the signal."
-      },
-      "multiplier": 1.25,
+      "tier": 1,
+      "flavor": "Patterns begin to hide. Focus your lens to isolate the signal.",
+      "rewardMultiplier": 1.25,
       "hintLevel": "medium",
       "phrasing": "explicit",
       "lensModes": [
@@ -70,11 +66,9 @@ export default {
     {
       "id": "TRACKER",
       "name": "Tracker",
-      "flavor": {
-        "title": "The Tracker's Path",
-        "description": "The questions grow metaphorical. Read the signs, not just the text."
-      },
-      "multiplier": 1.5,
+      "tier": 2,
+      "flavor": "The questions grow metaphorical. Read the signs, not just the text.",
+      "rewardMultiplier": 1.5,
       "hintLevel": "medium",
       "phrasing": "flavored",
       "lensModes": [
@@ -108,12 +102,10 @@ export default {
     {
       "id": "SEER",
       "name": "Seer",
-      "flavor": {
-        "title": "The Seer's Vision",
-        "description": "See through the noise. The surface is a distraction."
-      },
-      "multiplier": 2.0,
-      "hintLevel": "minimal",
+      "tier": 3,
+      "flavor": "See through the noise. The surface is a distraction.",
+      "rewardMultiplier": 2.0,
+      "hintLevel": "low",
       "phrasing": "flavored",
       "lensModes": [
         "lens_standard",
@@ -149,11 +141,9 @@ export default {
     {
       "id": "MYTHIC",
       "name": "Mythic",
-      "flavor": {
-        "title": "The Arithmancer's Truth",
-        "description": "The data speaks in riddles. Only the pattern remains."
-      },
-      "multiplier": 3.0,
+      "tier": 4,
+      "flavor": "The data speaks in riddles. Only the pattern remains.",
+      "rewardMultiplier": 3.0,
       "hintLevel": "none",
       "phrasing": "mythic",
       "lensModes": [
