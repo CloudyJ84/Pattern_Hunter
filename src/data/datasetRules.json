@@ -19,56 +19,60 @@
         "structural": []
       },
       "patterns": [
-        "pattern_num_above_threshold",
-        "pattern_num_below_threshold",
-        "pattern_num_outlier",
-        "pattern_num_cluster",
-        "pattern_num_extremes"
+        "rising_flame",
+        "falling_stone",
+        "broken_pattern",
+        "convergence",
+        "peak_valley"
       ],
       "patternCompatibility": {
-        "pattern_num_above_threshold": {
+        "rising_flame": {
           "allowed": true,
           "notes": "Standard threshold check."
         },
-        "pattern_num_below_threshold": {
+        "falling_stone": {
           "allowed": true,
           "notes": "Standard threshold check."
         },
-        "pattern_num_outlier": {
+        "broken_pattern": {
           "allowed": true,
           "notes": "Requires significant deviation from mean."
         },
-        "pattern_num_cluster": {
+        "convergence": {
           "allowed": true,
           "notes": "Requires ensuring background noise is sufficiently random."
         },
-        "pattern_num_extremes": {
+        "peak_valley": {
           "allowed": true,
           "notes": "Highlights global max or min."
         },
-        "pattern_date_weekend": {
+        "twin_suns": {
           "allowed": false,
           "notes": "Incompatible: Numeric data lacks calendar context."
         },
-        "pattern_cat_most_frequent": {
+        "echo": {
           "allowed": false,
           "notes": "Numeric distributions handled via clusters, not strict frequency."
         }
       },
       "questionCompatibility": {
-        "question_find_outlier": {
+        "whichValueIsOutlier": {
           "allowed": true,
           "notes": "Find the value deviating from the set."
         },
-        "question_count_above_threshold": {
+        "countAboveThreshold": {
           "allowed": true,
           "notes": "Count values > X."
         },
-        "question_find_extremes": {
+        "whichValueIsHighest": {
           "allowed": true,
-          "notes": "Find max/min."
+          "notes": "Find max."
         },
-        "question_date_lookup": {
+        "whichValueIsLowest": {
+          "allowed": true,
+          "notes": "Find min."
+        },
+        "whichDateIsHighlighted": {
           "allowed": false,
           "notes": "No dates present."
         }
@@ -92,43 +96,43 @@
         "structural": []
       },
       "patterns": [
-        "pattern_date_weekend",
-        "pattern_date_weekday_cluster",
-        "pattern_date_extremes",
-        "pattern_date_range"
+        "twin_suns",
+        "day_alignment",
+        "time_anchor",
+        "temporal_rift"
       ],
       "patternCompatibility": {
-        "pattern_date_weekend": {
+        "twin_suns": {
           "allowed": true,
           "notes": "Injects Saturday/Sunday."
         },
-        "pattern_date_weekday_cluster": {
+        "day_alignment": {
           "allowed": true,
           "notes": "Injects multiple matching weekdays (e.g., all Fridays)."
         },
-        "pattern_date_extremes": {
+        "time_anchor": {
           "allowed": true,
           "notes": "Earliest or latest date in set."
         },
-        "pattern_date_range": {
+        "temporal_rift": {
           "allowed": true,
           "notes": "Cluster of dates within a 7-day window."
         },
-        "pattern_num_outlier": {
+        "broken_pattern": {
           "allowed": false,
           "notes": "Date outliers are handled via extremes pattern."
         }
       },
       "questionCompatibility": {
-        "question_find_weekend": {
+        "countWeekendDates": {
           "allowed": true,
           "notes": "Identify Sat/Sun."
         },
-        "question_count_range": {
+        "howManyInRange": {
           "allowed": true,
           "notes": "Count dates between X and Y."
         },
-        "question_most_frequent_weekday": {
+        "mostFrequentWeekday": {
           "allowed": true,
           "notes": "Identify the day appearing most often."
         }
@@ -152,43 +156,43 @@
         "structural": []
       },
       "patterns": [
-        "pattern_time_threshold",
-        "pattern_time_ampm",
-        "pattern_time_extremes",
-        "pattern_time_range"
+        "dawn_dusk",
+        "meridian_shift",
+        "chrono_limit",
+        "hour_glass"
       ],
       "patternCompatibility": {
-        "pattern_time_threshold": {
+        "dawn_dusk": {
           "allowed": true,
           "notes": "Early morning or late evening."
         },
-        "pattern_time_ampm": {
+        "meridian_shift": {
           "allowed": true,
           "notes": "Distinction between pre-noon and post-noon."
         },
-        "pattern_time_extremes": {
+        "chrono_limit": {
           "allowed": true,
           "notes": "Earliest start or latest finish."
         },
-        "pattern_time_range": {
+        "hour_glass": {
           "allowed": true,
           "notes": "Events occurring during lunch (12-14)."
         },
-        "pattern_cat_unique": {
+        "lone_star": {
           "allowed": false,
           "notes": "Time uniqueness is handled via extremes or threshold."
         }
       },
       "questionCompatibility": {
-        "question_count_pm": {
+        "howManyPmTimes": {
           "allowed": true,
           "notes": "Count times > 12:00."
         },
-        "question_find_earliest": {
+        "whichTimeIsEarliest": {
           "allowed": true,
           "notes": "Find min time."
         },
-        "question_in_time_range": {
+        "whichTimesInRange": {
           "allowed": true,
           "notes": "Is time X between A and B?"
         }
@@ -218,43 +222,43 @@
         ]
       },
       "patterns": [
-        "pattern_cat_most_frequent",
-        "pattern_cat_least_frequent",
-        "pattern_cat_unique",
-        "pattern_structural_rowcol"
+        "echo",
+        "silent_note",
+        "lone_star",
+        "vector_alignment"
       ],
       "patternCompatibility": {
-        "pattern_cat_most_frequent": {
+        "echo": {
           "allowed": true,
           "notes": "Requires category pool < cell count."
         },
-        "pattern_cat_least_frequent": {
+        "silent_note": {
           "allowed": true,
           "notes": "Single instance injection."
         },
-        "pattern_cat_unique": {
+        "lone_star": {
           "allowed": true,
           "notes": "Category X appears exactly once, effectively a 'needle in haystack'."
         },
-        "pattern_structural_rowcol": {
+        "vector_alignment": {
           "allowed": true,
           "notes": "Entire row or column filled with same category."
         },
-        "pattern_num_threshold_above": {
+        "rising_flame": {
           "allowed": false,
           "notes": "Categories cannot be numerically compared."
         }
       },
       "questionCompatibility": {
-        "question_find_unique": {
+        "whichCategoryIsUnique": {
           "allowed": true,
           "notes": "Which item appears only once?"
         },
-        "question_count_category": {
+        "howManyTimesCategoryAppears": {
           "allowed": true,
           "notes": "How many X are there?"
         },
-        "question_identify_row_pattern": {
+        "whichRowHasPattern": {
           "allowed": true,
           "notes": "Which row has all the same value?"
         }
