@@ -1,7 +1,7 @@
 {
   "tiers": [
     {
-      "id": 0,
+      "id": "SCOUT",
       "name": "Scout",
       "flavor": {
         "title": "The Initiate's Eye",
@@ -14,7 +14,8 @@
         "lens_standard"
       ],
       "glyphs": [
-        "glyph_reveal_basic"
+        "above",
+        "below"
       ],
       "uiVisibility": {
         "showContextPanels": true,
@@ -26,13 +27,14 @@
           "lens_standard"
         ],
         "glyphs": [
-          "glyph_reveal_basic"
+          "above",
+          "below"
         ]
       },
       "notes": "Base tier. Maximum assistance, minimum ambiguity."
     },
     {
-      "id": 1,
+      "id": "HUNTER",
       "name": "Hunter",
       "flavor": {
         "title": "The Hunter's Focus",
@@ -46,8 +48,9 @@
         "lens_focus"
       ],
       "glyphs": [
-        "glyph_reveal_basic",
-        "glyph_highlight_match"
+        "above",
+        "below",
+        "unique"
       ],
       "uiVisibility": {
         "showContextPanels": true,
@@ -59,13 +62,13 @@
           "lens_focus"
         ],
         "glyphs": [
-          "glyph_highlight_match"
+          "unique"
         ]
       },
       "notes": "Introduction of the Focus Lens and basic matching glyphs."
     },
     {
-      "id": 2,
+      "id": "TRACKER",
       "name": "Tracker",
       "flavor": {
         "title": "The Tracker's Path",
@@ -80,10 +83,11 @@
         "lens_summary"
       ],
       "glyphs": [
-        "glyph_reveal_basic",
-        "glyph_highlight_match",
-        "glyph_numeric_bounds",
-        "glyph_temporal_markers"
+        "above",
+        "below",
+        "unique",
+        "weekend",
+        "sequence"
       ],
       "uiVisibility": {
         "showContextPanels": true,
@@ -95,14 +99,14 @@
           "lens_summary"
         ],
         "glyphs": [
-          "glyph_numeric_bounds",
-          "glyph_temporal_markers"
+          "weekend",
+          "sequence"
         ]
       },
       "notes": "Phrasing shifts to flavored. Tooltips disappear. Summary lens unlocked."
     },
     {
-      "id": 3,
+      "id": "SEER",
       "name": "Seer",
       "flavor": {
         "title": "The Seer's Vision",
@@ -118,11 +122,13 @@
         "lens_xray"
       ],
       "glyphs": [
-        "glyph_reveal_basic",
-        "glyph_highlight_match",
-        "glyph_numeric_bounds",
-        "glyph_temporal_markers",
-        "glyph_cluster_detect"
+        "above",
+        "below",
+        "unique",
+        "weekend",
+        "sequence",
+        "cluster",
+        "outlier"
       ],
       "uiVisibility": {
         "showContextPanels": false,
@@ -134,13 +140,14 @@
           "lens_xray"
         ],
         "glyphs": [
-          "glyph_cluster_detect"
+          "cluster",
+          "outlier"
         ]
       },
       "notes": "Context panels removed. Hints become cryptic. X-Ray lens unlocked."
     },
     {
-      "id": 4,
+      "id": "MYTHIC",
       "name": "Mythic",
       "flavor": {
         "title": "The Arithmancer's Truth",
@@ -154,15 +161,17 @@
         "lens_focus",
         "lens_summary",
         "lens_xray",
-        "lens_pattern_overlay"
+        "lens_void"
       ],
       "glyphs": [
-        "glyph_reveal_basic",
-        "glyph_highlight_match",
-        "glyph_numeric_bounds",
-        "glyph_temporal_markers",
-        "glyph_cluster_detect",
-        "glyph_anomaly_scan"
+        "above",
+        "below",
+        "unique",
+        "weekend",
+        "sequence",
+        "cluster",
+        "outlier",
+        "frequency"
       ],
       "uiVisibility": {
         "showContextPanels": false,
@@ -171,10 +180,10 @@
       },
       "unlocks": {
         "lensModes": [
-          "lens_pattern_overlay"
+          "lens_void"
         ],
         "glyphs": [
-          "glyph_anomaly_scan"
+          "frequency"
         ]
       },
       "notes": "Endgame tier. No hints. Mythic phrasing. All tools available but no UI hand-holding."
