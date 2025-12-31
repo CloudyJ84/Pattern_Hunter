@@ -8,20 +8,12 @@
  * * "A diviner's lens revealing the skeleton of the world."
  */
 
-// --- MYTHIC TOKEN DEFINITIONS ---
-// Maps engine lens types to the new visual language of lenses.css
-const LENS_TOKEN_MAP = {
-    'standard': ['lens', 'lens--standard', 'lens-anim--reveal'],
-    'timeline': ['lens', 'lens--timeline', 'lens--active', 'lens-anim--shift'],
-    'cluster':  ['lens', 'lens--cluster', 'lens--active', 'lens-anim--reveal'],
-    'anomaly':  ['lens', 'lens--anomaly', 'lens--active', 'lens-anim--pulse'],
-    'pivot':    ['lens', 'lens--pivot', 'lens--active', 'lens-anim--reveal'],
-    // Fallback aliases
-    'flow':     ['lens', 'lens--timeline', 'lens--active', 'lens-anim--scanline']
-};
-
-
 export class LensRenderer {
+  /**
+   * NOTE: In the modern engine, LensRenderer is a non-destructive overlay system.
+   * It no longer applies highlight classes, legacy CSS, or lens tokens.
+   * It renders only: summary text, overlays, annotations, and legends.
+   */
   /**
    * @param {HTMLElement} gridContainer - The DOM element containing the grid cells.
    * @param {HTMLElement} legendContainer - The DOM element where legends should appear.
@@ -31,7 +23,7 @@ export class LensRenderer {
     this.legendContainer = legendContainer;
     
     // Registry to track active lenses and their artifacts
-    // Map<lensId, { tokens, fxNodes, summaryNode, legacyClass, highlightRefs, svgNodes, annotationNodes }>
+    // Map<lensId, { summaryNode }>
     this.registry = new Map();
 
     // Create or retrieve the specific layers for rendering
@@ -71,71 +63,32 @@ export class LensRenderer {
   activate(lensOutput) {
     const lensId = lensOutput.id || 'default-lens';
     const entry = {
-        tokens: [],
-        fxNodes: [],
         summaryNode: null,
-        legacyClass: null,
-        highlightRefs: [],
     };
 
-    // 1. Resolve Tokens & Apply to Lens Container
-    // Prefer explicit type, fallback to ID detection, default to 'standard'
-    let type = lensOutput.type;
-    if (!type) {
-        if (lensOutput.id && lensOutput.id.includes('heatmap')) type = 'heatmap';
-        else if (lensOutput.id && lensOutput.id.includes('focus')) type = 'cluster';
-        else type = 'standard';
-    }
+    // 1. Resolve Type
+    const type = lensOutput.type || 'standard';
 
-    const tokens = LENS_TOKEN_MAP[type] || ['lens', 'lens--standard'];
-    
-    // Apply tokens to the dedicated lens container
-    this.layers.lensContainer.classList.add(...tokens);
-    entry.tokens = tokens;
-
-    // 2. Render FX Layers (The Mythic Composition)
-    if (lensOutput.fx) {
-        lensOutput.fx.forEach(fxType => {
-            const fxNode = document.createElement('div');
-            fxNode.className = `lens-layer lens-layer--${fxType}`;
-            this.layers.lensContainer.appendChild(fxNode);
-            entry.fxNodes.push(fxNode);
-        });
-    }
-
-    // 3. Render Summary Label (The Title)
-    // Only render if there's actual content to show
-    if ((lensOutput.summary || lensOutput.name) && type !== 'standard') {
-        const text = lensOutput.summary || lensOutput.name;
+    // 2. Render Summary Label (The Title)
+    if (lensOutput.summary) {
         const summaryNode = document.createElement('div');
         summaryNode.className = 'lens-summary fade-in';
-        summaryNode.innerText = text;
+        summaryNode.innerText = lensOutput.summary;
         this.layers.lensContainer.appendChild(summaryNode);
         entry.summaryNode = summaryNode;
     }
 
-    // 4. Handle Legacy CSS Classes (The Bridge)
-    if (lensOutput.cssClass) {
-        this.gridContainer.classList.add(lensOutput.cssClass);
-        entry.legacyClass = lensOutput.cssClass;
-    }
-
-    // 5. Render Highlights (Cell-level classes)
-    if (lensOutput.highlights) {
-        this._renderHighlights(lensOutput.highlights, entry.highlightRefs);
-    }
-
-    // 6. Render Overlays (SVG Lines/Regions)
+    // 3. Render Overlays (SVG Lines/Regions)
     if (lensOutput.overlays) {
         this._renderOverlays(lensOutput.overlays);
     }
 
-    // 7. Render Annotations (Floating Text)
+    // 4. Render Annotations (Floating Text)
     if (lensOutput.annotations) {
         this._renderAnnotations(lensOutput.annotations);
     }
 
-    // 8. Render Legends (Side panel)
+    // 5. Render Legends (Side panel)
     if (lensOutput.legends) {
         this._renderLegends(lensOutput.legends);
     }
@@ -148,34 +101,23 @@ export class LensRenderer {
    * "Dissolving the illusion, returning to the raw grid."
    */
   clearAll() {
-    // 1. Reset Lens Container (Tokens & FX)
-    this.layers.lensContainer.className = 'lens'; // Reset to base class
-    this.layers.lensContainer.innerHTML = ''; // Remove FX layers & summary
+    // Clear lens container content (summary only)
+    this.layers.lensContainer.innerHTML = '';
 
-    // 2. Clear Legacy Grid Classes & Highlights
-    this.registry.forEach(entry => {
-        if (entry.legacyClass) {
-            this.gridContainer.classList.remove(entry.legacyClass);
-        }
-        // Clear active highlights
-        entry.highlightRefs.forEach(({ element, className }) => {
-            if (element) element.classList.remove(className);
-        });
-    });
-    this.registry.clear();
-
-    // 3. Clear SVG content (lines, shapes)
+    // Clear SVG overlays
     while (this.layers.svg.firstChild) {
-      this.layers.svg.removeChild(this.layers.svg.firstChild);
+        this.layers.svg.removeChild(this.layers.svg.firstChild);
     }
 
-    // 4. Clear Annotation content (labels, runes)
+    // Clear annotations
     this.layers.annotations.innerHTML = '';
 
-    // 5. Clear Legend
+    // Clear legends
     if (this.legendContainer) {
-      this.legendContainer.innerHTML = '';
+        this.legendContainer.innerHTML = '';
     }
+
+    this.registry.clear();
   }
 
   // Alias for backward compatibility
@@ -186,28 +128,6 @@ export class LensRenderer {
   /* -------------------------------------------------------------------------- */
   /* INTERNAL LAYERS & RENDERING                                                */
   /* -------------------------------------------------------------------------- */
-
-  /**
-   * Applies direct CSS classes to grid cells.
-   * Used for soft emphasis like glows, borders, or dims.
-   * * @param {Array} highlights - [{ row, col, style }]
-   * * @param {Array} refArray - Array to store cleanup references
-   */
-  _renderHighlights(highlights, refArray) {
-    highlights.forEach(highlight => {
-      const cell = this._getCellElement(highlight.row, highlight.col);
-      if (cell) {
-        // Map abstract style names to mythic CSS classes
-        const className = this._mapStyleToClass(highlight.style, 'highlight');
-        cell.classList.add(className);
-        
-        // Track for cleanup
-        if (refArray) {
-            refArray.push({ element: cell, className });
-        }
-      }
-    });
-  }
 
   /**
    * Renders graphical shapes connecting or encompassing cells.
