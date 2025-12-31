@@ -3,6 +3,17 @@ import { injectPattern } from './patternEngine.js';
 import { applyFormatting } from './formattingEngine.js';
 import { generateQuestion } from './questionEngine.js';
 import { computePatternMetadata } from './analyticsEngine.js';
+import patternDefinitions from '../data/patternEngineData.js';
+
+// --- Dynamic Pattern Registry ---
+// Builds a canonical map of datasetType → [patternIds]
+const patternRegistry = (() => {
+    const registry = {};
+    for (const datasetType of Object.keys(patternDefinitions)) {
+        registry[datasetType] = Object.keys(patternDefinitions[datasetType] || {});
+    }
+    return registry;
+})();
 
 let progressionRules = null;
 
@@ -145,21 +156,20 @@ export function generateLevel(levelNumber, thresholdTier = 1) {
 }
 
 function resolveValidPattern(datasetType, patternType) {
-    // Gracefully handle legacy config (array) where patternRegistry doesn't exist
-    const registry = progressionRules.patternRegistry;
-    if (!registry) return patternType;
+    const validPatterns = patternRegistry[datasetType];
 
-    const group = registry[datasetType];
-    
-    // If we have a registry but no group for this type, fallback to none
-    if (!group) return "none";
-
-    if (patternType === "random") {
-        const keys = Object.keys(group);
-        return keys[Math.floor(Math.random() * keys.length)];
+    // If no patterns exist for this datasetType, fallback to "none"
+    if (!validPatterns || validPatterns.length === 0) {
+        return "none";
     }
 
-    return group[patternType] ? patternType : "none";
+    // Random selection
+    if (patternType === "random") {
+        return validPatterns[Math.floor(Math.random() * validPatterns.length)];
+    }
+
+    // Validate explicit patternType
+    return validPatterns.includes(patternType) ? patternType : "none";
 }
 
 function getLevelConfig(level) {
