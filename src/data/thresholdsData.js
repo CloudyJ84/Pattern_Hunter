@@ -1,4 +1,4 @@
-{
+export default {
   "tiers": [
     {
       "id": "SCOUT",
@@ -189,4 +189,4 @@
       "notes": "Endgame tier. No hints. Mythic phrasing. All tools available but no UI hand-holding."
     }
   ]
-}
+};
