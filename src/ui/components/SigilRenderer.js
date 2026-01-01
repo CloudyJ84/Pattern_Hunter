@@ -20,28 +20,30 @@ export class SigilRenderer {
             console.warn("SigilRenderer: No container provided. The ritual cannot commence.");
         }
         this.container = containerElement;
-        
-        // Registry to track manifested sigils
-        this.activeSigils = new Set();
     }
 
     /**
+     * Expected SigilOutput shape (modern engine):
+     * {
+     * id: string,
+     * icon: string,   // visual rune
+     * hint: string,   // textual reveal
+     * name: string    // optional display name
+     * }
+     * Sigils are always active if provided.
+     */
+    /**
      * Inscribes a single sigil into the container.
-     * @param {Object} sigilOutput - The sigil data contract { id, icon, hint, active, ... }
+     * @param {Object} sigilOutput - The sigil data contract { id, icon, hint, ... }
      */
     render(sigilOutput) {
-        if (!this.container || !sigilOutput || !sigilOutput.active) return;
+        if (!this.container || !sigilOutput) return;
 
         // 1. Create the Sigil Vessel (Wrapper)
         const sigilNode = document.createElement('div');
         sigilNode.className = 'sigil-unit fade-in';
         sigilNode.setAttribute('data-sigil-id', sigilOutput.id);
         
-        // Optional: Apply visual weight based on strength (0.0 - 1.0)
-        if (typeof sigilOutput.strength === 'number') {
-            sigilNode.style.setProperty('--sigil-strength', sigilOutput.strength);
-        }
-
         // 2. The Mark (Icon State) - Visible by default
         const iconLayer = document.createElement('div');
         iconLayer.className = 'sigil-face sigil-face--icon';
@@ -51,13 +53,12 @@ export class SigilRenderer {
         // 3. The Whisper (Hint State) - Hidden by default
         const hintLayer = document.createElement('div');
         hintLayer.className = 'sigil-face sigil-face--hint';
-        hintLayer.innerText = sigilOutput.hint || sigilOutput.name;
+        hintLayer.innerText = sigilOutput.hint || sigilOutput.name || sigilOutput.id;
         // Ideally hidden via CSS, but we ensure structure here
         sigilNode.appendChild(hintLayer);
 
         // 4. Manifestation
         this.container.appendChild(sigilNode);
-        this.activeSigils.add(sigilOutput.id);
     }
 
     /**
@@ -66,15 +67,8 @@ export class SigilRenderer {
      */
     renderAll(sigilOutputs) {
         if (!Array.isArray(sigilOutputs)) return;
-        
-        // Clear previous marks before new inscription to avoid duplicates
         this.clearAll();
-
-        sigilOutputs.forEach(sigil => {
-            if (sigil.active) {
-                this.render(sigil);
-            }
-        });
+        sigilOutputs.forEach(sigil => this.render(sigil));
     }
 
     /**
@@ -105,6 +99,5 @@ export class SigilRenderer {
                 this.container.removeChild(this.container.firstChild);
             }
         }
-        this.activeSigils.clear();
     }
 }
