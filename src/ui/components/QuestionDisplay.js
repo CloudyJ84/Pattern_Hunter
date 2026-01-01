@@ -6,6 +6,15 @@ export class QuestionDisplay {
         this.element = container;
     }
 
+    /**
+     * Expected Question object (modern engine):
+     * {
+     * text: string,
+     * noInput?: boolean,   // true for cell-selection questions
+     * hint?: string,       // reserved for future UI
+     * sigilId?: string     // handled by SigilRenderer, not here
+     * }
+     */
     render(question) {
         if (!question || !question.text) {
             console.error("QuestionDisplay: invalid question object", question);
@@ -17,17 +26,24 @@ export class QuestionDisplay {
         // Sigil logic removed; purely renders text and ritual zone now.
         this.container.innerHTML = `
             <div class="query-rune">
-                <h3 class="rune-text">${question.text}</h3>
+                <h3 class="rune-text" aria-live="polite">${question.text}</h3>
+                <div class="question-hint"></div>
                 <div class="input-group ritual-zone"></div>
             </div>
         `;
 
         const group = this.container.querySelector('.input-group');
 
+        // If no input is required (cell-selection mode), stop here
+        if (question.noInput) {
+            return;
+        }
+
         const input = document.createElement('input');
         input.className = 'answer-input';
         input.placeholder = "Inscribe answer…";
         input.setAttribute('autocomplete', 'off');
+        input.setAttribute('aria-label', 'Answer input');
 
         const btn = document.createElement('button');
         btn.textContent = 'Submit';
