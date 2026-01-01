@@ -94,7 +94,7 @@
    Aesthetic: Void colors, high contrast, flicker potential. */
 .lens--anomaly {
     background: radial-gradient(circle, transparent 50%, rgba(74, 35, 90, 0.2) 100%); /* --void-purple tint */
-    box-shadow: inset 0 0 50px rgba(13, 17, 13, 0.8); /* --void-dark vignette */
+    box-shadow: inset 0 0 clamp(20px, 10vmin, 60px) rgba(13, 17, 13, 0.8); /* Updated for responsive scaling */
 }
 
 /* TYPE: FLOW (The Gradient)
@@ -135,7 +135,7 @@
     background-image: 
         linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-size: var(--cell-size) var(--cell-size); /* Updated for responsive scaling */
     opacity: 0.5;
 }
 
@@ -143,7 +143,7 @@
 /* Used for selecting specific regions in the lens */
 .lens-layer--highlight {
     border: 1px solid var(--accent);
-    box-shadow: 0 0 15px rgba(33, 115, 70, 0.3);
+    box-shadow: 0 0 calc(var(--cell-size) * 0.4) rgba(33, 115, 70, 0.3); /* Updated for responsive scaling */
 }
 
 /* Layer: Mask (Dimming non-focus areas) */
@@ -168,11 +168,11 @@
     animation: lensShift 4s ease-in-out infinite;
 }
 
-.lens-anim--pulse {
+.lens-anim--breath {
     animation: lensPulse 3s infinite;
 }
 
-.lens-anim--scanline {
+.lens-anim--scan {
     animation: lensScan 2s linear infinite;
     background: linear-gradient(to bottom, transparent 50%, rgba(33, 115, 70, 0.1) 51%, transparent 52%);
     background-size: 100% 200%;
@@ -207,54 +207,18 @@
    and modify children .grid-cell elements.
 */
 
-/* LEGACY MAPPING: .lens-focus (Now maps to Cluster/Focus logic) */
-.dataset-grid.lens-focus .grid-cell:not(:hover) {
-    opacity: 0.6;
-    filter: blur(1px);
-    transition: opacity 0.2s, filter 0.2s;
-}
-
-.dataset-grid.lens-focus .grid-cell:hover {
-    transform: scale(1.1);
-    z-index: 10;
-    /* Uses main.css panel/accent vars */
-    background: var(--panel); 
-    border-color: var(--accent);
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-}
-
-/* LEGACY MAPPING: .lens-xray (Now maps to Pivot/Structure logic) */
-.dataset-grid.lens-xray .grid-cell {
-    background: transparent;
-    border: 1px solid #444;
-    color: #aaa;
-    /* Note: "Hide formatted backgrounds" logic relies on CSS specificity 
-       or JS toggling in the legacy system. */
-}
-
-.dataset-grid.lens-xray .grid-cell:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: #fff;
-    color: #fff;
-}
-
-.dataset-grid.lens-xray .grid-cell.marked {
-    border-color: var(--error);
-    color: var(--error);
-}
-
 /* LEGACY MAPPING: .lens-summary (The floating label) */
 .lens-summary {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    /* Updated for lore-pane compatibility */
+    position: relative;
+    margin: 1rem auto;
+    width: fit-content;
     background: rgba(20, 20, 20, 0.9);
     border: 1px solid var(--accent);
     color: var(--text);
-    padding: 10px 20px;
+    padding: 0.6rem 1.2rem; /* Updated for responsive scaling */
     border-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.5); /* Updated for responsive scaling */
     z-index: 20;
     pointer-events: none;
     font-size: 0.9rem;
@@ -277,17 +241,17 @@
 /* --- HIGHLIGHT TOKENS (Cell-Level) --- */
 
 /* Focus: The cell is selected or central to the lens */
-.lens-highlight-focus {
+.lens--highlight-focus {
     position: relative;
     z-index: 5;
     border-color: var(--accent-light) !important;
-    box-shadow: 0 0 10px rgba(46, 168, 107, 0.4), inset 0 0 0 1px rgba(255,255,255,0.1);
+    box-shadow: 0 0 0.6rem rgba(46, 168, 107, 0.4), inset 0 0 0 1px rgba(255,255,255,0.1); /* Updated for responsive scaling */
     background: rgba(46, 168, 107, 0.1) !important;
     transition: all 0.3s ease;
 }
 
 /* Dim: Recedes into background to let others shine */
-.lens-highlight-dim {
+.lens--highlight-dim {
     opacity: 0.3;
     filter: grayscale(80%) brightness(0.8);
     transition: opacity 0.4s ease;
@@ -295,21 +259,21 @@
 }
 
 /* Warn: Anomaly or Error state (Void energy) */
-.lens-highlight-warn {
+.lens--highlight-warn {
     border-color: var(--error) !important;
     color: var(--error) !important;
     background: rgba(231, 76, 60, 0.15) !important;
-    box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 0 1rem rgba(231, 76, 60, 0.3); /* Updated for responsive scaling */
     z-index: 6;
     animation: lensPulseFast 2s infinite;
 }
 
 /* Success: Validation or positive flow */
-.lens-highlight-success {
+.lens--highlight-success {
     border-color: var(--success) !important;
     color: var(--success) !important;
     background: rgba(46, 204, 113, 0.1) !important;
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+    box-shadow: 0 0 0.6rem rgba(46, 204, 113, 0.2); /* Updated for responsive scaling */
 }
 
 /* --- SVG OVERLAYS (Lines & Regions) --- */
@@ -380,6 +344,7 @@
 /* --- ANNOTATIONS (Floating Text) --- */
 
 .lens-annotation {
+    /* Updated for lore-pane compatibility */
     position: absolute;
     transform: translate(-50%, -120%); /* Center above cell */
     pointer-events: none;
