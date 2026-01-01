@@ -30,6 +30,9 @@
 
     /* Mythic Motion Physics */
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    /* Strength Injection */
+    --intensity: var(--glyph-strength, 1);
 }
 
 /* Ensure inner content resets rotation if parent is rotated */
@@ -48,37 +51,37 @@
 
 /* Icon / Tiny Indicator */
 .glyph--xs {
-    width: 24px;
-    height: 24px;
-    font-size: 0.75rem;
+    width: calc(var(--cell-size, 60px) * 0.4);
+    height: calc(var(--cell-size, 60px) * 0.4);
+    font-size: clamp(0.6rem, calc(var(--cell-size, 60px) * 0.25), 0.8rem);
 }
 
 /* Control / Button Cap */
 .glyph--sm {
-    width: 40px;
-    height: 40px;
-    font-size: 0.9rem;
+    width: calc(var(--cell-size, 60px) * 0.6);
+    height: calc(var(--cell-size, 60px) * 0.6);
+    font-size: clamp(0.75rem, calc(var(--cell-size, 60px) * 0.35), 1rem);
 }
 
-/* Standard Node (Matches .level-node) */
+/* Standard Node */
 .glyph--md {
-    width: 50px;
-    height: 50px;
-    font-size: 1rem;
+    width: calc(var(--cell-size, 60px) * 0.8);
+    height: calc(var(--cell-size, 60px) * 0.8);
+    font-size: clamp(0.85rem, calc(var(--cell-size, 60px) * 0.4), 1.1rem);
 }
 
-/* Rune / Cell (Matches .rune-node, .grid-cell) */
+/* Rune / Cell (Base Unit) */
 .glyph--lg {
-    width: 60px;
-    height: 60px;
-    font-size: 1.2rem;
+    width: var(--cell-size, 60px);
+    height: var(--cell-size, 60px);
+    font-size: clamp(1rem, calc(var(--cell-size, 60px) * 0.5), 1.4rem);
 }
 
 /* Hero / Tier Sigil */
 .glyph--xl {
-    width: 80px;
-    height: 80px;
-    font-size: 2rem;
+    width: calc(var(--cell-size, 60px) * 1.3);
+    height: calc(var(--cell-size, 60px) * 1.3);
+    font-size: clamp(1.5rem, calc(var(--cell-size, 60px) * 0.7), 2.5rem);
 }
 
 /* ========================================= */
@@ -277,121 +280,16 @@
 }
 
 /* ========================================= */
-/* 7. LEGACY BRIDGE                          */
+/* 7. LEGACY BRIDGE (DEPRECATED - REMOVED)   */
 /* ========================================= */
-/* Direct mapping of main.css classes to the new 
-   token system to ensure zero visual regression 
-   while enabling gradual engine migration.
-*/
-
-/* Legacy: .level-node (The round levels) */
-.level-node {
-    /* Base + Question Role + Medium Size */
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    font-weight: bold;
-    user-select: none;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    
-    /* Default Active State */
-    background: var(--accent);
-    color: white;
-}
-
-.level-node.locked {
-    /* Dormant State */
-    background: #2a2f2a;
-    color: #4f5f4f;
-    cursor: not-allowed;
-}
-
-/* Legacy: .rune-node (The diamond ritual path) */
-.rune-node {
-    /* Base + Pattern Role + Large Size */
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    font-weight: bold;
-    user-select: none;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-    width: 60px;
-    height: 60px;
-    font-size: 1.2rem;
-    
-    /* Pattern Specifics */
-    transform: rotate(45deg);
-    background: #222;
-    border: 2px solid #444;
-    color: #666;
-}
-
-/* Inner span rotation fix for legacy runes */
-.rune-node span {
-    transform: rotate(-45deg);
-    display: block;
-}
-
-/* Unlocked Path = Charged State */
-.rune-node.unlocked-path {
-    background: #1e2e1e;
-    border-color: var(--accent);
-    color: var(--text);
-    box-shadow: 0 0 10px rgba(33, 115, 70, 0.2);
-}
-
-.rune-node.unlocked-path:hover {
-    transform: rotate(45deg) scale(1.15);
-    background: var(--accent);
-    border-color: var(--accent-light);
-    box-shadow: 0 0 25px var(--accent-light);
-    color: white;
-    z-index: 5;
-}
-
-/* Locked Void = Dormant State */
-.rune-node.locked-void {
-    background: #151515;
-    border-color: #2a2a2a;
-    color: #333;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
-}
-
-/* Legacy: .grid-cell (The dataset) */
-.grid-cell {
-    /* Base + Dataset Role + Large Size */
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    font-weight: bold;
-    user-select: none;
-    transition: all 0.3s; /* Keeping slightly simpler transition from main.css */
-
-    width: 60px;
-    height: 60px;
-    background: #2c332c;
-    border-radius: 4px;
-    border: 2px solid transparent;
-}
+/* Legacy selectors (level-node, rune-node, grid-cell) have been purged 
+   in favor of the Codex-compliant Renderer architecture. */
 
 /* ========================================= */
 /* 8. STRENGTH & RITUAL AMPLIFICATION        */
 /* ========================================= */
 /* Responds to --glyph-strength (0.0 to 1.0) 
    injected by GlyphRenderer.js */
-
-.glyph {
-    /* Calculate intensity: default to 1 if undefined */
-    --intensity: var(--glyph-strength, 1);
-}
 
 /* Strength-based Opacity Modulation */
 .glyph--dataset {
@@ -469,10 +367,10 @@
     box-shadow: 0 4px 0 rgba(70, 130, 180, 0.1); /* The Echo */
 }
 
-/* CATEGORY: UNIQUENESS (The Singularity)
+/* CATEGORY: UNIQUE (The Singularity)
    Context: Unique values, lone stars.
    Metaphor: A holy object, circular and radiant. */
-.glyph--uniqueness {
+.glyph--unique {
     border: 1px dashed var(--rune-gold);
     color: var(--rune-gold);
     border-radius: 50%; /* Distinct from square grid */
@@ -512,7 +410,7 @@
 }
 
 .glyph-icon-marker.glyph--reward,
-.glyph-icon-marker.glyph--uniqueness {
+.glyph-icon-marker.glyph--unique {
     color: var(--rune-gold);
     text-shadow: 0 0 10px var(--rune-gold);
 }
