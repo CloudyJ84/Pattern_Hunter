@@ -66,7 +66,7 @@ export class ChallengeScreen {
         el.className = `screen challenge-screen fade-in ${themeClass}`;
 
         el.innerHTML = `
-            <aside class="nav-panel anchor-zone">
+            <aside class="player-info-pane nav-panel">
                 <div class="nav-top">
                     <button id="withdraw-btn" class="control-btn secondary nav-back">
                         <span class="icon">↩</span> Withdraw
@@ -89,7 +89,7 @@ export class ChallengeScreen {
                 </div>
             </aside>
 
-            <main class="challenge-field ritual-field">
+            <main class="challenge-field field-zone">
                 <div class="grid-wrapper">
                     <div class="dataset-grid" id="grid"></div>
                     
@@ -107,7 +107,7 @@ export class ChallengeScreen {
                     
                     <div class="glyph-bar">
                         ${GLYPHS.map(g => `
-                            <button class="glyph-button glyph" 
+                            <button class="glyph-button" 
                                 data-glyph="${g.id}" 
                                 data-glyph-name="${g.name}"
                                 title="${g.desc}">
@@ -120,7 +120,7 @@ export class ChallengeScreen {
                 </footer>
             </main>
 
-            <aside class="challenge-panel scroll-zone panel-reveal">
+            <aside class="challenge-info-pane challenge-panel">
                 <div class="scroll-content">
                     <h3 class="panel-header">
                         The Query
@@ -328,7 +328,7 @@ export class ChallengeScreen {
     }
 
     updateGlyphBar(activeGlyphs, analytics) {
-        const glyphEls = this.element.querySelectorAll('.glyph');
+        const glyphEls = this.element.querySelectorAll('.glyph-button');
         glyphEls.forEach(glyph => {
             const id = glyph.dataset.glyph;
             const isActive = activeGlyphs && activeGlyphs.includes(id);
