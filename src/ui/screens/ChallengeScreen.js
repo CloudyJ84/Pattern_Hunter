@@ -120,6 +120,8 @@ export class ChallengeScreen {
                 </footer>
             </main>
 
+            <aside class="lore-pane" id="lore-pane"></aside>
+
             <aside class="challenge-info-pane challenge-panel">
                 <div class="scroll-content">
                     <h3 class="panel-header">
@@ -325,6 +327,48 @@ export class ChallengeScreen {
             this.hintBtn.disabled = false;
             this.hintBtn.classList.remove('used', 'hint-used');
         }
+
+        this._renderLorePane();
+    }
+
+    _renderLorePane() {
+        const lorePane = this.element.querySelector('#lore-pane');
+        if (!lorePane) return;
+
+        const config = this.data.config || {};
+        const narrative = config.narrative || {};
+        const teaching = config.teachingFocus || {};
+
+        const intro = narrative.intro || "";
+        const description = teaching.description || "";
+        const introduces = teaching.introduces || [];
+        const reinforces = teaching.reinforces || [];
+
+        lorePane.innerHTML = `
+            <div class="lore-payload fade-in">
+                <h4 class="lore-title">Lore</h4>
+                <p class="mythic-text">${intro}</p>
+
+                <hr class="lore-divider">
+
+                <h4 class="lore-title">Spreadsheet Insight</h4>
+                <p class="pedagogy-text">${description}</p>
+
+                ${introduces.length > 0 ? `
+                    <hr class="lore-divider">
+                    <h4 class="lore-title">Introduces</h4>
+                    <p class="pedagogy-text">${introduces.join(", ")}</p>
+                ` : ""}
+
+                ${reinforces.length > 0 ? `
+                    <hr class="lore-divider">
+                    <h4 class="lore-title">Reinforces</h4>
+                    <p class="pedagogy-text">${reinforces.join(", ")}</p>
+                ` : ""}
+            </div>
+        `;
+
+        lorePane.classList.add('active');
     }
 
     updateGlyphBar(activeGlyphs, analytics) {
