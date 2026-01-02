@@ -13,19 +13,23 @@
     --void-purple: #4a235a;
     --rune-gold: #daa520;
     --rune-blue: #4682b4;
-    --glass-panel: rgba(20, 30, 25, 0.85);
+    --glass-panel: rgba(20, 30, 25, 0.9);
     --border-subtle: rgba(255, 255, 255, 0.1);
+
+    /* --- CYBER-MYTH FX --- */
+    --shadow-soft: 0 8px 20px rgba(0,0,0,0.55);
+    --glow-accent: 0 0 20px rgba(46, 168, 107, 0.4);
+    --glow-gold: 0 0 15px rgba(218, 165, 32, 0.3);
+    --glow-void: 0 0 20px rgba(74, 35, 90, 0.4);
 
     /* --- RESPONSIVE DIMENSIONS --- */
     --cell-size: clamp(35px, 8vw, 60px); /* Adaptive grid cells */
-    --nav-width: 260px;
-    --panel-width: 320px;
+    --nav-width: 280px;
+    --panel-width: 340px;
     --header-height: 60px;
 }
 
 /* --- THEME OVERRIDES --- */
-/* These classes are applied to the root .screen element */
-
 .theme-scout {
     --accent: #daa520;
     --accent-light: #ffd700;
@@ -48,19 +52,18 @@
     --void-dark: #000000;
 }
 
-/* Reset */
+/* ========================================= */
+/* BASE & RESET                              */
+/* ========================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* Reduced Motion Preference */
 @media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
-    }
+    * { animation: none !important; transition: none !important; }
 }
 
 body {
@@ -68,7 +71,6 @@ body {
     color: var(--text);
     font-family: 'Segoe UI', sans-serif;
     height: 100vh;
-    /* Use dynamic viewport height for mobile browsers */
     height: 100dvh; 
     overflow: hidden;
     transition: background 0.5s ease;
@@ -78,11 +80,10 @@ button {
     cursor: pointer;
     border: none;
     font-family: inherit;
-    /* Prevent blue tap highlight on mobile */
     -webkit-tap-highlight-color: transparent; 
 }
 
-/* Scrollbar Styling */
+/* Cyber-Myth Scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -93,9 +94,9 @@ button {
 ::-webkit-scrollbar-thumb {
     background: var(--accent);
     border-radius: 3px;
+    box-shadow: 0 0 5px var(--accent);
 }
 
-/* Screens */
 .screen {
     width: 100%;
     height: 100%;
@@ -112,20 +113,17 @@ button {
     gap: 20px;
     width: 100%;
     height: 100%;
-    overflow-y: auto; /* Allow scrolling on small vertical screens */
+    overflow-y: auto; 
 }
 
-/* Fade-in animation */
-.fade-in {
-    animation: fadeIn 0.3s ease-out;
-}
+/* Global Animations */
+.fade-in { animation: fadeIn 0.3s ease-out; }
 
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* Loading Screen */
 .loading-screen {
     display: flex;
     flex-direction: column;
@@ -144,63 +142,74 @@ button {
 .game-header {
     padding: 15px;
     background: var(--panel);
-    border-bottom: 1px solid #3a4a3a;
+    border-bottom: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 50;
 }
 
-/* Controls */
+/* Controls & Buttons (Cyber-Myth Unification) */
 .control-btn {
     padding: 8px 16px;
     border-radius: 4px;
-    background: #2d3a2d;
+    background: rgba(45, 58, 45, 0.8);
     color: white;
-    border: 1px solid #3f4f3f;
-    transition: background 0.2s ease, filter 0.2s ease;
+    border: 1px solid var(--border-subtle);
+    transition: all 0.2s ease;
     font-size: 0.9rem;
     white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .control-btn.primary {
     background: var(--accent);
     border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
 }
 
 .control-btn.primary:hover {
     background: var(--accent-light);
+    box-shadow: var(--glow-accent);
 }
 
 .control-btn.secondary {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .control-btn:hover {
     filter: brightness(1.1);
+    transform: translateY(-1px);
 }
 
 .control-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 /* Panels */
 .panel {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--glass-panel);
     padding: 15px;
     border-radius: 8px;
-    border: 1px solid #3a4a3a;
+    border: 1px solid var(--border-subtle);
+    backdrop-filter: blur(4px);
 }
 
 .feedback-panel.success {
     border-color: var(--success);
     background: rgba(46, 204, 113, 0.1);
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);
 }
 
 .feedback-panel.error {
     border-color: var(--error);
     background: rgba(231, 76, 60, 0.1);
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.1);
 }
 
 .hidden {
@@ -213,24 +222,23 @@ button {
 
 .home-screen {
     /* Cosmic Pivot Table Background */
-    background: radial-gradient(circle at center, #1b261b 0%, #0d110d 100%);
+    background: radial-gradient(circle at center, #1b261b 0%, var(--void-dark) 100%);
     position: relative;
     overflow: hidden;
 }
 
-/* Theme-aware backgrounds */
 .home-screen.theme-scout { background: radial-gradient(circle at center, #262420 0%, #0f0e0c 100%); }
 .home-screen.theme-tracker { background: radial-gradient(circle at center, #1b2026 0%, #0d1012 100%); }
 .home-screen.theme-mythic { background: radial-gradient(circle at center, #2a1b2a 0%, #0f0a10 100%); }
 
-/* The Grid Overlay */
+/* The Grid Overlay (Background Matrix) */
 .home-screen::before {
     content: '';
     position: absolute;
     top: -50%; left: -50%; width: 200%; height: 200%;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
     transform: perspective(500px) rotateX(20deg);
     animation: gridDrift 60s linear infinite;
@@ -244,25 +252,24 @@ button {
     position: absolute;
     top: 50%; left: 50%;
     width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    animation: lensBreathe 8s ease-in-out infinite;
+    animation: lensBreathe 8s ease-in-out infinite; /* Conceptually linked to glyph breath */
     pointer-events: none;
     z-index: 0;
 }
 
 .home-content-wrapper {
     position: relative;
-    z-index: 2; /* Above the grid */
+    z-index: 2;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100%;
     width: 100%;
-    padding: 20px 20px 40px 20px; /* Added bottom padding to lift content */
-    /* Ensure content is never clipped if it overflows on small screens */
+    padding: 20px 20px 40px 20px;
     overflow-y: auto; 
 }
 
@@ -303,7 +310,7 @@ button {
 
 /* Flavor Panel */
 .flavor-panel {
-    margin: 30px 0; /* Reduced from 40px to tighten empty space */
+    margin: 30px 0;
     padding: 20px 40px;
     background: rgba(0, 0, 0, 0.4);
     border-left: 1px solid var(--accent);
@@ -331,7 +338,7 @@ button {
     letter-spacing: 1px;
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
     text-align: center;
-    opacity: 0; /* Default hidden */
+    opacity: 0;
     transition: opacity 1.5s ease-in-out;
 }
 
@@ -347,268 +354,52 @@ button {
 .home-start-btn {
     padding: 18px 45px;
     font-size: 1.1rem;
-    font-weight: 700; /* Added for hierarchy */
-    letter-spacing: 2px; /* Increased */
+    font-weight: 700;
+    letter-spacing: 2px;
     text-transform: uppercase;
     background: transparent;
     border: 1px solid var(--accent);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
-}
-
-.home-start-btn::before {
-    content: '';
-    position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    transition: left 0.5s;
+    animation: inevitablePulse 6s ease-in-out infinite;
 }
 
 .home-start-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 25px var(--accent);
+    box-shadow: var(--glow-accent);
     text-shadow: 0 0 8px rgba(255,255,255,0.8);
     transform: scale(1.02);
 }
 
-.home-start-btn:hover::before {
-    left: 100%;
-}
-
 .home-lore-btn {
     background: transparent;
-    border: 1px solid #3a4a3a;
+    border: 1px solid var(--border-subtle);
     color: #777;
     padding: 18px 30px;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 0.9rem;
-    opacity: 0.8; /* Base opacity */
+    opacity: 0.8;
 }
 
 .home-lore-btn:hover {
-    border-color: #555;
+    border-color: #aaa;
     color: #aaa;
     background: rgba(255,255,255,0.02);
     opacity: 1;
 }
 
-/* --- ADDITIVE: HOME SCREEN RITUAL STATES & MOBILE --- */
-
-/* Objective 1 & 2: Ritual States & Pacing */
-.home-content-wrapper .mythic-title,
-.home-content-wrapper .mythic-subtitle,
-.home-content-wrapper .flavor-panel,
-.home-content-wrapper .button-zone {
-    transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Hidden state for initial load */
-.ritual-hidden {
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: none;
-}
-
-/* Revealed state */
-.ritual-revealed {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-}
-
-/* Stagger utilities - Tightened for Better Pacing (600ms-900ms range) */
+/* Home Screen Ritual States */
+.ritual-hidden { opacity: 0; transform: translateY(20px); pointer-events: none; }
+.ritual-revealed { opacity: 1; transform: translateY(0); pointer-events: auto; }
 .ritual-delay-1 { transition-delay: 0.2s; }
 .ritual-delay-2 { transition-delay: 0.6s; }
 .ritual-delay-3 { transition-delay: 0.9s; }
 
-/* Objective 3: Button Hierarchy Refinements */
-.home-start-btn {
-    /* Make the primary action inevitable but not loud */
-    animation: inevitablePulse 6s ease-in-out infinite;
-}
-
-.home-lore-btn {
-    /* Secondary action quieter by default */
-    transition: opacity 0.3s ease, border-color 0.3s ease, background 0.3s ease;
-}
-
-/* Subtitle Pulse for Returning Players */
-.mythic-subtitle.returning {
-    color: var(--accent-light);
-    animation: subtitlePulse 4s ease-in-out infinite;
-}
-
-@keyframes inevitablePulse {
-    0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); border-color: var(--accent); }
-    50% { box-shadow: 0 0 25px rgba(33, 115, 70, 0.25); border-color: var(--accent-light); }
-}
-
-@keyframes subtitlePulse {
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 1; text-shadow: 0 0 10px rgba(46, 168, 107, 0.4); }
-}
-
-/* Objective 4: Mobile Home Adjustments */
-@media (max-width: 480px) {
-    .home-start-btn, .home-lore-btn {
-        width: 100%;
-        max-width: 320px;
-        padding: 16px 20px;
-    }
-    
-    .button-zone {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-        width: 100%;
-    }
-}
-
-/* Lore Modal */
-.lore-modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-    backdrop-filter: blur(5px);
-    transition: opacity 0.3s;
-    padding: 20px;
-}
-
-.lore-content {
-    background: var(--bg);
-    border: 1px solid var(--accent);
-    padding: 40px;
-    width: 100%;
-    max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-    text-align: center;
-    box-shadow: 0 0 50px rgba(0,0,0,0.8);
-    position: relative;
-}
-
-.lore-content h2 {
-    color: var(--accent);
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
-}
-
-.lore-content p {
-    color: #ccc;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    font-size: 1rem;
-}
-
-.lore-content strong { color: white; }
-.lore-content em { color: var(--accent-light); }
-.lore-directive { margin-top: 1.5rem; color: #88a !important; font-style: italic; }
-
-.lore-footer {
-    font-family: monospace;
-    font-size: 0.8rem;
-    color: #555 !important;
-    margin-top: 30px;
-    border-top: 1px solid #333;
-    padding-top: 10px;
-}
-
-/* --- ADDITIVE: CONCEPT TRIAD (Objective 2) --- */
-.concept-triad {
-    display: flex;
-    justify-content: space-evenly; /* Even spacing for the triad */
-    align-items: flex-start;
-    gap: clamp(20px, 4vw, 40px);
-    margin: 30px 0;
-    padding: 25px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
-}
-
-.triad-node {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    opacity: 0.7;
-    transition: all 0.4s ease;
-    min-width: 80px;
-    /* Animation for Entrance */
-    animation: revealNode 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-}
-
-/* Stagger Triad Entrance */
-.triad-node:nth-child(1) { animation-delay: 0.1s; }
-.triad-node:nth-child(2) { animation-delay: 0.2s; }
-.triad-node:nth-child(3) { animation-delay: 0.3s; }
-
-@keyframes revealNode {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 0.7; transform: translateY(0); }
-}
-
-.triad-node:hover {
-    opacity: 1;
-    transform: translateY(-5px);
-}
-
-.triad-icon {
-    font-size: 1.8rem;
-    color: var(--accent);
-    margin-bottom: 5px;
-    filter: drop-shadow(0 0 8px rgba(33, 115, 70, 0.3));
-}
-
-.triad-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #889988;
-    font-weight: 600;
-}
-
-/* Mobile tweak for Triad */
-@media (max-width: 450px) {
-    .concept-triad {
-        flex-direction: column;
-        gap: 20px;
-        align-items: center;
-    }
-    
-    .triad-node {
-        flex-direction: row;
-        width: 100%;
-        justify-content: center;
-        gap: 15px;
-        text-align: left;
-    }
-    
-    .triad-icon {
-        margin-bottom: 0;
-        font-size: 1.5rem;
-    }
-    
-    .triad-label {
-        font-size: 0.85rem;
-    }
-}
-
 /* ========================================= */
-/* MYTHIC INITIATION UI (Level Select)       */
+/* LEVEL SELECT: THE INITIATION              */
 /* ========================================= */
 
 .level-select-ritual {
@@ -619,14 +410,13 @@ button {
     overflow-y: auto;
 }
 
-/* 1. Ritual Header Area */
 .ritual-header {
     padding: 15px 30px;
     display: flex;
     align-items: center;
-    background: rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid #3a4a3a;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.6);
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: var(--shadow-soft);
     z-index: 10;
     flex-wrap: wrap;
     gap: 15px;
@@ -634,7 +424,7 @@ button {
 
 .nav-rune {
     background: transparent;
-    border: 1px solid #3a4a3a;
+    border: 1px solid var(--border-subtle);
     color: #889988;
     padding: 8px 16px;
     border-radius: 4px;
@@ -649,6 +439,7 @@ button {
     border-color: var(--accent);
     color: var(--text);
     background: rgba(255, 255, 255, 0.05);
+    box-shadow: var(--glow-accent);
 }
 
 .title-block {
@@ -673,10 +464,6 @@ button {
     font-family: serif; 
 }
 
-.spacer { width: 90px; display: none; } /* Hidden on mobile by default */
-@media (min-width: 768px) { .spacer { display: block; } }
-
-/* 2. Zones */
 .tier-selection-zone, .level-grid-zone {
     padding: clamp(15px, 4vw, 30px);
     display: flex;
@@ -685,19 +472,6 @@ button {
     gap: 20px;
 }
 
-.section-label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #556655;
-    border-bottom: 1px solid #333;
-    padding-bottom: 5px;
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-}
-
-/* 3. Tier Cards (The Vow) */
 .tier-cards-container {
     display: flex;
     gap: 20px;
@@ -707,12 +481,12 @@ button {
     max-width: 1000px;
 }
 
+/* Tier Card (The Vow) */
 .ritual-card {
     background: rgba(30, 35, 30, 0.7);
-    border: 1px solid #3a4a3a;
+    border: 1px solid var(--border-subtle);
     border-radius: 6px;
     width: 200px;
-    /* Allow shrinking on very small screens */
     min-width: 160px; 
     min-height: 250px;
     position: relative;
@@ -720,6 +494,7 @@ button {
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     overflow: hidden;
+    /* Cyber pattern overlay */
     background-image: 
         linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
@@ -729,7 +504,7 @@ button {
 .ritual-card:hover {
     transform: translateY(-5px);
     background: rgba(40, 45, 40, 0.9);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+    box-shadow: var(--shadow-soft);
 }
 
 .card-inner {
@@ -800,38 +575,32 @@ button {
     border-radius: 2px;
 }
 
-/* 4. Tier Identities (Colors) */
+/* Tier Identities */
 .tier-scout { border-color: #8a7a4a; }
-.tier-scout:hover { border-color: #DAA520; box-shadow: 0 0 15px rgba(218, 165, 32, 0.2); }
-.tier-scout .tier-name { color: #DAA520; }
+.tier-scout:hover { border-color: var(--rune-gold); box-shadow: var(--glow-gold); }
+.tier-scout .tier-name { color: var(--rune-gold); }
 .tier-scout.active { border-color: #FFD700; background: rgba(40, 35, 20, 0.9); }
-.tier-scout .active-indicator { color: #FFD700; border: 1px solid #FFD700; }
 
 .tier-hunter { border-color: #5d4037; }
 .tier-hunter:hover { border-color: #cd7f32; box-shadow: 0 0 15px rgba(205, 127, 50, 0.2); }
 .tier-hunter .tier-name { color: #cd7f32; }
-.tier-hunter.active { border-color: #2ecc71; background: rgba(30, 40, 30, 0.9); }
-.tier-hunter .active-indicator { color: #2ecc71; border: 1px solid #2ecc71; }
+.tier-hunter.active { border-color: var(--success); background: rgba(30, 40, 30, 0.9); }
 
 .tier-tracker { border-color: #34495e; }
-.tier-tracker:hover { border-color: #4682B4; box-shadow: 0 0 15px rgba(70, 130, 180, 0.2); }
+.tier-tracker:hover { border-color: var(--rune-blue); box-shadow: 0 0 15px rgba(70, 130, 180, 0.2); }
 .tier-tracker .tier-name { color: #87CEEB; }
 .tier-tracker.active { border-color: #00BFFF; background: rgba(20, 30, 40, 0.9); }
-.tier-tracker .active-indicator { color: #00BFFF; border: 1px solid #00BFFF; }
 
-.tier-mythic { border-color: #4a235a; background: linear-gradient(135deg, rgba(20,0,20,0.8), rgba(40,0,40,0.8)); }
-.tier-mythic:hover { border-color: #9400D3; box-shadow: 0 0 15px rgba(148, 0, 211, 0.3); }
+.tier-mythic { border-color: var(--void-purple); background: linear-gradient(135deg, rgba(20,0,20,0.8), rgba(40,0,40,0.8)); }
+.tier-mythic:hover { border-color: #9400D3; box-shadow: var(--glow-void); }
 .tier-mythic .tier-name { color: #D8BFD8; text-shadow: 0 0 5px #9400D3; }
 .tier-mythic.active { 
     border-color: #FF00FF; 
     box-shadow: 0 0 30px rgba(255, 0, 255, 0.25); 
-    background: linear-gradient(135deg, #2a0e35, #000);
-    background-size: 200% 200%;
     animation: voidShift 4s ease infinite;
 }
-.tier-mythic .active-indicator { color: #FF00FF; border: 1px solid #FF00FF; }
 
-/* 5. The Path (Runes) */
+/* Runic Grid Container (Layout Only - Nodes are via Glyphs.css) */
 .runic-grid {
     display: flex;
     flex-wrap: wrap;
@@ -840,89 +609,6 @@ button {
     padding: 20px;
     max-width: 800px;
     margin-top: 10px;
-}
-
-.rune-node {
-    width: 60px;
-    height: 60px;
-    position: relative;
-    background: #222;
-    border: 2px solid #444;
-    color: #666;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    transform: rotate(45deg);
-    margin: 10px; 
-}
-
-.rune-node span {
-    transform: rotate(-45deg);
-    display: block;
-}
-
-/* Unlocked Path */
-.rune-node.unlocked-path {
-    background: #1e2e1e;
-    border-color: var(--accent);
-    color: var(--text);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-}
-
-.rune-node.unlocked-path:hover {
-    transform: rotate(45deg) scale(1.15);
-    background: var(--accent);
-    border-color: var(--accent-light);
-    box-shadow: 0 0 25px var(--accent-light);
-    color: white;
-    z-index: 5;
-}
-
-.rune-node.unlocked-path .rune-glow {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
-}
-
-/* Locked Path */
-.rune-node.locked-void {
-    background: #151515;
-    border-color: #2a2a2a;
-    color: #333;
-    cursor: not-allowed;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
-}
-
-/* Animations */
-@keyframes pulseGlow {
-    0% { box-shadow: 0 0 5px var(--accent); }
-    50% { box-shadow: 0 0 20px var(--accent-light); }
-    100% { box-shadow: 0 0 5px var(--accent); }
-}
-
-@keyframes voidShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-@keyframes gridDrift {
-    0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
-    100% { transform: perspective(500px) rotateX(20deg) translateY(-40px); }
-}
-
-@keyframes lensBreathe {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
-    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
-}
-
-.level-select-ritual.ritual-complete .rune-node {
-    transform: rotate(45deg) scale(0);
-    opacity: 0;
 }
 
 /* ========================================= */
@@ -934,26 +620,28 @@ button {
     flex-direction: row;
     background: var(--bg);
     overflow: hidden;
+    position: relative;
 }
 
-/* ZONE A: THE HUNTER'S ANCHOR (Left Nav) */
+/* --- LEFT PANE: PLAYER INFO --- */
+/* .player-info-pane provides the structural contract.
+   .nav-panel is the legacy class maintained for JS selection. */
+.player-info-pane,
 .nav-panel {
     width: var(--nav-width);
     min-width: var(--nav-width);
     background: var(--panel);
-    border-right: 1px solid rgba(255,255,255,0.05);
+    border-right: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
     padding: 20px;
-    z-index: 10;
+    z-index: 20;
     box-shadow: 5px 0 15px rgba(0,0,0,0.3);
     transition: width 0.3s ease;
     overflow-y: auto;
 }
 
-.nav-top {
-    margin-bottom: 30px;
-}
+.nav-top { margin-bottom: 30px; }
 
 .nav-back {
     width: 100%;
@@ -962,6 +650,7 @@ button {
     justify-content: center;
     gap: 8px;
     padding: 12px;
+    color: #889988;
 }
 
 .tier-display {
@@ -973,12 +662,13 @@ button {
     margin-bottom: 20px;
     position: relative;
     overflow: hidden;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
 }
 
 .tier-rune {
     font-size: 3rem;
     margin-bottom: 10px;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
 }
 
 .tier-info .label {
@@ -995,12 +685,6 @@ button {
     text-transform: uppercase;
     margin-bottom: 4px;
 }
-
-/* Tier Colors in Challenge Screen */
-.class-scout { color: var(--rune-gold); text-shadow: 0 0 8px rgba(218, 165, 32, 0.4); }
-.class-hunter { color: var(--accent); text-shadow: 0 0 8px rgba(33, 115, 70, 0.4); }
-.class-tracker { color: var(--rune-blue); text-shadow: 0 0 8px rgba(70, 130, 180, 0.4); }
-.class-mythic { color: #d8bfd8; text-shadow: 0 0 8px rgba(148, 0, 211, 0.4); }
 
 .tier-info .mult {
     font-family: monospace;
@@ -1031,32 +715,31 @@ button {
 .level-indicator .label { font-size: 0.8rem; text-transform: uppercase; display: block; }
 .level-indicator .value { font-size: 2rem; font-weight: bold; font-family: monospace; }
 
-
-/* ZONE B: THE FIELD (Center) */
+/* --- CENTER PANE: THE FIELD --- */
 .challenge-field {
     flex: 1;
     display: flex;
     flex-direction: column;
     position: relative;
-    background: radial-gradient(circle at center, #1b221b 0%, #0e110e 100%);
+    /* Mythic background for the data chamber */
+    background: radial-gradient(circle at center, #1b221b 0%, var(--void-dark) 100%);
     overflow: hidden;
-    /* Ensure content is centerable */
     min-width: 0;
+    z-index: 1;
 }
 
-/* Grid Wrapper with subtle background grid */
 .grid-wrapper {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: clamp(10px, 3vw, 40px);
-    overflow: auto; /* Allow scrolling if grid is large */
+    overflow: auto;
     position: relative;
     z-index: 1;
 }
 
-/* Mythic Background Grid for The Field */
+/* Background Matrix */
 .grid-wrapper::before {
     content: '';
     position: absolute;
@@ -1069,27 +752,14 @@ button {
     z-index: -1;
 }
 
-/* Lens Summary Overlay */
-.lens-summary {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(20, 20, 20, 0.9);
-    border: 1px solid var(--accent);
-    color: var(--text);
-    padding: 10px 20px;
-    border-radius: 4px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    z-index: 20;
-    pointer-events: none;
-    font-size: 0.9rem;
-    font-family: monospace;
-    max-width: 90%;
-    text-align: center;
+/* The Dataset Grid Container */
+.dataset-grid {
+    display: grid;
+    gap: 8px;
+    transition: transform 0.3s ease, gap 0.3s ease;
 }
 
-/* ZONE C: BOTTOM CONTROLS (Glyph Bar) */
+/* Bottom Controls (Glyph Bar) */
 .mythic-controls {
     height: 90px;
     background: var(--glass-panel);
@@ -1110,7 +780,7 @@ button {
     gap: 12px;
     padding: 10px 20px;
     background: rgba(0,0,0,0.3);
-    border: 1px solid #3a4a3a;
+    border: 1px solid var(--border-subtle);
     border-radius: 30px;
     cursor: pointer;
     transition: all 0.3s;
@@ -1120,6 +790,7 @@ button {
 .lens-selector:hover {
     border-color: var(--accent);
     background: rgba(255, 255, 255, 0.05);
+    box-shadow: var(--glow-accent);
 }
 
 .lens-icon { font-size: 1.5rem; }
@@ -1128,11 +799,10 @@ button {
 .glyph-bar {
     display: flex;
     gap: 10px;
-    /* Responsive Scroll */
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 5px; /* Spacing for scrollbar */
+    padding-bottom: 5px;
     scrollbar-width: thin;
 }
 
@@ -1151,7 +821,7 @@ button {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-shrink: 0; /* Prevent squishing on mobile */
+    flex-shrink: 0;
 }
 
 .glyph-icon { font-size: 1.1rem; }
@@ -1166,7 +836,7 @@ button {
     border-color: var(--accent);
     color: var(--accent-light);
     background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    box-shadow: var(--glow-accent);
 }
 
 .glyph-button.active::after {
@@ -1177,15 +847,44 @@ button {
     box-shadow: 0 0 5px var(--accent);
 }
 
-/* ZONE D: THE CHALLENGE SCROLL (Right Panel) */
+/* --- NEW: LORE PANE (THE ORACLE) --- */
+/* Cyber-myth pane layout
+   TODO: Wire lore-pane to narrative systems */
+.lore-pane {
+    /* Initially hidden or collapsed */
+    width: 0;
+    opacity: 0;
+    overflow: hidden;
+    background: var(--glass-panel);
+    border-left: 1px solid var(--border-subtle);
+    backdrop-filter: blur(8px);
+    transition: width 0.3s ease, opacity 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    z-index: 15;
+    /* Oracle Aesthetic */
+    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+}
+
+/* When active (to be toggled via JS in future) */
+.lore-pane.active {
+    width: 250px;
+    opacity: 1;
+    padding: 20px;
+}
+
+/* --- RIGHT PANE: CHALLENGE INFO --- */
+/* .challenge-info-pane provides the structural contract.
+   .challenge-panel is the legacy class maintained for JS. */
+.challenge-info-pane,
 .challenge-panel {
     width: var(--panel-width);
     min-width: var(--panel-width);
     background: var(--panel);
-    border-left: 1px solid rgba(255,255,255,0.05);
+    border-left: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
-    z-index: 10;
+    z-index: 20;
     box-shadow: -5px 0 15px rgba(0,0,0,0.3);
     transition: transform 0.3s ease;
 }
@@ -1216,6 +915,7 @@ button {
     font-size: 1.1rem;
     line-height: 1.5;
     color: #eee;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
 }
 
 .action-area {
@@ -1247,85 +947,7 @@ button {
 
 .hint-btn.used .check { color: var(--success); }
 
-/* GRID INTERACTIONS & LENS EFFECTS */
-
-.dataset-grid {
-    display: grid;
-    gap: 8px;
-    transition: transform 0.3s ease, gap 0.3s ease;
-}
-
-.grid-cell {
-    /* Responsive Cell Size */
-    width: var(--cell-size);
-    height: var(--cell-size);
-    background: #2c332c;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: calc(var(--cell-size) * 0.4); /* Scalable font */
-    transition: all 0.3s;
-    border: 2px solid transparent;
-    position: relative;
-    user-select: none;
-}
-
-/* Formatting (Scale preserved) */
-.fmt-weekend { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
-.fmt-above { color: var(--success); border-color: var(--success); }
-.fmt-below { color: #e74c3c; border-color: #e74c3c; }
-.fmt-outlier { background: #e74c3c; color: white; transform: scale(1.1); box-shadow: 0 0 10px #e74c3c; }
-.fmt-extreme { background: #6c5ce7; color: white; }
-.fmt-ampm { color: #00d2d3; border-color: #00d2d3; }
-.fmt-frequency { border-bottom: 3px solid #e056fd; }
-.fmt-unique { border: 2px dashed #f1c40f; }
-
-/* Standard marked cell */
-.grid-cell.marked {
-    border-color: var(--rune-gold);
-    box-shadow: inset 0 0 0 1px var(--rune-gold);
-}
-
-.grid-cell.marked::after {
-    content: '✖';
-    position: absolute;
-    top: 2px; right: 2px;
-    font-size: 0.6rem;
-    color: var(--rune-gold);
-}
-
-/* Lens Modes */
-.dataset-grid.lens-focus .grid-cell:not(:hover) {
-    opacity: 0.6;
-    filter: blur(1px);
-    transition: opacity 0.2s, filter 0.2s;
-}
-.dataset-grid.lens-focus .grid-cell:hover {
-    transform: scale(1.1);
-    z-index: 10;
-    background: var(--panel);
-    border-color: var(--accent);
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-}
-
-.dataset-grid.lens-xray .grid-cell {
-    background: transparent;
-    border: 1px solid #444;
-    color: #aaa;
-}
-.dataset-grid.lens-xray .grid-cell:hover {
-    background: rgba(255,255,255,0.05);
-    border-color: #fff;
-    color: #fff;
-}
-.dataset-grid.lens-xray .grid-cell.marked {
-    border-color: var(--error);
-    color: var(--error);
-}
-
-/* Visual Feedback Animations */
+/* Animation Utils */
 .challenge-panel.success-pulse { animation: successPulse 0.5s ease-out; }
 .challenge-panel.shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
 
@@ -1342,23 +964,51 @@ button {
     40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
+/* Keyframes - Normalized */
+@keyframes gridDrift {
+    0% { transform: perspective(500px) rotateX(20deg) translateY(0); }
+    100% { transform: perspective(500px) rotateX(20deg) translateY(-40px); }
+}
+
+@keyframes lensBreathe {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+}
+
+@keyframes inevitablePulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.05); border-color: var(--accent); }
+    50% { box-shadow: var(--glow-accent); border-color: var(--accent-light); }
+}
+
+@keyframes subtitlePulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; text-shadow: 0 0 10px rgba(46, 168, 107, 0.4); }
+}
+
+@keyframes voidShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 /* ========================================= */
-/* RESPONSIVE BREAKPOINTS                    */
+/* RESPONSIVE BEHAVIOR                       */
 /* ========================================= */
 
 /* Large Tablets & Small Laptops (max 1200px) */
 @media (max-width: 1200px) {
-    .nav-panel { width: 220px; min-width: 220px; }
-    .challenge-panel { width: 280px; min-width: 280px; }
+    .player-info-pane { width: 220px; min-width: 220px; }
+    .challenge-info-pane { width: 280px; min-width: 280px; }
+    /* Ensure lore pane doesn't crowd out the grid */
+    .lore-pane.active { width: 200px; position: absolute; right: 280px; height: 100%; top: 0; }
 }
 
 /* Portrait Tablets / Large Phones (max 900px) */
 @media (max-width: 900px) {
-    .challenge-screen {
-        flex-direction: column;
-    }
+    .challenge-screen { flex-direction: column; }
     
     /* Nav becomes top bar */
+    .player-info-pane,
     .nav-panel {
         width: 100%;
         min-width: 0;
@@ -1369,6 +1019,7 @@ button {
         padding: 10px 20px;
         align-items: center;
         gap: 20px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
     }
     
     .nav-top { margin-bottom: 0; }
@@ -1379,6 +1030,9 @@ button {
         display: flex; 
         gap: 15px; 
         align-items: center;
+        box-shadow: none;
+        background: transparent;
+        border: none;
     }
     .tier-rune { font-size: 1.5rem; margin-bottom: 0; }
     .level-indicator { margin-top: 0; margin-left: auto; }
@@ -1390,7 +1044,14 @@ button {
         flex-wrap: wrap;
     }
     
+    /* Lore Pane on Mobile: Stacks or hides */
+    .lore-pane { 
+        /* Future implementation for mobile lore: bottom sheet or modal */
+        display: none; 
+    }
+
     /* Panel becomes bottom sheet or scrollable section */
+    .challenge-info-pane,
     .challenge-panel {
         width: 100%;
         min-width: 0;
@@ -1398,44 +1059,30 @@ button {
         border-top: 1px solid var(--border-subtle);
         max-height: 35vh;
         overflow-y: auto;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
     }
 }
 
 /* Phones (max 700px) */
 @media (max-width: 700px) {
-    /* Adjust header for mobile */
     .ritual-header { padding: 10px; justify-content: center; }
     .nav-rune { font-size: 0.8rem; padding: 6px 10px; }
     
-    /* Compact Nav Panel */
-    .nav-panel {
-        padding: 5px 10px;
-        gap: 10px;
-    }
-    .tier-info .label, .tier-info .mult { display: none; } /* Show only name */
+    .player-info-pane, .nav-panel { padding: 5px 10px; gap: 10px; }
+    .tier-info .label, .tier-info .mult { display: none; }
     .nav-back span.icon { font-size: 1.2rem; }
     .nav-back { width: auto; padding: 8px; }
     
-    /* Adjust Field */
     .grid-wrapper { padding: 10px; }
     
-    /* Compact Controls */
     .mythic-controls {
-        flex-direction: column-reverse; /* Glyphs above, lens below or vice versa */
+        flex-direction: column-reverse;
         gap: 10px;
         padding: 10px;
     }
     
-    .lens-selector {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .glyph-bar {
-        width: 100%;
-        justify-content: flex-start;
-        padding-bottom: 10px;
-    }
+    .lens-selector { width: 100%; justify-content: center; }
+    .glyph-bar { width: 100%; justify-content: flex-start; padding-bottom: 10px; }
     
     .glyph-button {
         flex-direction: column;
@@ -1444,30 +1091,41 @@ button {
         font-size: 0.7rem;
         width: 70px;
     }
-    .glyph-name { display: none; } /* Show only icons on very small screens? Or keep small text */
     
-    /* Adjust Panel */
     .scroll-content { padding: 15px; }
     .panel-header { font-size: 1rem; padding-bottom: 10px; }
     .question-container { font-size: 1rem; padding: 10px; }
+    
+    /* Home Screen Mobile */
+    .home-start-btn, .home-lore-btn {
+        width: 100%;
+        max-width: 320px;
+        padding: 16px 20px;
+    }
+    
+    .button-zone {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
 }
 
-/* Very Small Phones (max 400px) */
-@media (max-width: 400px) {
-    .tier-display { display: none; } /* Hide tier info to save space */
-    .level-grid { grid-template-columns: repeat(auto-fill, 40px); }
-    .level-node { width: 40px; height: 40px; font-size: 0.9rem; }
-}
+/* ========================================= */
+/* CONVERGED STYLES & CLEANUP                */
+/* ========================================= */
 
-/* 🔮 Mythic UI: Sigil & Hint System */
+/* Legacy bridges for older JS that hasn't fully migrated to new Renderers yet.
+   Most functional styling is now in glyphs.css, lenses.css, sigils.css. */
 
+/* Query Sigil Text */
 .query-sigil {
     font-size: 1.5rem;
     text-align: center;
     margin-bottom: 10px;
     opacity: 0.9;
     transition: all 0.3s ease;
-    display: block; /* Ensure width for centering */
+    display: block;
 }
 
 .query-sigil.sigil-revealed {
@@ -1479,72 +1137,10 @@ button {
     text-shadow: none;
 }
 
-/* ========================================= */
-/* PATCH: UI VISUAL SYSTEMS INTEGRATION      */
-/* ========================================= */
-
-/* --- SIGIL ICON --- */
-.sigil-icon {
-    font-size: 2rem;
-    line-height: 1;
-    display: inline-block;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    user-select: none;
-}
-
-.sigil-icon.sigil-revealed {
-    opacity: 0.85;
-    transform: scale(1.1);
-}
-
-/* --- LENS BAR --- */
-.lens-button {
-    padding: 6px 10px;
-    margin: 0 4px;
-    border-radius: 4px;
-    border: 1px solid var(--lens-border, #ccc);
-    background: var(--lens-bg, #f5f5f5);
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.lens-button.active {
-    background-color: var(--lens-active-bg, #dfefff);
-    border-color: var(--lens-active-border, #4a90e2);
-    font-weight: 600;
-}
-
-/* Note: This appends to existing .lens-summary styles. 
-   Ensure HTML structure aligns with intended layout (overlay vs inline). */
-.lens-summary {
-    margin-left: 8px;
-    font-size: 0.9rem;
-    opacity: 0.8;
-}
-
-/* --- GLYPH BAR --- */
-.glyph {
-    opacity: 0.4;
-    transition: opacity 0.2s ease, filter 0.2s ease;
-    cursor: default;
-}
-
-.glyph.present {
-    opacity: 1;
-}
-
-.glyph.active {
-    filter: brightness(1.3);
-}
-
-/* --- GRID HIGHLIGHTING --- */
-.grid-cell.highlighted {
-    background-color: var(--highlight-bg, #fff6c4);
-    border-color: var(--highlight-border, #e0b400);
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-/* --- OPTIONAL UX --- */
-.grid-cell:hover {
-    filter: brightness(1.05);
+/* Contextual wrapper for Lens Summary if present in main layout */
+.challenge-field .lens-summary {
+    /* Positioned absolute in field, handled by lenses.css primarily.
+       This block ensures safe defaults if lenses.css fails to load. */
+    z-index: 30;
+    pointer-events: none;
 }
